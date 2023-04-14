@@ -1,0 +1,61 @@
+openapi: 3.0.3
+
+info:
+  title: Event Planning App RESTful API Project
+  version: "1.0"
+  description: The Event Planning App RESTful API Project is an application used for creating and managing events.
+  contact:
+    name: Developer 
+    email: dimas.yudhana@gmail.com
+    url: https://github.com/dimasyudhana
+  license:
+    name: APACHE 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0
+
+externalDocs:
+  description: Visit the Event Planning App GitHub repository for more information.
+  url: https://github.com/wanta-zulfikri/Event-Planning-App.git
+
+servers:
+  - description: "Event Planning App RESTful API Servers"
+    url: https://{environment}.eventplanningapp.com/api/v1
+    variables:
+      environment:
+        default: development
+        enum:
+          - deployment
+          - development
+          - testing
+  - url: https://testing.eventplanningapp.com/api/v1
+
+paths:
+  /auth/register:
+    post:
+      tags:
+        - Authentication
+      summary: Register new user
+      description: Endpoint register new user to the database
+      requestBody:
+        $ref: '#/components/requestBodies/RequestRegisterUser'
+      responses:
+        '200':
+          $ref: '#/components/responses/Response200'  
+        '400':
+          $ref: '#/components/responses/Response400'
+        '500':
+          $ref: '#/components/responses/Response500'
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: Login user
+      description: Endpoint login user to the web-application
+      requestBody: 
+         $ref: '#/components/requestBodies/RequestLoginUser'
+      responses:
+        '200':
+          $ref: '#/components/responses/Response200'
+        '400':
+          $ref: '#/components/responses/Response400'
+        '500':
+          $ref: '#/components/responses/Response500'
