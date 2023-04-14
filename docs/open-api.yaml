@@ -38,14 +38,15 @@ paths:
       summary: Register new user
       description: Endpoint register new user to the database
       requestBody:
-      #  $ref: '#/components/requestBodies/RequestRegisterUser'
+          $ref: '#/components/requestBodies/RequestRegisterUser'
       responses:
         '200':
-          # $ref: '#/components/responses/Response200'  
+          $ref: '#/components/responses/Response200Register'  
         '400':
-          # $ref: '#/components/responses/Response400'
+          $ref: '#/components/responses/Response400'
         '500':
-          # $ref: '#/components/responses/Response500'
+          $ref: '#/components/responses/Response500'
+  
   /auth/login:
     post:
       tags:
@@ -53,15 +54,155 @@ paths:
       summary: Login user
       description: Endpoint login user to the web-application
       requestBody: 
-        #  $ref: '#/components/requestBodies/RequestLoginUser'
+        $ref: '#/components/requestBodies/RequestLoginUser'
       responses:
         '200':
-        #  $ref: '#/components/responses/Response200'
+          $ref: '#/components/responses/Response200Login'
         '400':
-         # $ref: '#/components/responses/Response400'
+          $ref: '#/components/responses/Response400'
         '500':
-        #  $ref: '#/components/responses/Response500'
+          $ref: '#/components/responses/Response500'
 
+components:
+  securitySchemes:
+    bearerAuth:           
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: "Token obtained upon successful login"
+
+  requestBodies:
+    RequestRegisterUser:
+      required: true
+      content:
+        multipart/form-data:
+          schema:
+            $ref: '#/components/schemas/UsersSchemaRegister'
+
+    RequestLoginUser:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UsersSchemaLogin'
+
+  responses:
+
+    Response200Register:
+      description: Successful registration
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                example: 200
+              message:
+                type: string
+                example: "Success Create an Account"
+
+    Response200Login:
+      description: Successful login
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                example: 200
+              message:
+                type: string
+                example: "Successful login, please use this token for further access."
+              token:
+                type: string
+                example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InBldGVyemFsYWlAZ21haWwuY29tIiwicGFzc3dvcmQiOiJAU2VjcmV0MTIzIn0.BZq48TAx5wci2LH48KW5geslrGR2ybr0-5Wol-HyDkI"
+
+    Response400:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                example: 400
+              message:
+                type: string
+                example: "Bad Request"
+
+    Response404:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                example: 404
+              message:
+                type: string
+                example: "The requested resource was not found. Please check your email and password input."
+
+
+    Response500:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                example: 500
+              message:
+                type: string
+                example: "Internal Server Error"
+
+  schemas:
+    UsersSchemaRegister:
+      type: object
+      properties:
+        name:
+          type: string
+        username:
+          type: string
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+        address:
+          type: string
+        password:
+          type: string
+          format: password
+        image:
+          type: string
+          format: binary
+      example:
+        name: "Peter Zalai"
+        username: "peterzalai"
+        email: "peterzalai@gmail.com"
+        phone: "+6281235288543"
+        address: "Denpasar, Bali"
+        password: "@Secret123"
+        image: "peterzalai.png"
+    UsersSchemaLogin:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+      example:
+        email: "peterzalai@gmail.com"
+        password: "@Secret123"
 
   ####################################
   #  Events
