@@ -56,9 +56,9 @@ paths:
       requestBody:
         required: true
         content:
-          application/json:
+          multipart/form-data:
             schema:
-              $ref: '#/components/schemas/UsersSchemaLogin'
+              $ref: '#/components/schemas/UsersLogin'
             examples:
               example1:
                 summary: Example login user id 1
@@ -149,6 +149,25 @@ paths:
         '500':
           $ref: '#/components/responses/Response500'
 
+  /transaction:
+    post:
+      tags:
+        - Transactions
+      summary: Create transaction
+      description: Endpoint to create a new transaction
+      requestBody:
+          $ref: '#/components/requestBodies/RequestTransactionCreate'
+      responses:
+        '200':
+          $ref: '#/components/responses/Response200TransactionCreate'
+        '400':
+          $ref: '#/components/responses/Response400'
+        '401':
+          $ref: '#/components/responses/Response401'
+        '500':
+          $ref: '#/components/responses/Response500'
+
+
 components:
   securitySchemes:
     bearerAuth:           
@@ -164,14 +183,14 @@ components:
       content:
         multipart/form-data:
           schema:
-            $ref: '#/components/schemas/UsersSchemaRegister'
+            $ref: '#/components/schemas/UsersRegister'
 
     RequestLoginUser:
       required: true
       content:
-        application/json:
+        multipart/form-data:
           schema:
-            $ref: '#/components/schemas/UsersSchemaLogin' 
+            $ref: '#/components/schemas/UsersLogin' 
     
     RequestUpdateUser:
       required: true
@@ -179,6 +198,13 @@ components:
         multipart/form-data:
           schema:
             $ref: '#/components/schemas/UserUpdate'
+
+    RequestTransactionCreate:
+      required: true
+      content:
+        multipart/form-data:
+          schema:
+            $ref: '#/components/schemas/RequestTransactionCreate'
 
   responses:
 
@@ -302,6 +328,114 @@ components:
                   type: string
                   example: "Success Deleted an Account"
     
+    Response200TransactionCreate:
+      description: Successful for creating a transaction
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ResponseTransactionCreate'
+          examples:
+            example_transaction_pending:
+              summary: Example transaction pending
+              value:
+                code: 200
+                message: Success created a transaction
+                data:
+                  invoice: "MT00002570"
+                  user_id: 1
+                  event_id: 1
+                  event_date: "2023-04-25 10:15:00"
+                  purchase_startdate: "2023-04-14 20:15:00"
+                  purchase_enddate: "2023-04-17 10:15:00"
+                  status: "pending"
+                  status_date: "2023-04-17 10:15:00"
+                  items:
+                    - name: "Naruto & Hinata Wedding Day"
+                      person: 2
+                      price: 100
+                  subtotal: 200
+                  tax:
+                    description: "Sales tax (10%)"
+                    amount: 10
+                  total_price: 220
+                  payment_type: "paid"
+                  payment_method: "credit_card"
+            example_transaction_completed:
+              summary: Example transaction completed
+              value:
+                code: 200
+                message: Success created a transaction
+                data:
+                  invoice: "MT00002575"
+                  user_id: 2
+                  event_id: 1
+                  event_date: "2023-04-25 10:15:00"
+                  purchase_startdate: "2023-04-14 20:15:00"
+                  purchase_enddate: "2023-04-15 10:15:00"
+                  status: "completed"
+                  status_date: "2023-04-15 07:15:00"
+                  items:
+                    - name: "Naruto & Hinata Wedding Day"
+                      person: 4
+                      price: 100
+                  subtotal: 400
+                  tax:
+                    description: "Sales tax (10%)"
+                    amount: 10
+                  total_price: 440
+                  payment_type: "paid"
+                  payment_method: "alfamart"   
+            example_transaction_failed:
+              summary: Example transaction failed
+              value:
+                code: 200
+                message: Success created a transaction
+                data:
+                  invoice: "MT00002575"
+                  user_id: 3
+                  event_id: 1
+                  event_date: "2023-04-25 10:15:00"
+                  purchase_startdate: "2023-04-14 10:15:00"
+                  purchase_enddate: "2023-04-15 10:15:00"
+                  status: "failed"
+                  status_date: "2023-04-15 05:15:00"
+                  items:
+                    - name: "Naruto & Hinata Wedding Day"
+                      person: 4
+                      price: 100
+                  subtotal: 400
+                  tax:
+                    description: "Sales tax (10%)"
+                    amount: 10
+                  total_price: 440
+                  payment_type: "paid"
+                  payment_method: "alfamart"
+            example_transaction_canceled:
+              summary: Example transaction canceled
+              value:
+                code: 200
+                message: Success created a transaction
+                data:
+                  invoice: "MT00002575"
+                  user_id: 3
+                  event_id: 1
+                  event_date: "2023-04-25 10:15:00"
+                  purchase_startdate: "2023-04-14 10:15:00"
+                  purchase_enddate: "2023-04-15 10:15:00"
+                  status: "canceled"
+                  status_date: "2023-04-15 05:15:00"
+                  items:
+                    - name: "Naruto & Hinata Wedding Day"
+                      person: 4
+                      price: 100
+                  subtotal: 400
+                  tax:
+                    description: "Sales tax (10%)"
+                    amount: 10
+                  total_price: 440
+                  payment_type: "paid"
+                  payment_method: "alfamart"      
+
     Response400:
       description: Bad request
       content:
@@ -316,20 +450,22 @@ components:
                 type: string
                 example: "Bad Request"
 
-    Response404Login:
-      description: Not Found
+    Response401:
+      description: Access token is missing or invalid
       content:
         application/json:
           schema:
             type: object
             properties:
               code:
-                type: integer
-                example: 404
+                type: number                
               message:
+                type: string                
+              data:
                 type: string
-                example: "The requested resource was not found. Please check your email and password input."
-
+            example:
+              code: 401
+              message: "Missing or Malformed JWT"
 
     Response404:
       description: Not Found
@@ -344,6 +480,20 @@ components:
               message:
                 type: string
                 example: "The requested resource was not found."
+
+    Response404Login:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                example: 404
+              message:
+                type: string
+                example: "The requested resource was not found. Please check your email and password input."
 
     Response500:
       description: Internal server error
@@ -360,7 +510,7 @@ components:
                 example: "Internal Server Error"
 
   schemas:
-    UsersSchemaRegister:
+    UsersRegister:
       type: object
       properties:
         name:
@@ -389,7 +539,7 @@ components:
         password: "@Secret123"
         image: "peterzalai.png"
     
-    UsersSchemaLogin:
+    UsersLogin:
       type: object
       properties:
         email:
@@ -457,3 +607,97 @@ components:
         phone: "+6281235288543"
         address: "Denpasar, Bali"
         image: "peterzalai.png"
+
+    RequestTransactionCreate:
+      type: object
+      properties:
+        event_id:
+          type: number
+          example: 1
+        person:
+          type: number
+          example: 2
+        payment_method:
+          type: string
+          enum: [credit_card, debit_card, bank_transfer, e-wallet]
+          example: "credit_card"
+    
+    ResponseTransactionCreate:
+          type: object
+          properties:
+            code:
+              type: integer
+              example: 200
+            message:
+              type: string
+              example: "Success created a transaction"
+            data:
+              type: object
+              properties:
+                invoice:
+                  type: string
+                  example: "MT00002570"
+                user_id:
+                  type: number
+                  example: 1
+                event_id:
+                  type: number
+                  example: 1
+                event_date:
+                  type: string
+                  format: date-time
+                  example: "2023-04-25 10:15:00"
+                purchase_startdate:
+                  type: string
+                  format: date-time
+                  example: "2023-04-16 10:15:00"
+                purchase_enddate:
+                  type: string
+                  format: date-time
+                  example: "2023-04-17 10:15:00"
+                status:
+                  type: string
+                  example: "pending"
+                status_date:
+                  type: string
+                  example: "2023-04-17 10:15:00"
+                items:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                        example: "Naruto & Hinata Wedding Day"
+                      person:
+                        type: number
+                        example: 2
+                      price:
+                        type: number
+                        example: 100
+                subtotal:
+                  type: number
+                  example: 200
+                tax:
+                  type: object
+                  properties:
+                    description:
+                      type: string
+                      example: "Sales tax (10%)"
+                    amount:
+                      type: number
+                      example: 10
+                  example:
+                    description: "Sales tax (10%)"
+                    amount: 10
+                total_price:
+                  type: number
+                  example: 220
+                payment_type:
+                  type: string
+                  enum: [free, paid]
+                  example: "paid"
+                payment_method:
+                  type: string
+                  enum: [credit_card, debit_card, bank_transfer, e-wallet]
+                  example: "credit_card"
