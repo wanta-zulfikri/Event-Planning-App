@@ -17,7 +17,7 @@ externalDocs:
   url: https://github.com/wanta-zulfikri/Event-Planning-App.git
 
 servers:
-  - url: https://{environment}.eventplanningapp.com/api/v1
+  - url: http://{environment}
     description: "Event Planning App RESTful API Servers"
     variables:
       environment:
@@ -25,17 +25,17 @@ servers:
           - deployment
           - localhost:8080
         default: localhost:8080
-  - url: https://deployment.eventplanningapp.com/api/v1
+  - url: http://deployment.eventplanningapp.com/api/v1
     description: "Production server"
-  - url: https://localhost:8000/
+  - url: https://localhost:8080/
     description: "Local development server"
 
 paths:
-  /auth/register:
+  /user/register:
     post:
       tags:
         - Authentication
-      summary: Register new user
+      summary: Register user
       description: Endpoint register new user to the database
       requestBody:
           $ref: '#/components/requestBodies/RequestRegisterUser'
@@ -47,19 +47,105 @@ paths:
         '500':
           $ref: '#/components/responses/Response500'
   
-  /auth/login:
+  /user/login:
     post:
       tags:
         - Authentication
       summary: Login user
       description: Endpoint login user to the web-application
-      requestBody: 
-        $ref: '#/components/requestBodies/RequestLoginUser'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsersSchemaLogin'
+            examples:
+              example1:
+                summary: Example login user id 1
+                value:
+                  email: "peterzalai@gmail.com"
+                  password: "@Secret123"
+              example2:
+                summary: Example login user id 2
+                value:
+                  email: "satriowibowo@gmail.com"
+                  password: "@Secret123"
       responses:
         '200':
           $ref: '#/components/responses/Response200Login'
         '400':
           $ref: '#/components/responses/Response400'
+        '404':
+          $ref: '#/components/responses/Response404'
+        '500':
+          $ref: '#/components/responses/Response500'
+
+  /user:
+    get:
+      tags:
+        - Users
+      summary: Get user profile
+      description: Get user information by their ID
+      parameters:
+        - name: id
+          in: path
+          description: User ID
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          $ref: '#/components/responses/Response200UserGet'
+        '400':
+          $ref: '#/components/responses/Response400'
+        '404':
+          $ref: '#/components/responses/Response404'
+        '500':
+          $ref: '#/components/responses/Response500'
+
+    put:
+      tags:
+        - Users
+      summary: Update user by ID
+      description: Update user information by their ID
+      parameters:
+        - name: id
+          in: path
+          description: User ID
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        $ref: '#/components/requestBodies/RequestUpdateUser'
+      responses:
+        '200':
+          $ref: '#/components/responses/Response200UserUpdate'
+        '400':
+          $ref: '#/components/responses/Response400'
+        '404':
+          $ref: '#/components/responses/Response404'
+        '500':
+          $ref: '#/components/responses/Response500'
+
+    delete:
+      tags:
+        - Users
+      summary: Delete user by ID
+      description: Delete user information by their ID
+      parameters:
+        - name: id
+          in: path
+          description: User ID
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          $ref: '#/components/responses/Response200UserDelete'
+        '400':
+          $ref: '#/components/responses/Response400'
+        '404':
+          $ref: '#/components/responses/Response404'
         '500':
           $ref: '#/components/responses/Response500'
 
@@ -72,6 +158,7 @@ components:
       description: "Token obtained upon successful login"
 
   requestBodies:
+    
     RequestRegisterUser:
       required: true
       content:
@@ -84,7 +171,14 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/UsersSchemaLogin'
+            $ref: '#/components/schemas/UsersSchemaLogin' 
+    
+    RequestUpdateUser:
+      required: true
+      content:
+        multipart/form-data:
+          schema:
+            $ref: '#/components/schemas/UserUpdate'
 
   responses:
 
@@ -111,14 +205,103 @@ components:
             properties:
               code:
                 type: integer
-                example: 200
               message:
                 type: string
-                example: "Successful login, please use this token for further access."
               token:
                 type: string
-                example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InBldGVyemFsYWlAZ21haWwuY29tIiwicGFzc3dvcmQiOiJAU2VjcmV0MTIzIn0.BZq48TAx5wci2LH48KW5geslrGR2ybr0-5Wol-HyDkI"
-
+            example: 
+              code: 200
+              message: "Successful login, please use this token for further access."
+              token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InBldGVyemFsYWlAZ21haWwuY29tIiwicGFzc3dvcmQiOiJAU2VjcmV0MTIzIn0.BZq48TAx5wci2LH48KW5geslrGR2ybr0-5Wol-HyDkI"
+          examples:
+            Example login user id 1:
+              value:
+                code: 200
+                message: "Successful login, please use this token for further access."
+                token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InBldGVyemFsYWlAZ21haWwuY29tIiwicGFzc3dvcmQiOiJAU2VjcmV0MTIzIn0.BZq48TAx5wci2LH48KW5geslrGR2ybr0-5Wol-HyDkI"
+            Example login user id 2:
+              value:
+                code: 200
+                message: "Successful login, please use this token for further access."
+                token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImpvaG5ib2FzdEBnbWFpbC5jb20iLCJwYXNzd29yZCI6IiRzYW1wbGUxMjMifQ.1Tq3XNnmNcv_cFZ0YdBUV8juv0x26bV7jK00aUOQ6U0"
+    
+    Response200UserGet:    
+          description: Get user profile information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+              examples:
+                example 1:
+                  summary: Example user id 1
+                  value:
+                    name: "Peter Zalai"
+                    username: "peterzalai"
+                    email: "peterzalai@gmail.com"
+                    phone: "+6281235288543"
+                    address: "Denpasar, Bali"
+                    image: "peterzalai.png"
+                example 2:
+                  summary: Example user id 2
+                  value:
+                    name: "Satrio Wibowo"
+                    username: "satriowibowo"
+                    email: "satriowibowo@gmail.com"
+                    phone: "+6281235299999"
+                    address: "Jakarta, Indonesia"
+                    image: "satriowibowo.png"
+                example 3:
+                  summary: Example user id 3
+                  value:
+                    name: "Wanta Zulfikri"
+                    username: "wantazulfikri"
+                    email: "wantazulfikri@gmail.com"
+                    phone: "+6281235288999"
+                    address: "Tangerang, Jawa Barat"
+                    image: "wantazulfikri.png"
+    
+    Response200UserUpdate:
+        description: User information updated successfully
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+            examples:
+              example update 1:
+                summary: Example update user id 1
+                value:
+                  name: "Peter Zalai"
+                  username: "peterzalai"
+                  email: "peterzalai@gmail.com"
+                  phone: "+6281333555777"
+                  address: "Jakarta, Bali"
+                  password: "@Secret123"
+                  image: "peterzalai.png"
+              example update 2:
+                summary: Example update user id 3
+                value:
+                  name: "Wanta Zulfikri"
+                  username: "wantazulfikri"
+                  email: "wzulfikri@gmail.com"
+                  phone: "+6281235666777"
+                  address: "Semarang, Jawa Tengah"
+                  password: "@Secret123"
+                  image: "wantazulfikri.png"
+    
+    Response200UserDelete:
+        description: User information deleted successfully
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                code:
+                  type: integer
+                  example: 200
+                message:
+                  type: string
+                  example: "Success Deleted an Account"
+    
     Response400:
       description: Bad request
       content:
@@ -146,7 +329,6 @@ components:
               message:
                 type: string
                 example: "The requested resource was not found. Please check your email and password input."
-
 
     Response500:
       description: Internal server error
@@ -191,6 +373,7 @@ components:
         address: "Denpasar, Bali"
         password: "@Secret123"
         image: "peterzalai.png"
+    
     UsersSchemaLogin:
       type: object
       properties:
@@ -203,3 +386,59 @@ components:
       example:
         email: "peterzalai@gmail.com"
         password: "@Secret123"
+    
+    User:
+      type: object
+      properties:
+        name:
+          type: string
+        username:
+          type: string
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+        address:
+          type: string
+        password:
+          type: string
+          format: password
+        image:
+          type: string
+          format: binary
+      example:
+        name: "Peter Zalai"
+        username: "peterzalai"
+        email: "peterzalai@gmail.com"
+        phone: "+6281235288543"
+        address: "Denpasar, Bali"
+        image: "peterzalai.png"
+    
+    UserUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        username:
+          type: string
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+        address:
+          type: string
+        password:
+          type: string
+          format: password
+        image:
+          type: string
+          format: binary
+      example:
+        name: "Peter Zalai"
+        username: "peterzalai"
+        email: "peterzalai@gmail.com"
+        phone: "+6281235288543"
+        address: "Denpasar, Bali"
+        image: "peterzalai.png"
