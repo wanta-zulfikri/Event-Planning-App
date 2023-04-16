@@ -58,7 +58,7 @@ paths:
         content:
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/UsersLogin'
+              $ref: '#/components/schemas/UserLogin'
             examples:
               example1:
                 summary: Example login user id 1
@@ -84,7 +84,7 @@ paths:
     get:
       tags:
         - Users
-      summary: Get user profile
+      summary: Get user profile by ID
       description: Get user information by their ID
       parameters:
         - name: id
@@ -103,12 +103,12 @@ paths:
         '500':
           $ref: '#/components/responses/Response500'
       security:
-        - bearerAuth: []
+        - bearerAuth : []
 
     put:
       tags:
         - Users
-      summary: Update user by ID
+      summary: Update user profile by ID
       description: Update user information by their ID
       parameters:
         - name: id
@@ -124,17 +124,20 @@ paths:
           $ref: '#/components/responses/Response200UserUpdate'
         '400':
           $ref: '#/components/responses/Response400'
+        '401':
+          $ref: '#/components/responses/Response401'
         '404':
           $ref: '#/components/responses/Response404'
         '500':
           $ref: '#/components/responses/Response500'
       security:
-        - bearerAuth: []
+        - bearerAuth : []
+
 
     delete:
       tags:
         - Users
-      summary: Delete user by ID
+      summary: Delete user profile by ID
       description: Delete user information by their ID
       parameters:
         - name: id
@@ -148,6 +151,8 @@ paths:
           $ref: '#/components/responses/Response200UserDelete'
         '400':
           $ref: '#/components/responses/Response400'
+        '401':
+          $ref: '#/components/responses/Response401'  
         '404':
           $ref: '#/components/responses/Response404'
         '500':
@@ -173,10 +178,95 @@ paths:
         '500':
           $ref: '#/components/responses/Response500'
       security:
-        - bearerAuth: []
+        - bearerAuth : []
 
-components:
-  securitySchemes:
+  /event/:id/reviews:
+    get:
+      tags:
+        - Reviews
+      summary: Get list of reviews
+      description: Get list of reviews on a single event's page
+      parameters:
+        - name: id
+          in: path
+          description: Event ID
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200': 
+          $ref: '#/components/responses/Response200ReviewGet'
+        '400':
+          $ref: '#/components/responses/Response400' 
+        '404':
+          $ref: '#/components/responses/Response404' 
+        '500': 
+          $ref: '#/components/responses/Response500'
+      security:
+        - bearerAuth : []
+
+  /event/:id/review:
+    post:
+      tags:
+        - Reviews    
+      summary: Write a review
+      description: Write a review on a single event's page
+      requestBody:
+          $ref: '#/components/requestBodies/RequestReviewCreate'
+      responses:
+        '200':
+          $ref: '#/components/responses/Response200ReviewCreate'  
+        '400':
+          $ref: '#/components/responses/Response400'
+        '401':
+          $ref: '#/components/responses/Response401'
+        '500':
+          $ref: '#/components/responses/Response500'
+      security:
+        - bearerAuth : []
+
+    put:
+      tags:
+        - Reviews
+      summary: Edit a review
+      description: Edit an existing review on a single event's page
+      requestBody:
+          $ref: '#/components/requestBodies/RequestReviewEdit'
+      responses:
+        '200':
+          $ref: '#/components/responses/Response200ReviewEdit'  
+        '400':
+          $ref: '#/components/responses/Response400'
+        '401':
+          $ref: '#/components/responses/Response401'
+        '404':
+          $ref: '#/components/responses/Response404'
+        '500':
+          $ref: '#/components/responses/Response500'
+      security:
+        - bearerAuth : []
+
+    delete:
+      tags:
+        - Reviews
+      summary: Delete a review
+      description: Delete an existing review on a single event's page
+      responses:
+        '200':
+          $ref: '#/components/responses/Response200ReviewDelete'  
+        '400':
+          $ref: '#/components/responses/Response400'
+        '401':
+          $ref: '#/components/responses/Response401'
+        '404':
+          $ref: '#/components/responses/Response404'
+        '500':
+          $ref: '#/components/responses/Response500'
+      security:
+        - bearerAuth : []
+
+components: 
+  securitySchemes:  
     bearerAuth:           
       type: http
       scheme: bearer
@@ -190,14 +280,14 @@ components:
       content:
         multipart/form-data:
           schema:
-            $ref: '#/components/schemas/UsersRegister'
+            $ref: '#/components/schemas/UserRegister'
 
     RequestLoginUser:
       required: true
       content:
         multipart/form-data:
           schema:
-            $ref: '#/components/schemas/UsersLogin' 
+            $ref: '#/components/schemas/UserLogin' 
     
     RequestUpdateUser:
       required: true
@@ -212,6 +302,22 @@ components:
         multipart/form-data:
           schema:
             $ref: '#/components/schemas/RequestTransactionCreate'
+    
+    RequestReviewCreate:
+      required: true
+      content:
+        multipart/form-data:
+          schema:
+            $ref: '#/components/schemas/RequestReviewCreate'
+
+    RequestReviewEdit:
+      required: true
+      content:
+        multipart/form-data:
+          schema:
+            $ref: '#/components/schemas/RequestReviewEdit'
+
+
 
   responses:
 
@@ -443,6 +549,67 @@ components:
                   payment_type: "paid"
                   payment_method: "alfamart"      
 
+    Response200ReviewGet:
+      description: Get list of reviews of event successfully
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ResponseEventReviews'
+
+    Response200ReviewCreate:
+        description: Create a review successfully
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResponseReviewCreate'
+              examples:
+                example create review 1:
+                  summary: Example update review id 1
+                  value:
+                    username: "peterzalai"
+                    image: "peterzalai.png"
+                    review: "A review is a longer, more formal write-up concerning someones work over a set period of time."
+                example create review 2:
+                  summary: Example update review id 2
+                  value:
+                    username: "Carlo"
+                    image: "janedoe.png"
+                    review: "I really enjoyed this event! The performers were amazing and the venue was beautiful."
+
+    Response200ReviewEdit:
+        description: Review edited successfully
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResponseReviewEdit'
+            examples:
+              example edit review 1:
+                summary: Example edit review id 1
+                value:
+                  username: "peterzalai"
+                  image: "peterzalai.png"
+                  review: "A review is a longer, more formal write-up concerning someones work over a set period of time."
+              example edit review 2:
+                summary: Example edit review id 2
+                value:
+                  username: "Carlo"
+                  image: "carlo.png"
+                  review: "I really enjoyed this event! The performers were amazing and the venue was beautiful."
+
+    Response200ReviewDelete:
+        description: Review deleted successfully
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                code:
+                  type: integer
+                  example: 200
+                message:
+                  type: string
+                  example: "Success Deleted a Review"
+
     Response400:
       description: Bad request
       content:
@@ -517,7 +684,7 @@ components:
                 example: "Internal Server Error"
 
   schemas:
-    UsersRegister:
+    UserRegister:
       type: object
       properties:
         name:
@@ -546,7 +713,7 @@ components:
         password: "@Secret123"
         image: "peterzalai.png"
     
-    UsersLogin:
+    UserLogin:
       type: object
       properties:
         email:
@@ -708,3 +875,99 @@ components:
                   type: string
                   enum: [credit_card, debit_card, bank_transfer, e-wallet]
                   example: "credit_card"
+
+    ResponseEventReviews:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 200
+        message:
+          type: string
+          example: "Success created a transaction"
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              username:
+                type: string
+              image:
+                type: string
+                format: binary
+              review:
+                type: string
+            example:
+              - username: "peterzalai"
+                image: "peterzalai.png"
+                review: "A review is a longer, more formal write-up concerning someones work over a set period of time."
+              - username: "Carlo"
+                image: "janedoe.png"
+                review: "I really enjoyed this event! The performers were amazing and the venue was beautiful."
+              - username: "EmilyB"
+                image: "emilyb.png"
+                review: "This was such a fun event! Can't wait for the next one!"
+              - username: "DavidH"
+                image: "davidh.png"
+                review: "I have been to many events in the past, but this one was truly special. I would definitely go again!"
+              - username: "MikeJ"
+                image: "mikej.png"
+                review: "I had high expectations for this event and it did not disappoint! I would definitely attend again."
+            
+    RequestReviewCreate:
+      type: object
+      properties:
+        review:
+          type: string
+    
+    ResponseReviewCreate:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 200
+        message:
+          type: string
+          example: "Success created a transaction"
+        data:
+          properties:
+            username:
+              type: string
+            image:
+              type: string
+              format: binary
+            review:
+              type: string
+          example:
+            - username: "peterzalai"
+              image: "peterzalai.png"
+              review: "Seems quite difficult to give an expression, overall good"
+
+    RequestReviewEdit:
+      type: object
+      properties:
+        review:
+          type: string
+
+    ResponseReviewEdit:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 200
+        message:
+          type: string
+          example: "Success edited a transaction"
+        data:
+          properties:
+            username:
+              type: string
+            image:
+              type: string
+              format: binary
+            review:
+              type: string
+          example:
+            - username: "peterzalai"
+              image: "peterzalai.png"
+              review: "Seems quite difficult to give an expression, overall good"
