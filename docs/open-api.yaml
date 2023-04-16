@@ -133,7 +133,6 @@ paths:
       security:
         - bearerAuth : []
 
-
     delete:
       tags:
         - Users
@@ -149,6 +148,154 @@ paths:
       responses:
         '200':
           $ref: '#/components/responses/Response200UserDelete'
+        '400':
+          $ref: '#/components/responses/Response400'
+        '401':
+          $ref: '#/components/responses/Response401'  
+        '404':
+          $ref: '#/components/responses/Response404'
+        '500':
+          $ref: '#/components/responses/Response500'
+      security:
+        - bearerAuth: []
+
+  /events:
+    get:
+      tags:
+        - Events
+      summary: Get list of events
+      description: Get list of events by their ID on the database
+      parameters:
+        - name: id
+          in: path
+          description: Event ID
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          $ref: '#/components/responses/Response200EventGet'
+        '400':
+          $ref: '#/components/responses/Response400'
+        '401':
+          $ref: '#/components/responses/Response401'
+        '404':
+          $ref: '#/components/responses/Response404'
+        '500':
+          $ref: '#/components/responses/Response500'
+      security:
+        - bearerAuth : []
+
+  /event:
+    post:
+      tags:
+        - Events
+      summary: Create a new event
+      description: Endpoint create event to the web-application
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/EventCreate"
+      responses:
+        '200':
+          $ref: '#/components/responses/Response200EventCreate'
+        '400':
+          $ref: '#/components/responses/Response400'
+        '401':
+          $ref: '#/components/responses/Response401'
+        '500':
+          $ref: '#/components/responses/Response500'
+      security:
+        - bearerAuth: []
+
+    put: 
+      tags: 
+        - Events 
+      summary: Update an event by ID 
+      security: 
+        - bearerAuth: [] 
+      parameters:
+        - name: id
+          in: path
+          description: Event ID
+          required: true
+          schema:
+            type: integer
+      requestBody: 
+        description: The updated event 
+        required: true 
+        content: 
+          multipart/form-data: 
+            schema: 
+              type: object 
+              properties: 
+                name: 
+                  type: string  
+                  description: Name of the event 
+                hosted_by: 
+                  type: string 
+                  description: Name of the event host 
+                date: 
+                  type: string 
+                  format: date 
+                  description: Date of the event in ISO format (YYYY-MM-DD) 
+                location: 
+                  type: string 
+                  description: Location of the event 
+                details: 
+                  type: string 
+                  description: Details of the event 
+                event_picture: 
+                  type: string 
+                  format: binary
+                  description: Image of the event 
+      responses: 
+          '200': 
+            $ref: "#/components/responses/Response200EventUpdate" 
+          '400': 
+            $ref: "#/components/responses/Response400"
+          '401':
+            $ref: "#/components/responses/Response401"
+          '404': 
+            description: Event not found 
+            content: 
+              application/json: 
+                schema: 
+                  type: object 
+                  properties: 
+                    message: 
+                      type: string 
+                  example: 
+                    message: "Event not found" 
+          '500': 
+            $ref: "#/components/responses/Response500"
+
+    delete:
+      tags:
+        - Events
+      summary: Delete an event by ID
+      description: Delete event information by event ID
+      parameters:
+        - name: id
+          in: path
+          description: Event ID
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200': 
+          description: Success deleting event  
+          content: 
+            application/json: 
+              schema: 
+                type: object 
+                properties: 
+                  message: 
+                    type: string 
+                example: 
+                  message: "Success deleting event"
         '400':
           $ref: '#/components/responses/Response400'
         '401':
@@ -317,8 +464,6 @@ components:
           schema:
             $ref: '#/components/schemas/RequestReviewEdit'
 
-
-
   responses:
 
     Response200Register:
@@ -440,7 +585,47 @@ components:
                 message:
                   type: string
                   example: "Success Deleted an Account"
-    
+
+    Response200EventGet:
+          description: Get list of event information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+
+    Response200EventCreate:
+      description: Successful Create an Event
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                example: 200
+              message:
+                type: string
+                example: "Success Create an Event"
+
+    Response200EventUpdate:
+      description: Successful response for updating an event
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/EventUpdate'
+          examples:
+            success:
+              value:
+                id: 1 
+                name: "Soundrenaline 2023"
+                hosted_by: "Ravel Entertainment"
+                date: "2023-08-05"
+                location: "Jakarta"
+                details: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s."
+                event_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg"
+                message: "Event information updated successfully"
+                summary: Successful response example
+
     Response200TransactionCreate:
       description: Successful for creating a transaction
       content:
@@ -781,6 +966,127 @@ components:
         phone: "+6281235288543"
         address: "Denpasar, Bali"
         image: "peterzalai.png"
+
+    Event:
+      type: array
+      items:
+        type: object
+        properties: 
+          name: 
+            type: string  
+            description: Nama acara 
+          hosted_by: 
+            type: string 
+            description: Penyelenggara acara 
+          date: 
+            type: string 
+            description: Tanggal acara  
+          location: 
+            type: string  
+            description: Lokasi acara  
+          details: 
+            type: string 
+            description: Detail acara 
+          event_picture: 
+            type: string 
+            format: binary
+        example:
+          - name: "Webinar: Your Product Manager Career by PlayStation Sr PM"
+            hosted_by: "Product School"
+            date: "2023-04-14"
+            location: "Jakarta"
+            details: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
+            event_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg"
+          - name: "udemy: golang goroutines"
+            hosted_by: "Product Udemy"
+            date: "2023-04-15"
+            location: "Jakarta"
+            details: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
+            event_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg"
+          - name: "hackerrank: golang goroutines"
+            hosted_by: "Product Udemy"
+            date: "2023-04-15"
+            location: "Jakarta"
+            details: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
+            event_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg"
+          - name: "pesta rakyat music"
+            hosted_by: "pemda tangerang"
+            date: "2023-08-12"
+            location: "tangerang"
+            details": "hari ulang pemda tangerang berbagai acara musik"
+            event_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg"
+          - name: "pesta rakyat"
+            hosted_by: "dewa 19"
+            date: "2023-08-13"
+            location: "jakarta"
+            details: "dewa 19 30 tahun membawakan lagu hits"
+            event_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg"
+          - name: "MASTERPIECE Timed Then Live Action"
+            hosted_by: "MASTERPIECE HOUSE"
+            date: "2023-07-13"
+            location: "jakarta"
+            details: "Rumah lelang MASTERPIECE berbagai macam seni rupa" 
+            event_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg"
+
+    EventCreate:
+      type: object
+      properties:
+        name: 
+          type: string  
+          description: name event 
+        hosted_by: 
+          type: string 
+          description: host event 
+        date: 
+          type: string 
+          description: date event  
+        location: 
+          type: string  
+          description: location event  
+        details: 
+          type: string 
+          description: details event 
+        event_picture: 
+          type: string 
+          format: binary
+      example: 
+        name: "soundrenaline2023"
+        hosted_by": "Ravel Entertaiment"
+        date: "2023-04-14"
+        location: "Jakarta"
+        details: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
+        event_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg"
+
+    EventUpdate:
+      type: object 
+      properties: 
+        name: 
+          type: string  
+          description: Name of the event 
+        hosted_by: 
+          type: string 
+          description: Name of the event host 
+        date: 
+          type: string 
+          format: date 
+          description: Date of the event in ISO format (YYYY-MM-DD) 
+        location: 
+          type: string 
+          description: Location of the event 
+        details: 
+          type: string 
+          description: Details of the event 
+        event_picture: 
+          type: string 
+          format: binary
+          description: Image of the event 
+      example: 
+        name: "Soundrenaline 2023"
+        hosted_by: "Ravel Entertainment"
+        date: "2023-08-05"
+        location: "Jakarta"
+        details: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s."
+        event_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg"
 
     RequestTransactionCreate:
       type: object

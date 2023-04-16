@@ -4,7 +4,7 @@
     ####################################
 
       /events:
-      post:
+      get:
         
         tags:
           - event
@@ -107,7 +107,7 @@
             500: 
               $ref: "#/components/response/500" 
         
-      get:     
+      post:     
           tags: 
             - event 
           summary: Liat all event
@@ -264,39 +264,39 @@
                 $ref: "#/components/responses/500"
             delete: 
 
-           tags: 
-              - Event 
-           description: delete event by event id 
-            summary: delete event by event id 
-            security: 
-              - JWTAuth: [] 
-           responses:
-              200: 
-                description: success delete event  
-                content: 
-                  application/json: 
-                    schema: 
-                      type: object 
-                      properties: 
-                      message: 
-                        type: string 
-                    example: 
-                      message: " success delete event"
-              400: 
-                $ref: "#/components/responses/Response400" 
-              404: 
-                description: event not found
-                content: 
-                  application/json: 
-                    schema: 
-                      type: object 
-                      properties: 
+            tags: 
+                - Event 
+            description: delete event by event id 
+              summary: delete event by event id 
+              security: 
+                - JWTAuth: [] 
+            responses:
+                200: 
+                  description: success delete event  
+                  content: 
+                    application/json: 
+                      schema: 
+                        type: object 
+                        properties: 
                         message: 
-                        type: string 
+                          type: string 
                       example: 
-                        message: "success delete event" 
-              500: 
-              $ref: "#/components/responses/Response500"  
+                        message: " success delete event"
+                400: 
+                  $ref: "#/components/responses/Response400" 
+                404: 
+                  description: event not found
+                  content: 
+                    application/json: 
+                      schema: 
+                        type: object 
+                        properties: 
+                          message: 
+                          type: string 
+                        example: 
+                          message: "success delete event" 
+                500: 
+                $ref: "#/components/responses/Response500"  
       
       /user/events:
           get:
