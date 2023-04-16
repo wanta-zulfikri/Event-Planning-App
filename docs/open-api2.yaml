@@ -1,0 +1,534 @@
+
+    ####################################
+    #  Events
+    ####################################
+
+      /events:
+      post:
+        
+        tags:
+          - event
+        summary: Create a new event
+        responses:
+          200:
+            description: The event to create
+            content:
+              application/json:
+                schema: 
+                  $ref: "#/components/schemas/EventSchemaseeventtocreaate"
+                example:
+                  event:
+                    [
+                      {
+                        "name": "Webinar: Your Product Manager Career by PlayStation Sr PM",
+                        "hosted_by": "Product School",
+                        "date": "2023-04-14",
+                        "location": "Jakarta",
+                        "details": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
+                        "event_picture": "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg",
+                      },
+                      {
+                        "name": "udemy: golang goroutines",
+                        "hosted_by": "Product Udemy",
+                        "date": "2023-04-15",
+                        "location": "Jakarta",
+                        "details": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
+                        "event_picture": "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg",
+                      },
+                      {
+                        "name": "hackerrank: golang goroutines",
+                        "hosted_by": "Product Udemy",
+                        "date": "2023-04-15",
+                        "location": "Jakarta",
+                        "details": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
+                        "event_picture": "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg",
+    
+                      },
+                      {
+                        "name": "pesta rakyat music",
+                        "hosted_by": "pemda tangerang",
+                        "date": "2023-08-12", 
+                        "location": "tangerang", 
+                        "details": "hari ulang pemda tangerang berbagai acara musik",
+                        "event_picture": "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg",
+                      },
+                      {
+                        "name": "pesta rakyat",
+                        "hosted_by": "dewa 19", 
+                        "date": "2023-08-13", 
+                        "location": "jakarta", 
+                        "details": "dewa 19 30 tahun membawakan lagu hits",
+                        "event_picture": "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg",
+                      },
+                      {
+                        "name": "MASTERPIECE Timed Then Live Action", 
+                        "hosted_by": "MASTERPIECE HOUSE",
+                        "date": "2023-07-13",
+                        "location": "jakarta", 
+                        "details": "Rumah lelang MASTERPIECE berbagai macam seni rupa", 
+                        "event_picture": "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg",
+                      },
+                      {
+                        "name": "AremaFC vs BhayangkaraFC", 
+                        "hosted_by": "PSSI Liga 1 indonesia", 
+                        "date": "2023-04-13", 
+                        "location": "Stadion Olah Raga PTIK", 
+                        "details" : "pertandingan sepak bola",
+                        "event_picture": "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg",
+                      },
+                      {
+                        "name": "OtherSoundVol#2", 
+                        "hosted_by": "amazzone world", 
+                        "date": "2023-05-21", 
+                        "location": "amazzone world-jababeka cikarang", 
+                        "details": "acara musik berbagai musisi", 
+                        "event_picture": "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg",
+                      }, 
+                      {
+                        "name": "SHOPPING MARATHON", 
+                        "hosted_by": "Central Park", 
+                        "date": "2023-04-15", 
+                        "location": "Laguna Atrium", 
+                        "details": "SHOPPING MARATHON TILL MIDNIGHT", 
+                        "event_picture": "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg",
+                      },
+                      {
+                        "name": "SOUNDS FEST 2023", 
+                        "hosted_by": "PAYDAY ALLERT", 
+                        "date": "2023-04-15", 
+                        "location": "Summarecon mall bekasi", 
+                        "details": "SOUNDS FEST Sounds People, it's the end the month", 
+                        "event_picture": "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg",
+                      },
+                    ]
+                  message: success show all event 
+            400: 
+              $ref: "#/components/response/400" 
+            500: 
+              $ref: "#/components/response/500" 
+        
+      get:     
+          tags: 
+            - event 
+          summary: Liat all event
+          security: 
+            - JWTAuth: [] 
+          requestBody: 
+            description:  get all event 
+            required: true 
+            content: 
+              multipart/form-data: 
+                schema: 
+                  type: object 
+                  properties: 
+                    name: 
+                      type: string  
+                      description: name event 
+                    hosted_by: 
+                      type: string 
+                      description: host event 
+                    date: 
+                      type: string 
+                      description: date event  
+                    location: 
+                      type: string  
+                      description: location event  
+                    details: 
+                      type: string 
+                      description: details event 
+                    event_picture: 
+                      type: string 
+                      format: binary
+                example: 
+                    name: "soundrenaline2023"
+                    hosted_by": "Ravel Entertaiment"
+                    date: "2023-04-14"
+                    location: "Jakarta"
+                    details: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
+                    event_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg"
+          responses: 
+            201:   
+              description: "Success insert event"
+              content:
+                application/json: 
+                  schema: 
+                    type: object 
+                    properties: 
+                        message: 
+                        type: string 
+                  example: 
+                        message: "success get a event" 
+            400: 
+              $ref: "#/components/responses/400" 
+            500:
+              $ref: "#/components/responses/500"  
+      
+      /events/{event_id}: 
+            parameters: 
+              - in: path 
+                name: event_id 
+                required: true 
+                description: The ID of the event to retrieve or update 
+                schema: 
+                  type: integer  
+            get: 
+
+              tags: 
+                - event 
+              summary: Get a event by ID 
+              responses: 
+                200: 
+                  description: "get event details"
+                  content: 
+                    application/json: 
+                      schema: 
+                        $ref: "#/components/schemas/responseObject"
+                      example: 
+                          event: 
+                          id: 1
+                          "name": "soundrenaline2023"
+                          "hosted_by": "Ravel Entertaiment"
+                          "date": "2023-04-14"
+                          "location": "Jakarta"
+                          "details": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
+                          "event_picture": "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg"
+                      message: "success get event details"
+                400: 
+                  $ref: "#/components/responses/400" 
+                500: 
+                  $ref: "#/components/responses/500" 
+            put: 
+
+            tags: 
+              - event 
+            summary: Update a event by ID 
+            security: 
+              - JWTAuth: [] 
+            requestBody: 
+              description: The updated book 
+              required: false 
+              content: 
+                multipart/form-data: 
+                  schema: 
+                  type: object 
+                  properties: 
+                    name: 
+                      type: string  
+                      description: name event 
+                    hosted_by: 
+                      type: string 
+                      description: host event 
+                    date: 
+                      type: string 
+                      description: date event 
+                    location: 
+                      type: string 
+                      description: location event 
+                    details: 
+                      type: string 
+                      description: details event 
+                    event_picture: 
+                      type: string 
+                      format: binary
+            responses: 
+              200: 
+                description: success update event 
+                content: 
+                  application/json: 
+                    schema: 
+                    $ref: "#/components/schemas/responseObject" 
+                  example:
+                  data: 
+                    id: 1 
+                    "name": "soundrenaline2023"
+                    "hosted_by": "Ravel Entertaiment"
+                    "date": "2023-04-14"
+                    "location": "Jakarta"
+                    "details": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
+                    "event_picture": "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg"
+                  message: "success update event" 
+              400: 
+                $ref: "#/components/responses/400"
+              404: 
+                description: event not found 
+                content: 
+                  application/json: 
+                    schema: 
+                      type: object 
+                      properties: 
+                      message: 
+                        type: string 
+                      example: 
+                       message: "event not found" 
+              500: 
+                $ref: "#/components/responses/500"
+            delete: 
+
+           tags: 
+              - Event 
+           description: delete event by event id 
+            summary: delete event by event id 
+            security: 
+              - JWTAuth: [] 
+           responses:
+              200: 
+                description: success delete event  
+                content: 
+                  application/json: 
+                    schema: 
+                      type: object 
+                      properties: 
+                      message: 
+                        type: string 
+                    example: 
+                      message: " success delete event"
+              400: 
+                $ref: "#/components/responses/Response400" 
+              404: 
+                description: event not found
+                content: 
+                  application/json: 
+                    schema: 
+                      type: object 
+                      properties: 
+                        message: 
+                        type: string 
+                      example: 
+                        message: "success delete event" 
+              500: 
+              $ref: "#/components/responses/Response500"  
+      
+      /user/events:
+          get:
+            tags:
+              - event
+            summary: Get all events of a user
+            description: Returns all events created by the authenticated user
+            security:
+              - JWTAuth: []
+            responses:
+              '200':
+                description: Returns all events of the authenticated user
+                content:
+                  application/json:
+                    schema:
+                      type: object
+                      properties:
+                        events:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: integer
+                                description: ID of the event
+                              name:
+                                type: string
+                                description: Name of the event
+                              hosted_by:
+                                type: string
+                                description: Name of the entity hosting the event
+                              date:
+                                type: string
+                                format: date
+                                description: Date of the event in the format YYYY-MM-DD
+                              location:
+                                type: string
+                                description: Location of the event
+                              details:
+                                type: string
+                                description: Details of the event
+                              event_picture:
+                                type: string
+                                format: uri
+                                description: URL of the event picture
+                            example:
+                              - id: 1
+                                name: "Soundrenaline2023"
+                                hosted_by: "Ravel Entertainment"
+                                date: "2023-04-14"
+                                location: "Jakarta"
+                                details: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis porttitor ligula eu congue euismod."
+                                event_picture: "https://example.com/soundrenaline2023.jpg"
+                              - id: 2
+                                name: "Pesta Rakyat"
+                                hosted_by: "Dewa 19"
+                                date: "2023-08-13"
+                                location: "Jakarta"
+                                details: "Dewa 19 will perform their hit songs for their 30th anniversary"
+                                event_picture: "https://example.com/pesta-rakyat.jpg"
+                        message:
+                          type: string
+                          description: Success message
+                          example: "Success get all user events"
+              '400':
+                $ref: "#/components/responses/Response400"
+              '401':
+                $ref: "#/components/responses/Response401"
+              '500':
+                $ref: "#/components/responses/Response500"
+
+  ####################################
+  #  Event Participations
+  ####################################      
+
+      /events/participations: 
+      post:
+
+        tags: 
+          - event Participations
+        summary: Create a new event Participations
+        responses:  
+          200:   
+          description:  The event participation create  
+          content: 
+          application/json:
+            schema: 
+              $ref: "#/components/schemas/eventparticipations"
+            example: 
+              event: 
+              [
+                {
+                  "name": "Webinar: Your Product Manager Career by PlayStation Sr PM",
+                    "hosted_by": "Product School",
+                    "date": "2023-04-14",
+                    "location": "Jakarta",
+                    "details": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
+
+                },
+              ]
+            message: success create event 
+          400: 
+            $ref: "#/components/response/400" 
+          500: 
+            $ref: "#/components/response/500" 
+
+        get: 
+          
+          tags: 
+            - event participation 
+          summary: list all participation 
+          security: 
+            - JWTAuth: []
+          requestBody: 
+            description: get all participation 
+            required: true 
+            content: 
+              multipart/form-data:
+                schema: 
+                name:
+                  type: string 
+                  description: name event participation 
+                hosted_by: 
+                  type: string  
+                  description: host event participation 
+                date: 
+                  type: string 
+                  description: date event participation 
+                location: 
+                  type: string  
+                  description: location event participation 
+                details: 
+                  type: string 
+                  description: details event participation  
+          example: 
+                  name: "soundrenaline2023"
+                  hosted_by": "Ravel Entertaiment"
+                  date: "2023-04-14"
+                  location: "Jakarta"
+                  details: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
+          responses: 
+            201: 
+              description: "Success insert event participation" 
+              content: 
+                application/json: 
+                  schema: 
+                      type: object 
+                      properties: 
+                        message : 
+                        type: string  
+                  example: 
+                      message: "success get event participation"
+            400: 
+              $ref: "#/components/responses/400"
+            500: 
+              $ref: "#/components/responses/500" 
+
+  ####################################
+  #  Events comment
+  ####################################
+        
+      /events/comments:
+      post: 
+
+      tags: 
+        - event comment 
+      summary: Create a event comment 
+      responses: 
+        200: 
+          description: The event comment to create 
+          content: 
+            application/json: 
+            schema: 
+              $ref: "#/components/shemas/eventcomment" 
+            example: 
+              event: 
+                [
+                {               
+                  "event_id": 12,
+                  "user_id": 27,
+                  "comment": "I think this is great event"
+                },
+                {
+                  "event_id": 13,
+                  "user_id": 28, 
+                  "comment": "I think this is great event"
+                },
+                ]
+            message: success comment event created
+        400: 
+          $ref: "#/components/response/400"
+        500:
+          $ref: "#/components/response/500" 
+
+      get: 
+          tags: 
+            - event comment 
+          summary: list event comments 
+          requestBody: 
+            description: list event comments 
+            required: true 
+            content: 
+              multipart/form-data: 
+                schema: 
+                  type: object 
+                  properties: 
+                  event_id: 
+                    type: integer 
+                    description: event id 
+                  user_id: 
+                    type: integer 
+                    description: user id 
+                  comment: 
+                    type: string  
+                    description: event comment 
+                example: 
+                    event_id: 12,
+                    user_id: 27,
+                    comment: "I think this is great event"      
+              responses: 
+                201: 
+                description: "success insert event comment" 
+                content: 
+                  application/json:
+                    schema: 
+                    type: object 
+                    properties: 
+                        message: 
+                        type: string 
+                    example: 
+                      message: "success insert event comment" 
+                400: 
+                  $ref: "#/components/responses/400"  
+                500: 
+                  $ref: "#/components/responses/500"
