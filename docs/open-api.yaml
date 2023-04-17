@@ -861,7 +861,6 @@ components:
                   payment_type: "paid"
                   payment_method: "credit_card"
 
-
     Response200AttendeesGet:
       description: Get list of attendees information
       content:
@@ -1441,7 +1440,6 @@ components:
               type: string
               enum: [credit_card, debit_card, bank_transfer, e-wallet]
               example: "credit_card"
-
 
     RequestAttendeesCreate:
       type: object
