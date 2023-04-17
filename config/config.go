@@ -1,6 +1,12 @@
 package config
 
-import "github.com/spf13/viper"
+import (
+	"log"
+	"os"
+
+	"github.com/joho/godotenv"
+	"github.com/spf13/viper"
+)
 
 type Config struct {
 	Database           Database `mapstructure:"Database"`
@@ -34,16 +40,36 @@ type GoogleCloudStorage struct {
 }
 
 func InitConfiguration() (*Config, error) {
+	LoadEnv()
+
 	viper.SetConfigType("json")
 	viper.SetConfigName("config")
 	viper.AddConfigPath(".")
 	if err := viper.ReadInConfig(); err != nil {
-		return nil, err
+		log.Println("Viper failed to read config, attempting to read from environment variables...")
 	}
-	viper.AutomaticEnv()
+
 	var config Config
 	if err := viper.Unmarshal(&config); err != nil {
 		return nil, err
 	}
+
+	if config.Database.Host == "" {
+		var defaultConfig Config
+		defaultConfig.Database.Host = os.Getenv("Host")
+		defaultConfig.Database.Name = os.Getenv("Name")
+		defaultConfig.Database.Port = os.Getenv("Port")
+		defaultConfig.Database.Username = os.Getenv("Username")
+		defaultConfig.Database.Password = os.Getenv("Password")
+		return &defaultConfig, nil
+	}
+
 	return &config, nil
+}
+
+func LoadEnv() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Println("Error loading .env file, will use environment variables instead.")
+	}
 }
