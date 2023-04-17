@@ -1,712 +1,554 @@
-openapi: 3.0.3
+  openapi: 3.0.3
 
-info:
-  title: Event Planning App RESTful API Project
-  version: "1.0"
-  description: The Event Planning App RESTful API Project is an application used for creating and managing events.
-  contact:
-    name: Developer 
-    email: dimas.yudhana@gmail.com
-  license:
-    name: APACHE 2.0
-    url: https://www.apache.org/licenses/LICENSE-2.0
+  info:
+    title: Event Planning App RESTful API Project
+    version: "1.0"
+    description: The Event Planning App RESTful API Project is an application used for creating and managing events.
+    contact:
+      name: Developer 
+      email: dimas.yudhana@gmail.com
+    license:
+      name: APACHE 2.0
+      url: https://www.apache.org/licenses/LICENSE-2.0
 
-externalDocs:
-  description: Visit the Event Planning App GitHub repository for more information.
-  url: https://github.com/wanta-zulfikri/Event-Planning-App.git
+  externalDocs:
+    description: Visit the Event Planning App GitHub repository for more information.
+    url: https://github.com/wanta-zulfikri/Event-Planning-App.git
 
-servers:
-  - url: http://{environment}
-    description: "Event Planning App RESTful API Servers"
-    variables:
-      environment:
-        enum:
-          - SwaggerHub API Auto Mocking
-          - peterzalai.biz.id
-          - localhost:8080
-        default: SwaggerHub API Auto Mocking
-  - url: https://virtserver.swaggerhub.com/dimasyudhana/EventPlanningApp/1.0.5
-    description: "SwaggerHub API Auto Mocking"
-  - url: http://peterzalai.biz.id/
-    description: "Deployment server"
-  - url: https://localhost:8080/
-    description: "Development server"
+  servers:
+    - url: http://{environment}
+      description: "Event Planning App RESTful API Servers"
+      variables:
+        environment:
+          enum:
+            - SwaggerHub API Auto Mocking
+            - peterzalai.biz.id
+            - localhost:8080
+          default: SwaggerHub API Auto Mocking
+    - url: https://virtserver.swaggerhub.com/dimasyudhana/EventappRESTfulAPI/1.0
+      description: "SwaggerHub API Auto Mocking"
+    - url: http://peterzalai.biz.id/
+      description: "Deployment server"
+    - url: https://localhost:8080/
+      description: "Development server"
 
-paths:
-  /register:
-    post:
-      tags:
-        - Authentication
-      summary: Register user
-      description: Endpoint register new user to the database
-      requestBody:
-          $ref: '#/components/requestBodies/RequestRegisterUser'
-      responses:
-        '201':
-          $ref: '#/components/responses/Response201Register'  
-        '400':
-          $ref: '#/components/responses/Response400'
-        '500':
-          $ref: '#/components/responses/Response500'
+  paths:
+    /register:
+      post:
+        tags:
+          - Authentication
+        summary: Register user
+        description: Endpoint register new user to the database
+        requestBody:
+            $ref: '#/components/requestBodies/RequestRegisterUser'
+        responses:
+          '201':
+            $ref: '#/components/responses/Response201Register'  
+          '400':
+            $ref: '#/components/responses/Response400'
+          '500':
+            $ref: '#/components/responses/Response500'
 
-  /login:
-    post:
-      tags:
-        - Authentication
-      summary: Login user
-      description: Endpoint login user to the web-application
-      requestBody:
-        required: true
-        content:
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/UserLogin'
-            examples:
-              example1:
-                summary: Example login user id 1
-                value:
-                  email: "peterzalai@gmail.com"
-                  password: "@Secret123"
-              example2:
-                summary: Example login user id 2
-                value:
-                  email: "satriowibowo@gmail.com"
-                  password: "@Secret123"
-      responses:
-        '200':
-          $ref: '#/components/responses/Response200Login'
-        '400':
-          $ref: '#/components/responses/Response400'
-        '404':
-          $ref: '#/components/responses/Response404Login'
-        '500':
-          $ref: '#/components/responses/Response500'
-
-  /users:
-    get:
-      tags:
-        - Users
-      summary: Get user profile by ID
-      description: Get user information by their ID
-      parameters:
-        - name: id
-          in: path
-          description: User ID
+    /login:
+      post:
+        tags:
+          - Authentication
+        summary: Login user
+        description: Endpoint login user to the web-application
+        requestBody:
           required: true
-          schema:
-            type: integer
-      responses:
-        '200':
-          $ref: '#/components/responses/Response200UserGet'
-        '400':
-          $ref: '#/components/responses/Response400'
-        '404':
-          $ref: '#/components/responses/Response404'
-        '500':
-          $ref: '#/components/responses/Response500'
-      security:
-        - bearerAuth : []
-
-    put:
-      tags:
-        - Users
-      summary: Update user profile by ID
-      description: Update user information by their ID
-      parameters:
-        - name: id
-          in: path
-          description: User ID
-          required: true
-          schema:
-            type: integer
-      requestBody:
-        $ref: '#/components/requestBodies/RequestUpdateUser'
-      responses:
-        '200':
-          $ref: '#/components/responses/Response200UserUpdate'
-        '400':
-          $ref: '#/components/responses/Response400'
-        '401':
-          $ref: '#/components/responses/Response401'
-        '404':
-          $ref: '#/components/responses/Response404'
-        '500':
-          $ref: '#/components/responses/Response500'
-      security:
-        - bearerAuth : []
-
-    delete:
-      tags:
-        - Users
-      summary: Delete user profile by ID
-      description: Delete user information by their ID
-      parameters:
-        - name: id
-          in: path
-          description: User ID
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200':
-          $ref: '#/components/responses/Response200UserDelete'
-        '400':
-          $ref: '#/components/responses/Response400'
-        '401':
-          $ref: '#/components/responses/Response401'  
-        '404':
-          $ref: '#/components/responses/Response404'
-        '500':
-          $ref: '#/components/responses/Response500'
-      security:
-        - bearerAuth: []
-  
-  /events/{id}:
-    get:
-      tags:
-        - Events
-      summary: Get an event by ID
-      description: Get an event by their ID on the database
-      parameters:
-        - name: id
-          in: path
-          description: Event ID
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200':
-          $ref: '#/components/responses/Response200EventGet'
-        '400':
-          $ref: '#/components/responses/Response400'
-        '401':
-          $ref: '#/components/responses/Response401'
-        '404':
-          $ref: '#/components/responses/Response404'
-        '500':
-          $ref: '#/components/responses/Response500'
-      security:
-        - bearerAuth : []
-
-  /events:
-    get:
-      tags:
-        - Events
-      summary: Get list of event
-      description: Get list of event on the database
-      responses:
-        '200':
-          $ref: '#/components/responses/Response200EventListGet'
-        '400':
-          $ref: '#/components/responses/Response400'
-        '401':
-          $ref: '#/components/responses/Response401'
-        '404':
-          $ref: '#/components/responses/Response404'
-        '500':
-          $ref: '#/components/responses/Response500'
-      security:
-        - bearerAuth : []
-
-    post:
-      tags:
-        - Events
-      summary: Create a new event
-      description: Endpoint create event to the web-application
-      requestBody:
-        required: true
-        content:
-          multipart/form-data:
-            schema:
-              $ref: "#/components/schemas/EventCreate"
-      responses:
-        '200':
-          $ref: '#/components/responses/Response200EventCreate'
-        '400':
-          $ref: '#/components/responses/Response400'
-        '401':
-          $ref: '#/components/responses/Response401'
-        '500':
-          $ref: '#/components/responses/Response500'
-      security:
-        - bearerAuth: []
-
-    put: 
-      tags: 
-        - Events 
-      summary: Update an event by ID 
-      security: 
-        - bearerAuth: [] 
-      parameters:
-        - name: id
-          in: path
-          description: Event ID
-          required: true
-          schema:
-            type: integer
-      requestBody: 
-        description: The updated event 
-        required: true 
-        content: 
-          multipart/form-data: 
-            schema: 
-              type: object 
-              properties: 
-                name: 
-                  type: string  
-                  description: Name of the event 
-                hosted_by: 
-                  type: string 
-                  description: Name of the event host 
-                date: 
-                  type: string 
-                  format: date 
-                  description: Date of the event in ISO format (YYYY-MM-DD) 
-                location: 
-                  type: string 
-                  description: Location of the event 
-                details: 
-                  type: string 
-                  description: Details of the event 
-                event_picture: 
-                  type: string 
-                  format: binary
-                  description: Image of the event 
-      responses: 
-          '200': 
-            $ref: "#/components/responses/Response200EventUpdate" 
-          '400': 
-            $ref: "#/components/responses/Response400"
-          '401':
-            $ref: "#/components/responses/Response401"
-          '404': 
-            description: Event not found 
-            content: 
-              application/json: 
-                schema: 
-                  type: object 
-                  properties: 
-                    message: 
-                      type: string 
-                  example: 
-                    message: "Event not found" 
-          '500': 
-            $ref: "#/components/responses/Response500"
-
-    delete:
-      tags:
-        - Events
-      summary: Delete an event by ID
-      description: Delete event information by event ID
-      parameters:
-        - name: id
-          in: path
-          description: Event ID
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200': 
-          description: Success deleting event  
-          content: 
-            application/json: 
-              schema: 
-                type: object
-                properties:
-                  code:
-                    type: integer
-                    example: 200
-                  message:
-                    type: string
-                    example: "Success deleted an event"
-        '400':
-          $ref: '#/components/responses/Response400'
-        '401':
-          $ref: '#/components/responses/Response401'  
-        '404':
-          $ref: '#/components/responses/Response404'
-        '500':
-          $ref: '#/components/responses/Response500'
-      security:
-        - bearerAuth: []
-
-  /events/{id}/transactions:
-    post:
-      tags:
-        - Event Transactions
-      summary: Create transaction for an event
-      description: Endpoint to create a new transaction for an event
-      requestBody:
-          $ref: '#/components/requestBodies/RequestTransactionCreate'
-      responses:
-        '200':
-          $ref: '#/components/responses/Response200TransactionCreate'
-        '400':
-          $ref: '#/components/responses/Response400'
-        '401':
-          $ref: '#/components/responses/Response401'
-        '500':
-          $ref: '#/components/responses/Response500'
-      security:
-        - bearerAuth : []
-  
-    get:
-      tags:
-        - Event Transactions
-      summary: Get transactions for an event
-      description: Endpoint to get all transactions for an event
-      parameters:
-        - name: id
-          in: path
-          description: Transaction ID
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200':
-          $ref: '#/components/responses/Response200TransactionGet'
-        '400':
-          $ref: '#/components/responses/Response400'
-        '401':
-          $ref: '#/components/responses/Response401'
-        '500':
-          $ref: '#/components/responses/Response500'
-      security:
-        - bearerAuth : []
-
-  /events/{id}/attendees:
-    post:
-      tags:
-        - Event Attendees
-      summary: Create attendees for an event
-      description: Endpoint to create attendees for an event on an event profile
-      requestBody:
-          $ref: '#/components/requestBodies/RequestAttendeesCreate'
-      responses:
-        '200':
-          $ref: '#/components/responses/Response200'
-        '400':
-          $ref: '#/components/responses/Response400'
-        '401':
-          $ref: '#/components/responses/Response401'
-        '404':
-          $ref: '#/components/responses/Response404'
-        '500':
-          $ref: '#/components/responses/Response500'
-      security:
-        - bearerAuth: []
-  
-    get:
-      tags:
-        - Event Attendees
-      summary: Get list of attendees for an event
-      description: Get list of attendees for an event on an event profile
-      parameters:
-        - name: id
-          in: path
-          description: ID of The Event Attendees
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200': 
-          $ref: '#/components/responses/Response200EventAttendees'
-        '400':
-          $ref: '#/components/responses/Response400' 
-        '401':
-          $ref: '#/components/responses/Response401'
-        '404':
-          $ref: '#/components/responses/Response404' 
-        '500': 
-          $ref: '#/components/responses/Response500'
-      security:
-        - bearerAuth : []
-
-  /events/{id}/reviews:
-    get:
-      tags:
-        - Event Reviews
-      summary: Get list of reviews
-      description: Get list of reviews on a single event's page
-      parameters:
-        - name: id
-          in: path
-          description: Event ID
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200': 
-          $ref: '#/components/responses/Response200ReviewGet'
-        '400':
-          $ref: '#/components/responses/Response400' 
-        '404':
-          $ref: '#/components/responses/Response404' 
-        '500': 
-          $ref: '#/components/responses/Response500'
-      security:
-        - bearerAuth : []
-
-    post:
-      tags:
-        - Event Reviews   
-      summary: Write a review
-      description: Write a review on a single event's page
-      requestBody:
-          $ref: '#/components/requestBodies/RequestReviewCreate'
-      responses:
-        '200':
-          $ref: '#/components/responses/Response200ReviewCreate'  
-        '400':
-          $ref: '#/components/responses/Response400'
-        '401':
-          $ref: '#/components/responses/Response401'
-        '500':
-          $ref: '#/components/responses/Response500'
-      security:
-        - bearerAuth : []
-
-    put:
-      tags:
-        - Event Reviews
-      summary: Edit a review
-      description: Edit an existing review on a single event's page
-      requestBody:
-          $ref: '#/components/requestBodies/RequestReviewEdit'
-      responses:
-        '200':
-          $ref: '#/components/responses/Response200ReviewEdit'  
-        '400':
-          $ref: '#/components/responses/Response400'
-        '401':
-          $ref: '#/components/responses/Response401'
-        '404':
-          $ref: '#/components/responses/Response404'
-        '500':
-          $ref: '#/components/responses/Response500'
-      security:
-        - bearerAuth : []
-
-    delete:
-      tags:
-        - Event Reviews
-      summary: Delete a review
-      description: Delete an existing review on a single event's page
-      responses:
-        '200':
-          $ref: '#/components/responses/Response200ReviewDelete'  
-        '400':
-          $ref: '#/components/responses/Response400'
-        '401':
-          $ref: '#/components/responses/Response401'
-        '404':
-          $ref: '#/components/responses/Response404'
-        '500':
-          $ref: '#/components/responses/Response500'
-      security:
-        - bearerAuth : []
-
-components: 
-  securitySchemes:  
-    bearerAuth:           
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
-      description: "Token obtained upon successful login"
-
-  requestBodies:
-    
-    RequestRegisterUser:
-      required: true
-      content:
-        multipart/form-data:
-          schema:
-            $ref: '#/components/schemas/UserRegister'
-
-    RequestLoginUser:
-      required: true
-      content:
-        multipart/form-data:
-          schema:
-            $ref: '#/components/schemas/UserLogin' 
-    
-    RequestUpdateUser:
-      required: true
-      content:
-        multipart/form-data:
-          schema:
-            $ref: '#/components/schemas/UserUpdate'
-
-    RequestTransactionCreate:
-      required: true
-      content:
-        multipart/form-data:
-          schema:
-            $ref: '#/components/schemas/RequestTransactionCreate'
-
-    RequestAttendeesCreate:
-      description: Request body containing attendee information
-      required: true
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/RequestAttendeesCreate'
-
-    RequestReviewCreate:
-      required: true
-      content:
-        multipart/form-data:
-          schema:
-            $ref: '#/components/schemas/RequestReviewCreate'
-
-    RequestReviewEdit:
-      required: true
-      content:
-        multipart/form-data:
-          schema:
-            $ref: '#/components/schemas/RequestReviewEdit'
-
-  responses:
-    Response200:
-      description: Successful operation
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              code:
-                type: integer
-                example: 200
-              message:
-                type: string
-                example: "Successful operation"
-
-    Response201Register:
-      description: Successful registration
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              code:
-                type: integer
-                example: 201
-              message:
-                type: string
-                example: "Success Created an Account"
-
-    Response200Login:
-      description: Successful login
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              code:
-                type: integer
-              message:
-                type: string
-              token:
-                type: string
-            example: 
-              code: 200
-              message: "Successful login, please use this token for further access."
-              data:
-                token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InBldGVyemFsYWlAZ21haWwuY29tIiwicGFzc3dvcmQiOiJAU2VjcmV0MTIzIn0.BZq48TAx5wci2LH48KW5geslrGR2ybr0-5Wol-HyDkI"
-          examples:
-            Example login user id 1:
-              value:
-                code: 200
-                message: "Successful login, please use this token for further access."
-                data:
-                  token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InBldGVyemFsYWlAZ21haWwuY29tIiwicGFzc3dvcmQiOiJAU2VjcmV0MTIzIn0.BZq48TAx5wci2LH48KW5geslrGR2ybr0-5Wol-HyDkI"
-            Example login user id 2:
-              value:
-                code: 200
-                message: "Successful login, please use this token for further access."
-                data:
-                  token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImpvaG5ib2FzdEBnbWFpbC5jb20iLCJwYXNzd29yZCI6IiRzYW1wbGUxMjMifQ.1Tq3XNnmNcv_cFZ0YdBUV8juv0x26bV7jK00aUOQ6U0"
-    
-    Response200UserGet:    
-          description: Get user profile information
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/UserLogin'
               examples:
-                example 1:
-                  summary: Example user id 1
+                example1:
+                  summary: Example login user id 1
                   value:
-                    code: 200
-                    message: "Successful Operation"
-                    data:
-                      name: "Peter Zalai"
-                      username: "peterzalai"
-                      email: "peterzalai@gmail.com"
-                      phone: "+6281235288543"
-                      address: "Denpasar, Bali"
-                      image: "peterzalai.png"
-                example 2:
-                  summary: Example user id 2
+                    email: "peterzalai@gmail.com"
+                    password: "@Secret123"
+                example2:
+                  summary: Example login user id 2
                   value:
-                    code: 200
-                    message: "Successful Operation"
-                    data:
-                      name: "Satrio Wibowo"
-                      username: "satriowibowo"
-                      email: "satriowibowo@gmail.com"
-                      phone: ""
-                      address: "Jakarta, Indonesia"
-                      image: "satriowibowo.png"
-                example 3:
-                  summary: Example user id 3
-                  value:
-                    code: 200
-                    message: "Successful Operation"
-                    data:
-                      name: "Wanta Zulfikri"
-                      username: "wantazulfikri"
-                      email: "wantazulfikri@gmail.com"
-                      phone: "+6281235288999"
-                      address: "Tangerang, Jawa Barat"
-                      image: "wantazulfikri.png"
+                    email: "satriowibowo@gmail.com"
+                    password: "@Secret123"
+        responses:
+          '200':
+            $ref: '#/components/responses/Response200Login'
+          '400':
+            $ref: '#/components/responses/Response400'
+          '404':
+            $ref: '#/components/responses/Response404Login'
+          '500':
+            $ref: '#/components/responses/Response500'
+
+    /users:
+      get:
+        tags:
+          - Users
+        summary: Get user profile by ID
+        description: Get user information by their ID
+        responses:
+          '200':
+            $ref: '#/components/responses/Response200UserGet'
+          '400':
+            $ref: '#/components/responses/Response400'
+          '404':
+            $ref: '#/components/responses/Response404'
+          '500':
+            $ref: '#/components/responses/Response500'
+        security:
+          - bearerAuth : []
+
+      put:
+        tags:
+          - Users
+        summary: Update user profile by ID
+        description: Update user information by their ID
+        requestBody:
+          $ref: '#/components/requestBodies/RequestUpdateUser'
+        responses:
+          '200':
+            $ref: '#/components/responses/Response200UserUpdate'
+          '400':
+            $ref: '#/components/responses/Response400'
+          '401':
+            $ref: '#/components/responses/Response401'
+          '404':
+            $ref: '#/components/responses/Response404'
+          '500':
+            $ref: '#/components/responses/Response500'
+        security:
+          - bearerAuth : []
+
+      delete:
+        tags:
+          - Users
+        summary: Delete user profile by ID
+        description: Delete user information by their ID
+        responses:
+          '200':
+            $ref: '#/components/responses/Response200UserDelete'
+          '400':
+            $ref: '#/components/responses/Response400'
+          '401':
+            $ref: '#/components/responses/Response401'  
+          '404':
+            $ref: '#/components/responses/Response404'
+          '500':
+            $ref: '#/components/responses/Response500'
+        security:
+          - bearerAuth: []
+
+    /events:
+      get:
+        tags:
+          - Events
+        summary: Get list of event
+        description: Get list of event on the database
+        responses:
+          '200':
+            $ref: '#/components/responses/Response200EventListGet'
+          '400':
+            $ref: '#/components/responses/Response400'
+          '401':
+            $ref: '#/components/responses/Response401'
+          '404':
+            $ref: '#/components/responses/Response404'
+          '500':
+            $ref: '#/components/responses/Response500'
+        security:
+          - bearerAuth : []
+
+      post:
+        tags:
+          - Events
+        summary: Create a new event
+        description: Endpoint create event to the web-application
+        requestBody:
+          required: true
+          content:
+            multipart/form-data:
+              schema:
+                $ref: "#/components/schemas/EventCreate"
+        responses:
+          '201':
+            $ref: '#/components/responses/Response201EventCreate'
+          '400':
+            $ref: '#/components/responses/Response400'
+          '401':
+            $ref: '#/components/responses/Response401'
+          '500':
+            $ref: '#/components/responses/Response500'
+        security:
+          - bearerAuth: []
+
+    /events/{id}:
+      get:
+        tags:
+          - Events
+        summary: Get an event by ID
+        description: Get an event by their ID on the database
+        parameters:
+          - name: id
+            in: path
+            description: Event ID
+            required: true
+            schema:
+              type: integer
+        responses:
+          '200':
+            $ref: '#/components/responses/Response200EventGet'
+          '400':
+            $ref: '#/components/responses/Response400'
+          '401':
+            $ref: '#/components/responses/Response401'
+          '404':
+            $ref: '#/components/responses/Response404'
+          '500':
+            $ref: '#/components/responses/Response500'
+        security:
+          - bearerAuth : []
+
+      put: 
+        tags: 
+          - Events 
+        summary: Update an event by ID 
+        security: 
+          - bearerAuth: [] 
+        parameters:
+          - name: id
+            in: path
+            description: Event ID
+            required: true
+            schema:
+              type: integer
+        requestBody: 
+          description: The updated event 
+          required: true 
+          content: 
+            multipart/form-data: 
+              schema: 
+                type: object 
+                properties: 
+                  name: 
+                    type: string  
+                    description: Name of the event 
+                  hosted_by: 
+                    type: string 
+                    description: Name of the event host 
+                  date: 
+                    type: string 
+                    format: date 
+                    description: Date of the event in ISO format (YYYY-MM-DD) 
+                  location: 
+                    type: string 
+                    description: Location of the event 
+                  details: 
+                    type: string 
+                    description: Details of the event 
+                  event_picture: 
+                    type: string 
+                    format: binary
+                    description: Image of the event 
+        responses: 
+            '200': 
+              $ref: "#/components/responses/Response200EventUpdate" 
+            '400': 
+              $ref: "#/components/responses/Response400"
+            '401':
+              $ref: "#/components/responses/Response401"
+            '404': 
+              description: Event not found 
+              content: 
+                application/json: 
+                  schema: 
+                    type: object 
+                    properties: 
+                      message: 
+                        type: string 
+                    example: 
+                      message: "Event not found" 
+            '500': 
+              $ref: "#/components/responses/Response500"
+
+      delete:
+        tags:
+          - Events
+        summary: Delete an event by ID
+        description: Delete event information by event ID
+        parameters:
+          - name: id
+            in: path
+            description: Event ID
+            required: true
+            schema:
+              type: integer
+        responses:
+          '200': 
+            description: Success deleting event  
+            content: 
+              application/json: 
+                schema: 
+                  type: object
+                  properties:
+                    code:
+                      type: integer
+                      example: 200
+                    message:
+                      type: string
+                      example: "Success deleted an event"
+          '400':
+            $ref: '#/components/responses/Response400'
+          '401':
+            $ref: '#/components/responses/Response401'  
+          '404':
+            $ref: '#/components/responses/Response404'
+          '500':
+            $ref: '#/components/responses/Response500'
+        security:
+          - bearerAuth: []
+
+    /transactions:
+      post:
+        tags:
+          - Transactions
+        summary: Create transaction for an event
+        description: Endpoint to create a new transaction for an event
+        requestBody:
+            $ref: '#/components/requestBodies/RequestTransactionCreate'
+        responses:
+          '201':
+            $ref: '#/components/responses/Response201TransactionCreate'
+          '400':
+            $ref: '#/components/responses/Response400'
+          '401':
+            $ref: '#/components/responses/Response401'
+          '500':
+            $ref: '#/components/responses/Response500'
+        security:
+          - bearerAuth : []
+
+    /transactions/{id}:  
+      get:
+        tags:
+          - Transactions
+        summary: Get transactions for an event
+        description: Endpoint to get all transactions for an event
+        parameters:
+          - name: id
+            in: path
+            description: Transaction ID
+            required: true
+            schema:
+              type: integer
+        responses:
+          '200':
+            $ref: '#/components/responses/Response200TransactionGet'
+          '400':
+            $ref: '#/components/responses/Response400'
+          '401':
+            $ref: '#/components/responses/Response401'
+          '500':
+            $ref: '#/components/responses/Response500'
+        security:
+          - bearerAuth : []
+
+    /events/{id}/attendees:
+      post:
+        tags:
+          - Event Attendees
+        summary: Create attendees for an event
+        description: Endpoint to create attendees for an event on an event profile
+        parameters:
+        - name: id
+          in: path
+          description: Event ID
+          required: true
+          schema:
+            type: integer
+        requestBody:
+            $ref: '#/components/requestBodies/RequestAttendeesCreate'
+        responses:
+          '201':
+            $ref: '#/components/responses/Response201'
+          '400':
+            $ref: '#/components/responses/Response400'
+          '401':
+            $ref: '#/components/responses/Response401'
+          '404':
+            $ref: '#/components/responses/Response404'
+          '500':
+            $ref: '#/components/responses/Response500'
+        security:
+          - bearerAuth: []
     
-    Response200UserUpdate:
-        description: User information updated successfully
+      get:
+        tags:
+          - Event Attendees
+        summary: Get list of attendees for an event
+        description: Get list of attendees for an event on an event profile
+        parameters:
+          - name: id
+            in: path
+            description: ID of The Event Attendees
+            required: true
+            schema:
+              type: integer
+        responses:
+          '200': 
+            $ref: '#/components/responses/Response200EventAttendees'
+          '400':
+            $ref: '#/components/responses/Response400' 
+          '401':
+            $ref: '#/components/responses/Response401'
+          '404':
+            $ref: '#/components/responses/Response404' 
+          '500': 
+            $ref: '#/components/responses/Response500'
+        security:
+          - bearerAuth : []
+
+    /reviews:
+      post:
+        tags:
+          - Reviews   
+        summary: Write a review
+        description: Write a review on a single event's page
+        requestBody:
+            $ref: '#/components/requestBodies/RequestReviewCreate'
+        responses:
+          '201':
+            $ref: '#/components/responses/Response201ReviewCreate'  
+          '400':
+            $ref: '#/components/responses/Response400'
+          '401':
+            $ref: '#/components/responses/Response401'
+          '404':
+            $ref: '#/components/responses/Response404'
+          '500':
+            $ref: '#/components/responses/Response500'
+        security:
+          - bearerAuth : []
+
+    /reviews/{id}:
+      put:
+        tags:
+          - Reviews
+        summary: Edit a review
+        description: Edit an existing review on a single event's page
+        parameters:
+          - name: id
+            in: path
+            description: Review ID
+            required: true
+            schema:
+              type: integer
+        requestBody:
+            $ref: '#/components/requestBodies/RequestReviewEdit'
+        responses:
+          '200':
+            $ref: '#/components/responses/Response200ReviewEdit'  
+          '400':
+            $ref: '#/components/responses/Response400'
+          '401':
+            $ref: '#/components/responses/Response401'
+          '404':
+            $ref: '#/components/responses/Response404'
+          '500':
+            $ref: '#/components/responses/Response500'
+        security:
+          - bearerAuth : []
+
+      delete:
+        tags:
+          - Reviews
+        summary: Delete a review
+        description: Delete an existing review on a single event's page
+        parameters:
+          - name: id
+            in: path
+            description: Review ID
+            required: true
+            schema:
+              type: integer
+        responses:
+          '200':
+            $ref: '#/components/responses/Response200ReviewDelete'  
+          '400':
+            $ref: '#/components/responses/Response400'
+          '401':
+            $ref: '#/components/responses/Response401'
+          '404':
+            $ref: '#/components/responses/Response404'
+          '500':
+            $ref: '#/components/responses/Response500'
+        security:
+          - bearerAuth : []
+
+  components: 
+    securitySchemes:  
+      bearerAuth:           
+        type: http
+        scheme: bearer
+        bearerFormat: JWT
+        description: "Token obtained upon successful login"
+
+    requestBodies:
+      
+      RequestRegisterUser:
+        required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/User'
-            examples:
-              example update 1:
-                summary: Example update user id 1
-                value:
-                  code: 200
-                  message: "Successful Operation"
-                  data:
-                    name: "Peter Zalai"
-                    username: "peterzalai"
-                    email: "peterzalai@gmail.com"
-                    phone: "+6281333555777"
-                    address: "Jakarta, Bali"
-                    password: "@Secret123"
-                    image: "peterzalai.png"
-              example update 2:
-                summary: Example update user id 3
-                value:
-                  code: 200
-                  message: "Successful Operation"
-                  data:                
-                    name: "Wanta Zulfikri"
-                    username: "wantazulfikri"
-                    email: "wzulfikri@gmail.com"
-                    phone: "+6281235666777"
-                    address: "Semarang, Jawa Tengah"
-                    password: "@Secret123"
-                    image: "wantazulfikri.png"
-    
-    Response200UserDelete:
-        description: User information deleted successfully
+              $ref: '#/components/schemas/UserRegister'
+
+      RequestLoginUser:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserLogin' 
+      
+      RequestUpdateUser:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserUpdate'
+
+      RequestTransactionCreate:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestTransactionCreate'
+
+      RequestAttendeesCreate:
+        description: Request body containing attendee information
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestAttendeesCreate'
+
+      RequestReviewCreate:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestReviewCreate'
+
+      RequestReviewEdit:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestReviewEdit'
+
+    responses:
+      Response200:
+        description: Successful operation
         content:
           application/json:
             schema:
@@ -717,253 +559,398 @@ components:
                   example: 200
                 message:
                   type: string
-                  example: "Success Deleted an Account"
-
-    Response200EventGet:
-          description: Get event information by their ID
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Event'
-    
-    Response200EventListGet:
-      description: Get event information by their ID
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/EventList'
-
-    Response200EventCreate:
-      description: Successful Create an Event
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              code:
-                type: integer
-                example: 200
-              message:
-                type: string
-                example: "Success Create an Event"
-
-    Response200EventUpdate:
-      description: Successful response for updating an event
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/EventUpdate'
-
-    Response200TransactionCreate:
-      description: Successful for creating a transaction
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ResponseTransactionCreate'
-          examples:
-            example_transaction_pending:
-              summary: Example transaction pending
-              value:
-                code: 200
-                message: Success created a transaction
-                data:
-                  invoice: "MT00002570"
-                  user_id: 1
-                  event_id: 1
-                  event_date: "2023-04-25 10:15:00"
-                  purchase_startdate: "2023-04-14 20:15:00"
-                  purchase_enddate: "2023-04-17 10:15:00"
-                  status: "pending"
-                  status_date: "2023-04-17 10:15:00"
-                  items:
-                    - name: "Naruto & Hinata Wedding Day"
-                      person: 2
-                      price: 100
-                  subtotal: 200
-                  tax:
-                    description: "Sales tax (10%)"
-                    amount: 10
-                  total_price: 220
-                  payment_type: "paid"
-                  payment_method: "credit_card"
-            example_transaction_completed:
-              summary: Example transaction completed
-              value:
-                code: 200
-                message: Success created a transaction
-                data:
-                  invoice: "MT00002575"
-                  user_id: 2
-                  event_id: 1
-                  event_date: "2023-04-25 10:15:00"
-                  purchase_startdate: "2023-04-14 20:15:00"
-                  purchase_enddate: "2023-04-15 10:15:00"
-                  status: "completed"
-                  status_date: "2023-04-15 07:15:00"
-                  items:
-                    - name: "Naruto & Hinata Wedding Day"
-                      person: 4
-                      price: 100
-                  subtotal: 400
-                  tax:
-                    description: "Sales tax (10%)"
-                    amount: 10
-                  total_price: 440
-                  payment_type: "paid"
-                  payment_method: "alfamart"   
-            example_transaction_failed:
-              summary: Example transaction failed
-              value:
-                code: 200
-                message: Success created a transaction
-                data:
-                  invoice: "MT00002575"
-                  user_id: 3
-                  event_id: 1
-                  event_date: "2023-04-25 10:15:00"
-                  purchase_startdate: "2023-04-14 10:15:00"
-                  purchase_enddate: "2023-04-15 10:15:00"
-                  status: "failed"
-                  status_date: "2023-04-15 05:15:00"
-                  items:
-                    - name: "Naruto & Hinata Wedding Day"
-                      person: 4
-                      price: 100
-                  subtotal: 400
-                  tax:
-                    description: "Sales tax (10%)"
-                    amount: 10
-                  total_price: 440
-                  payment_type: "paid"
-                  payment_method: "alfamart"
-            example_transaction_canceled:
-              summary: Example transaction canceled
-              value:
-                code: 200
-                message: Success created a transaction
-                data:
-                  invoice: "MT00002575"
-                  user_id: 3
-                  event_id: 1
-                  event_date: "2023-04-25 10:15:00"
-                  purchase_startdate: "2023-04-14 10:15:00"
-                  purchase_enddate: "2023-04-15 10:15:00"
-                  status: "canceled"
-                  status_date: "2023-04-15 05:15:00"
-                  items:
-                    - name: "Naruto & Hinata Wedding Day"
-                      person: 4
-                      price: 100
-                  subtotal: 400
-                  tax:
-                    description: "Sales tax (10%)"
-                    amount: 10
-                  total_price: 440
-                  payment_type: "paid"
-                  payment_method: "alfamart"      
-
-    Response200TransactionGet:
-      description: Successful response for retrieving transactions
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ResponseTransactionGet'
-          examples:
-            example_transaction:
-              summary: Example transaction
-              value:
-                code: 200
-                message: Success retrieved transaction data
-                data:
-                  transaction_id: 2
-                  invoice: "MT00002570"
-                  user_id: 1
-                  event_id: 1
-                  event_date: "2023-04-25 10:15:00"
-                  purchase_date: "2023-04-15 10:15:00"
-                  status: "completed"
-                  status_date: "2023-04-15 07:15:00"
-                  items:
-                    - name: "Naruto & Hinata Wedding Day"
-                      person: 4
-                      price: 100
-                  subtotal: 400
-                  tax:
-                    description: "Sales tax (10%)"
-                    amount: 10
-                  total_price: 440
-                  payment_type: "paid"
-                  payment_method: "credit_card"
-
-    Response200EventAttendees:
-      description: Get list of attendees information
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ResponseEventAttendees'
-          examples:
-            paid_tickets:
-              summary: Example paid_tickets
-              value:
-                code: 200
-                message: Success retrieved event data
-                data:
-                  - id: 1
-                    user_id: 1
-                    event_id: 3
-                    event_category: Music
-                    ticket_type: paid
-                    quantity: 2
-                  - id: 2
-                    user_id: 2
-                    event_id: 3
-                    event_category: Music
-                    ticket_type: paid
-                    quantity: 4
-                  - id: 3
-                    user_id: 3
-                    event_id: 3
-                    event_category: Music
-                    ticket_type: paid
-                    quantity: 2
-            free_tickets:
-              summary: Example free_tickets
-              value:
-                code: 200
-                message: Success retrieved event data
-                data:
-                  - id: 1
-                    user_id: 1
-                    event_id: 5
-                    event_category: Sport
-                    ticket_type: free
-                    quantity: 2
-                  - id: 2
-                    user_id: 2
-                    event_id: 5
-                    event_category: Sport
-                    ticket_type: free
-                    quantity: 4
-                  - id: 3
-                    user_id: 3
-                    event_id: 5
-                    event_category: Sport
-                    ticket_type: free
-                    quantity: 2
-
-    Response200ReviewGet:
-      description: Get list of reviews of event successfully
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ResponseEventReviews'
-
-    Response200ReviewCreate:
-        description: Create a review successfully
+                  example: "Successful operation"
+      
+      Response201:
+        description: Successful operation
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ResponseReviewCreate'
+              type: object
+              properties:
+                code:
+                  type: integer
+                  example: 201
+                message:
+                  type: string
+                  example: "Successful operation"
+
+      Response201Register:
+        description: Successful registration
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                code:
+                  type: integer
+                  example: 201
+                message:
+                  type: string
+                  example: "Success Created an Account"
+
+      Response200Login:
+        description: Successful login
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                code:
+                  type: integer
+                message:
+                  type: string
+                token:
+                  type: string
+              example: 
+                code: 200
+                message: "Successful login, please use this token for further access."
+                data:
+                  token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InBldGVyemFsYWlAZ21haWwuY29tIiwicGFzc3dvcmQiOiJAU2VjcmV0MTIzIn0.BZq48TAx5wci2LH48KW5geslrGR2ybr0-5Wol-HyDkI"
+            examples:
+              Example login user id 1:
+                value:
+                  code: 200
+                  message: "Successful login, please use this token for further access."
+                  data:
+                    token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InBldGVyemFsYWlAZ21haWwuY29tIiwicGFzc3dvcmQiOiJAU2VjcmV0MTIzIn0.BZq48TAx5wci2LH48KW5geslrGR2ybr0-5Wol-HyDkI"
+              Example login user id 2:
+                value:
+                  code: 200
+                  message: "Successful login, please use this token for further access."
+                  data:
+                    token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImpvaG5ib2FzdEBnbWFpbC5jb20iLCJwYXNzd29yZCI6IiRzYW1wbGUxMjMifQ.1Tq3XNnmNcv_cFZ0YdBUV8juv0x26bV7jK00aUOQ6U0"
+      
+      Response200UserGet:    
+            description: Get user profile information
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/User'
+                examples:
+                  example 1:
+                    summary: Example user id 1
+                    value:
+                      code: 200
+                      message: "Successful Operation"
+                      data:
+                        name: "Peter Zalai"
+                        username: "peterzalai"
+                        email: "peterzalai@gmail.com"
+                        phone: "+6281235288543"
+                        address: "Denpasar, Bali"
+                        image: "peterzalai.png"
+                  example 2:
+                    summary: Example user id 2
+                    value:
+                      code: 200
+                      message: "Successful Operation"
+                      data:
+                        name: "Satrio Wibowo"
+                        username: "satriowibowo"
+                        email: "satriowibowo@gmail.com"
+                        phone: ""
+                        address: "Jakarta, Indonesia"
+                        image: "satriowibowo.png"
+                  example 3:
+                    summary: Example user id 3
+                    value:
+                      code: 200
+                      message: "Successful Operation"
+                      data:
+                        name: "Wanta Zulfikri"
+                        username: "wantazulfikri"
+                        email: "wantazulfikri@gmail.com"
+                        phone: "+6281235288999"
+                        address: "Tangerang, Jawa Barat"
+                        image: "wantazulfikri.png"
+      
+      Response200UserUpdate:
+          description: User information updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+              examples:
+                example update 1:
+                  summary: Example update user id 1
+                  value:
+                    code: 200
+                    message: "Successful Operation"
+                    data:
+                      name: "Peter Zalai"
+                      username: "peterzalai"
+                      email: "peterzalai@gmail.com"
+                      phone: "+6281333555777"
+                      address: "Jakarta, Bali"
+                      password: "@Secret123"
+                      image: "peterzalai.png"
+                example update 2:
+                  summary: Example update user id 3
+                  value:
+                    code: 200
+                    message: "Successful Operation"
+                    data:                
+                      name: "Wanta Zulfikri"
+                      username: "wantazulfikri"
+                      email: "wzulfikri@gmail.com"
+                      phone: "+6281235666777"
+                      address: "Semarang, Jawa Tengah"
+                      password: "@Secret123"
+                      image: "wantazulfikri.png"
+      
+      Response200UserDelete:
+          description: User information deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: "Success Deleted an Account"
+
+      Response200EventGet:
+            description: Get event information by their ID
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Event'
+      
+      Response200EventListGet:
+        description: Get event information by their ID
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventList'
+
+      Response201EventCreate:
+        description: Successful Create an Event
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                code:
+                  type: integer
+                  example: 201
+                message:
+                  type: string
+                  example: "Success Create an Event"
+
+      Response200EventUpdate:
+        description: Successful response for updating an event
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventUpdate'
+
+      Response201TransactionCreate:
+        description: Successful for creating a transaction
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResponseTransactionCreate'
+            examples:
+              example_transaction_pending:
+                summary: Example transaction pending
+                value:
+                  code: 201
+                  message: Success created a transaction
+                  data:
+                    invoice: "MT00002570"
+                    user_id: 1
+                    event_id: 1
+                    event_date: "2023-04-25 10:15:00"
+                    purchase_startdate: "2023-04-14 20:15:00"
+                    purchase_enddate: "2023-04-17 10:15:00"
+                    status: "pending"
+                    status_date: "2023-04-17 10:15:00"
+                    items:
+                      - name: "Naruto & Hinata Wedding Day"
+                        person: 2
+                        price: 100
+                    subtotal: 200
+                    tax:
+                      description: "Sales tax (10%)"
+                      amount: 10
+                    total_price: 220
+                    payment_type: "paid"
+                    payment_method: "credit_card"
+              example_transaction_completed:
+                summary: Example transaction completed
+                value:
+                  code: 201
+                  message: Success created a transaction
+                  data:
+                    invoice: "MT00002575"
+                    user_id: 2
+                    event_id: 1
+                    event_date: "2023-04-25 10:15:00"
+                    purchase_startdate: "2023-04-14 20:15:00"
+                    purchase_enddate: "2023-04-15 10:15:00"
+                    status: "completed"
+                    status_date: "2023-04-15 07:15:00"
+                    items:
+                      - name: "Naruto & Hinata Wedding Day"
+                        person: 4
+                        price: 100
+                    subtotal: 400
+                    tax:
+                      description: "Sales tax (10%)"
+                      amount: 10
+                    total_price: 440
+                    payment_type: "paid"
+                    payment_method: "alfamart"   
+              example_transaction_failed:
+                summary: Example transaction failed
+                value:
+                  code: 201
+                  message: Success created a transaction
+                  data:
+                    invoice: "MT00002575"
+                    user_id: 3
+                    event_id: 1
+                    event_date: "2023-04-25 10:15:00"
+                    purchase_startdate: "2023-04-14 10:15:00"
+                    purchase_enddate: "2023-04-15 10:15:00"
+                    status: "failed"
+                    status_date: "2023-04-15 05:15:00"
+                    items:
+                      - name: "Naruto & Hinata Wedding Day"
+                        person: 4
+                        price: 100
+                    subtotal: 400
+                    tax:
+                      description: "Sales tax (10%)"
+                      amount: 10
+                    total_price: 440
+                    payment_type: "paid"
+                    payment_method: "alfamart"
+              example_transaction_canceled:
+                summary: Example transaction canceled
+                value:
+                  code: 201
+                  message: Success created a transaction
+                  data:
+                    invoice: "MT00002575"
+                    user_id: 3
+                    event_id: 1
+                    event_date: "2023-04-25 10:15:00"
+                    purchase_startdate: "2023-04-14 10:15:00"
+                    purchase_enddate: "2023-04-15 10:15:00"
+                    status: "canceled"
+                    status_date: "2023-04-15 05:15:00"
+                    items:
+                      - name: "Naruto & Hinata Wedding Day"
+                        person: 4
+                        price: 100
+                    subtotal: 400
+                    tax:
+                      description: "Sales tax (10%)"
+                      amount: 10
+                    total_price: 440
+                    payment_type: "paid"
+                    payment_method: "alfamart"      
+
+      Response200TransactionGet:
+        description: Successful response for retrieving transactions
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResponseTransactionGet'
+            examples:
+              example_transaction:
+                summary: Example transaction
+                value:
+                  code: 200
+                  message: Success retrieved transaction data
+                  data:
+                    transaction_id: 2
+                    invoice: "MT00002570"
+                    user_id: 1
+                    event_id: 1
+                    event_date: "2023-04-25 10:15:00"
+                    purchase_date: "2023-04-15 10:15:00"
+                    status: "completed"
+                    status_date: "2023-04-15 07:15:00"
+                    items:
+                      - name: "Naruto & Hinata Wedding Day"
+                        person: 4
+                        price: 100
+                    subtotal: 400
+                    tax:
+                      description: "Sales tax (10%)"
+                      amount: 10
+                    total_price: 440
+                    payment_type: "paid"
+                    payment_method: "credit_card"
+
+      Response200EventAttendees:
+        description: Get list of attendees information
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResponseEventAttendees'
+            examples:
+              paid_tickets:
+                summary: Example paid_tickets
+                value:
+                  code: 200
+                  message: Success retrieved event data
+                  data:
+                    - id: 1
+                      user_id: 1
+                      event_id: 3
+                      event_category: Music
+                      ticket_type: paid
+                      quantity: 2
+                    - id: 2
+                      user_id: 2
+                      event_id: 3
+                      event_category: Music
+                      ticket_type: paid
+                      quantity: 4
+                    - id: 3
+                      user_id: 3
+                      event_id: 3
+                      event_category: Music
+                      ticket_type: paid
+                      quantity: 2
+              free_tickets:
+                summary: Example free_tickets
+                value:
+                  code: 200
+                  message: Success retrieved event data
+                  data:
+                    - id: 1
+                      user_id: 1
+                      event_id: 5
+                      event_category: Sport
+                      ticket_type: free
+                      quantity: 2
+                    - id: 2
+                      user_id: 2
+                      event_id: 5
+                      event_category: Sport
+                      ticket_type: free
+                      quantity: 4
+                    - id: 3
+                      user_id: 3
+                      event_id: 5
+                      event_category: Sport
+                      ticket_type: free
+                      quantity: 2
+
+      Response201ReviewCreate:
+          description: Create a review successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseReviewCreate'
               examples:
                 example create review 1:
                   summary: Example update review id 1
@@ -978,34 +965,48 @@ components:
                     image: "janedoe.png"
                     review: "I really enjoyed this event! The performers were amazing and the venue was beautiful."
 
-    Response200ReviewEdit:
-        description: Review edited successfully
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ResponseReviewEdit'
-            examples:
-              example edit review 1:
-                summary: Example edit review id 1
-                value:
-                  code: 200
-                  message: Success edited a review
-                  data:
-                    username: "peterzalai"
-                    image: "peterzalai.png"
-                    review: "A review is a longer, more formal write-up concerning someones work over a set period of time."
-              example edit review 2:
-                summary: Example edit review id 2
-                value:
-                  code: 200
-                  message: Success edited a review
-                  data:
-                    username: "Carlo"
-                    image: "carlo.png"
-                    review: "I really enjoyed this event! The performers were amazing and the venue was beautiful."
+      Response200ReviewEdit:
+          description: Review edited successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseReviewEdit'
+              examples:
+                example edit review 1:
+                  summary: Example edit review id 1
+                  value:
+                    code: 200
+                    message: Success edited a review
+                    data:
+                      username: "peterzalai"
+                      image: "peterzalai.png"
+                      review: "A review is a longer, more formal write-up concerning someones work over a set period of time."
+                example edit review 2:
+                  summary: Example edit review id 2
+                  value:
+                    code: 200
+                    message: Success edited a review
+                    data:
+                      username: "Carlo"
+                      image: "carlo.png"
+                      review: "I really enjoyed this event! The performers were amazing and the venue was beautiful."
 
-    Response200ReviewDelete:
-        description: Review deleted successfully
+      Response200ReviewDelete:
+          description: Review deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: "Success Deleted a Review"
+
+      Response400:
+        description: Bad request
         content:
           application/json:
             schema:
@@ -1013,648 +1014,190 @@ components:
               properties:
                 code:
                   type: integer
-                  example: 200
+                  example: 400
                 message:
                   type: string
-                  example: "Success Deleted a Review"
+                  example: "Bad Request"
 
-    Response400:
-      description: Bad request
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              code:
-                type: integer
-                example: 400
-              message:
-                type: string
-                example: "Bad Request"
-
-    Response401:
-      description: Access token is missing or invalid
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              code:
-                type: number                
-              message:
-                type: string                
-              data:
-                type: string
-            example:
-              code: 401
-              message: "Missing or Malformed JWT"
-
-    Response404:
-      description: Not Found
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              code:
-                type: integer
-                example: 404
-              message:
-                type: string
-                example: "The requested resource was not found."
-
-    Response404Login:
-      description: Not Found
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              code:
-                type: integer
-                example: 404
-              message:
-                type: string
-                example: "The requested resource was not found. Please check your email and password input."
-
-    Response500:
-      description: Internal server error
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              code:
-                type: integer
-                example: 500
-              message:
-                type: string
-                example: "Internal Server Error"
-
-  schemas:
-    UserRegister:
-      type: object
-      properties:
-        username:
-          type: string
-        email:
-          type: string
-          format: email
-        password:
-          type: string
-          format: password
-      example:
-        username: "peterzalai"
-        email: "peterzalai@gmail.com"
-        password: "@Secret123"
-    
-    UserLogin:
-      type: object
-      properties:
-        email:
-          type: string
-          format: email
-        password:
-          type: string
-          format: password
-      example:
-        email: "peterzalai@gmail.com"
-        password: "@Secret123"
-    
-    User:
-      type: object
-      properties:
-        name:
-          type: string
-        username:
-          type: string
-        email:
-          type: string
-          format: email
-        phone:
-          type: string
-        address:
-          type: string
-        password:
-          type: string
-          format: password
-        image:
-          type: string
-          format: binary
-      example:
-        name: "Peter Zalai"
-        username: "peterzalai"
-        email: "peterzalai@gmail.com"
-        phone: "+6281235288543"
-        address: "Denpasar, Bali"
-        image: "peterzalai.png"
-    
-    UserUpdate:
-      type: object
-      properties:
-        name:
-          type: string
-        username:
-          type: string
-        email:
-          type: string
-          format: email
-        phone:
-          type: string
-        address:
-          type: string
-        password:
-          type: string
-          format: password
-        image:
-          type: string
-          format: binary
-      example:
-        name: "Peter Zalai"
-        username: "peterzalai"
-        email: "peterzalai@gmail.com"
-        phone: "+6281235288543"
-        address: "Denpasar, Bali"
-        image: "peterzalai.png"
-
-    Event:
-      type: object
-      properties: 
-        name: 
-          type: string  
-          description: Nama acara 
-        hosted_by: 
-          type: string 
-          description: Penyelenggara acara 
-        date: 
-          type: string 
-          description: Tanggal acara  
-        location: 
-          type: string  
-          description: Lokasi acara  
-        details: 
-          type: string 
-          description: Detail acara 
-        event_picture: 
-          type: string 
-          format: binary
-      example:
-        code: 200
-        message: "Successful Operation"
-        data: 
-          name: "udemy: golang goroutines"
-          hosted_by: "Product Udemy"
-          date: "2023-04-15"
-          location: "Jakarta"
-          details: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
-          event_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg"
-
-    EventList:
-      type: object
-      properties: 
-        name: 
-          type: string  
-          description: Nama acara 
-        hosted_by: 
-          type: string 
-          description: Penyelenggara acara 
-        date: 
-          type: string 
-          description: Tanggal acara  
-        location: 
-          type: string  
-          description: Lokasi acara  
-        details: 
-          type: string 
-          description: Detail acara 
-        event_picture: 
-          type: string 
-          format: binary
-      example:
-        code: 200
-        message: "Successful Operation"
-        data: 
-        - name: "udemy: golang goroutines"
-          hosted_by: "Product Udemy"
-          date: "2023-04-15"
-          location: "Jakarta"
-          details: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
-          event_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg"
-        - name: "udemy: golang goroutines"
-          hosted_by: "Product Udemy"
-          date: "2023-04-15"
-          location: "Jakarta"
-          details: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
-          event_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg"
-        - name: "udemy: golang goroutines"
-          hosted_by: "Product Udemy"
-          date: "2023-04-15"
-          location: "Jakarta"
-          details: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
-          event_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg"
-        - name: "udemy: golang goroutines"
-          hosted_by: "Product Udemy"
-          date: "2023-04-15"
-          location: "Jakarta"
-          details: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
-          event_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg"
-        - name: "udemy: golang goroutines"
-          hosted_by: "Product Udemy"
-          date: "2023-04-15"
-          location: "Jakarta"
-          details: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
-          event_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg"
-        - name: "udemy: golang goroutines"
-          hosted_by: "Product Udemy"
-          date: "2023-04-15"
-          location: "Jakarta"
-          details: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
-          event_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg"
-        - name: "udemy: golang goroutines"
-          hosted_by: "Product Udemy"
-          date: "2023-04-15"
-          location: "Jakarta"
-          details: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
-          event_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg"
-        - name: "udemy: golang goroutines"
-          hosted_by: "Product Udemy"
-          date: "2023-04-15"
-          location: "Jakarta"
-          details: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
-          event_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg"
-        - name: "udemy: golang goroutines"
-          hosted_by: "Product Udemy"
-          date: "2023-04-15"
-          location: "Jakarta"
-          details: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
-          event_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg"
-        - name: "udemy: golang goroutines"
-          hosted_by: "Product Udemy"
-          date: "2023-04-15"
-          location: "Jakarta"
-          details: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
-          event_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg"
-        - name: "udemy: golang goroutines"
-          hosted_by: "Product Udemy"
-          date: "2023-04-15"
-          location: "Jakarta"
-          details: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
-          event_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg"
-        - name: "udemy: golang goroutines"
-          hosted_by: "Product Udemy"
-          date: "2023-04-15"
-          location: "Jakarta"
-          details: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
-          event_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg"
-
-    EventCreate:
-      type: object
-      properties:
-        name: 
-          type: string  
-          description: name event 
-        hosted_by: 
-          type: string 
-          description: host event 
-        date: 
-          type: string 
-          description: date event  
-        location: 
-          type: string  
-          description: location event  
-        details: 
-          type: string 
-          description: details event 
-        event_picture: 
-          type: string 
-          format: binary
-      example: 
-        name: "soundrenaline2023"
-        hosted_by": "Ravel Entertaiment"
-        date: "2023-04-14"
-        location: "Jakarta"
-        details: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
-        event_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg"
-
-    EventUpdate:
-      type: object 
-      properties: 
-        name: 
-          type: string  
-          description: Name of the event 
-        hosted_by: 
-          type: string 
-          description: Name of the event host 
-        date: 
-          type: string 
-          format: date 
-          description: Date of the event in ISO format (YYYY-MM-DD) 
-        location: 
-          type: string 
-          description: Location of the event 
-        details: 
-          type: string 
-          description: Details of the event 
-        event_picture: 
-          type: string 
-          format: binary
-          description: Image of the event 
-      example: 
-        code: 200
-        message: "Success updated an event"
-        data:
-          name: "Soundrenaline 2023"
-          hosted_by: "Ravel Entertainment"
-          date: "2023-08-05"
-          location: "Jakarta"
-          details: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s."
-          event_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg"
-
-    RequestTransactionCreate:
-      type: object
-      properties:
-        event_id:
-          type: number
-          example: 1
-        person:
-          type: number
-          example: 2
-        payment_method:
-          type: string
-          enum: [credit_card, debit_card, bank_transfer, e-wallet]
-          example: "credit_card"
-    
-    ResponseTransactionCreate:
-          type: object
-          properties:
-            code:
-              type: integer
-              example: 200
-            message:
-              type: string
-              example: "Success created a transaction"
-            data:
+      Response401:
+        description: Access token is missing or invalid
+        content:
+          application/json:
+            schema:
               type: object
               properties:
-                invoice:
+                code:
+                  type: number                
+                message:
+                  type: string                
+                data:
                   type: string
-                  example: "MT00002570"
-                user_id:
-                  type: number
-                  example: 1
-                event_id:
-                  type: number
-                  example: 1
-                event_date:
-                  type: string
-                  format: date-time
-                  example: "2023-04-25 10:15:00"
-                purchase_startdate:
-                  type: string
-                  format: date-time
-                  example: "2023-04-16 10:15:00"
-                purchase_enddate:
-                  type: string
-                  format: date-time
-                  example: "2023-04-17 10:15:00"
-                status:
-                  type: string
-                  example: "pending"
-                status_date:
-                  type: string
-                  example: "2023-04-17 10:15:00"
-                items:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      name:
-                        type: string
-                        example: "Naruto & Hinata Wedding Day"
-                      person:
-                        type: number
-                        example: 2
-                      price:
-                        type: number
-                        example: 100
-                subtotal:
-                  type: number
-                  example: 200
-                tax:
-                  type: object
-                  properties:
-                    description:
-                      type: string
-                      example: "Sales tax (10%)"
-                    amount:
-                      type: number
-                      example: 10
-                  example:
-                    description: "Sales tax (10%)"
-                    amount: 10
-                total_price:
-                  type: number
-                  example: 220
-                payment_type:
-                  type: string
-                  enum: [free, paid]
-                  example: "paid"
-                payment_method:
-                  type: string
-                  enum: [credit_card, debit_card, bank_transfer, e-wallet]
-                  example: "credit_card"
-
-    ResponseTransactionGet:
-      type: object
-      properties:
-        code:
-          type: integer
-          example: 200
-        message:
-          type: string
-          example: "Success retrieved transaction data"
-        data:
-          type: object
-          properties:
-            invoice:
-              type: string
-              example: "MT00002570"
-            user_id:
-              type: number
-              example: 1
-            event_id:
-              type: number
-              example: 1
-            event_date:
-              type: string
-              format: date-time
-              example: "2023-04-25 10:15:00"
-            purchase_startdate:
-              type: string
-              format: date-time
-              example: "2023-04-16 10:15:00"
-            purchase_enddate:
-              type: string
-              format: date-time
-              example: "2023-04-17 10:15:00"
-            status:
-              type: string
-              example: "pending"
-            status_date:
-              type: string
-              example: "2023-04-17 10:15:00"
-            items:
-              type: array
-              items:
-                type: object
-                properties:
-                  name:
-                    type: string
-                    example: "Naruto & Hinata Wedding Day"
-                  person:
-                    type: number
-                    example: 2
-                  price:
-                    type: number
-                    example: 100
-            subtotal:
-              type: number
-              example: 200
-            tax:
-              type: object
-              properties:
-                description:
-                  type: string
-                  example: "Sales tax (10%)"
-                amount:
-                  type: number
-                  example: 10
               example:
-                description: "Sales tax (10%)"
-                amount: 10
-            total_price:
-              type: number
-              example: 220
-            payment_type:
-              type: string
-              enum: [free, paid]
-              example: "paid"
-            payment_method:
-              type: string
-              enum: [credit_card, debit_card, bank_transfer, e-wallet]
-              example: "credit_card"
+                code: 401
+                message: "Missing or Malformed JWT"
 
-    RequestAttendeesCreate:
-      type: object
-      properties:
-        user_id:
-          type: integer
-          description: User ID who attends the event
-          example: 2
-        event_id:
-          type: integer
-          description: Event ID that the attendee is registered for
-          example: 3
-        event_category:
-          type: string
-          description: Category of the event
-          example: Music
-        ticket_type:
-          type: string
-          enum: [free, paid]
-          description: Type of ticket
-          example: paid
-        quantity:
-          type: integer
-          minimum: 1
-          description: Number of tickets to be purchased
-          example: 4
-      required:
-        - user_id
-        - event_id
-        - event_category
-        - ticket_type
-        - quantity
+      Response404:
+        description: Not Found
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                code:
+                  type: integer
+                  example: 404
+                message:
+                  type: string
+                  example: "The requested resource was not found."
 
-    ResponseEventAttendees:
-      type: object
-      properties:
-        code:
-          type: integer
-          example: 200
-        message:
-          type: string
-          example: "Success created a transaction"
-        data:
-          type: array
-          items:
-            type: object
-            properties:
-              id:
-                type: integer
-                description: ID of the event attendee
-              user_id:
-                type: integer
-                description: User ID who attends the event
-              event_id:
-                type: integer
-                description: Event ID that the attendee is registered for
-              event_category:
-                type: string
-                description: Category of the event
-              ticket_type:
-                type: string
-                enum: [free, paid]
-                description: Type of ticket
-              quantity:
-                type: integer
-                minimum: 1
-                description: Number of tickets purchased
-      example:
-        code: 200
-        message: "Success created a transaction"
-        data:
-          - id: 1
-            user_id: 1
-            event_id: 3
-            event_category: Music
-            ticket_type: paid
-            quantity: 2
-          - id: 2
-            user_id: 2
-            event_id: 3
-            event_category: Music
-            ticket_type: paid
-            quantity: 4
-          - id: 3
-            user_id: 3
-            event_id: 3
-            event_category: Music
-            ticket_type: paid
-            quantity: 2
+      Response404Login:
+        description: Not Found
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                code:
+                  type: integer
+                  example: 404
+                message:
+                  type: string
+                  example: "The requested resource was not found. Please check your email and password input."
 
-    ResponseEventReviews:
-      type: object
-      properties:
-        code:
-          type: integer
-          example: 200
-        message:
-          type: string
-          example: "Success created a transaction"
-        data:
-          type: array
-          items:
-            type: object
-            properties:
-              username:
-                type: string
-              image:
-                type: string
-                format: binary
-              review:
-                type: string
-            example:
+      Response500:
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                code:
+                  type: integer
+                  example: 500
+                message:
+                  type: string
+                  example: "Internal Server Error"
+
+    schemas:
+      UserRegister:
+        type: object
+        properties:
+          username:
+            type: string
+          email:
+            type: string
+            format: email
+          password:
+            type: string
+            format: password
+        example:
+          username: "peterzalai"
+          email: "peterzalai@gmail.com"
+          password: "@Secret123"
+      
+      UserLogin:
+        type: object
+        properties:
+          email:
+            type: string
+            format: email
+          password:
+            type: string
+            format: password
+        example:
+          email: "peterzalai@gmail.com"
+          password: "@Secret123"
+      
+      User:
+        type: object
+        properties:
+          name:
+            type: string
+          username:
+            type: string
+          email:
+            type: string
+            format: email
+          phone:
+            type: string
+          address:
+            type: string
+          password:
+            type: string
+            format: password
+          image:
+            type: string
+            format: binary
+        example:
+          name: "Peter Zalai"
+          username: "peterzalai"
+          email: "peterzalai@gmail.com"
+          phone: "+6281235288543"
+          address: "Denpasar, Bali"
+          image: "peterzalai.png"
+      
+      UserUpdate:
+        type: object
+        properties:
+          name:
+            type: string
+          username:
+            type: string
+          email:
+            type: string
+            format: email
+          phone:
+            type: string
+          address:
+            type: string
+          password:
+            type: string
+            format: password
+          image:
+            type: string
+            format: binary
+        example:
+          name: "Peter Zalai"
+          username: "peterzalai"
+          email: "peterzalai@gmail.com"
+          phone: "+6281235288543"
+          address: "Denpasar, Bali"
+          image: "peterzalai.png"
+
+      Event:
+        type: object
+        properties: 
+          name: 
+            type: string  
+            description: Nama acara 
+          hosted_by: 
+            type: string 
+            description: Penyelenggara acara 
+          date: 
+            type: string 
+            description: Tanggal acara  
+          location: 
+            type: string  
+            description: Lokasi acara  
+          details: 
+            type: string 
+            description: Detail acara 
+          event_picture: 
+            type: string 
+            format: binary
+          reviews:
+            type: string
+        example:
+          code: 200
+          message: "Successful Operation"
+          data: 
+            name: "udemy: golang goroutines"
+            hosted_by: "Product Udemy"
+            date: "2023-04-15"
+            location: "Jakarta"
+            details: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
+            event_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg"
+            reviews:
               - username: "peterzalai"
                 image: "peterzalai.png"
                 review: "A review is a longer, more formal write-up concerning someones work over a set period of time."
@@ -1670,61 +1213,491 @@ components:
               - username: "MikeJ"
                 image: "mikej.png"
                 review: "I had high expectations for this event and it did not disappoint! I would definitely attend again."
+
+      EventList:
+        type: object
+        properties: 
+          name: 
+            type: string  
+            description: Nama acara 
+          hosted_by: 
+            type: string 
+            description: Penyelenggara acara 
+          date: 
+            type: string 
+            description: Tanggal acara  
+          location: 
+            type: string  
+            description: Lokasi acara  
+          details: 
+            type: string 
+            description: Detail acara 
+          event_picture: 
+            type: string 
+            format: binary
+        example:
+          code: 200
+          message: "Successful Operation"
+          data: 
+          - name: "udemy: golang goroutines"
+            hosted_by: "Product Udemy"
+            date: "2023-04-15"
+            location: "Jakarta"
+            details: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
+            event_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg"
+          - name: "udemy: golang goroutines"
+            hosted_by: "Product Udemy"
+            date: "2023-04-15"
+            location: "Jakarta"
+            details: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
+            event_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg"
+          - name: "udemy: golang goroutines"
+            hosted_by: "Product Udemy"
+            date: "2023-04-15"
+            location: "Jakarta"
+            details: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
+            event_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg"
+          - name: "udemy: golang goroutines"
+            hosted_by: "Product Udemy"
+            date: "2023-04-15"
+            location: "Jakarta"
+            details: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
+            event_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg"
+          - name: "udemy: golang goroutines"
+            hosted_by: "Product Udemy"
+            date: "2023-04-15"
+            location: "Jakarta"
+            details: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
+            event_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg"
+          - name: "udemy: golang goroutines"
+            hosted_by: "Product Udemy"
+            date: "2023-04-15"
+            location: "Jakarta"
+            details: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
+            event_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg"
+          - name: "udemy: golang goroutines"
+            hosted_by: "Product Udemy"
+            date: "2023-04-15"
+            location: "Jakarta"
+            details: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
+            event_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg"
+          - name: "udemy: golang goroutines"
+            hosted_by: "Product Udemy"
+            date: "2023-04-15"
+            location: "Jakarta"
+            details: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
+            event_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg"
+          - name: "udemy: golang goroutines"
+            hosted_by: "Product Udemy"
+            date: "2023-04-15"
+            location: "Jakarta"
+            details: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
+            event_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg"
+          - name: "udemy: golang goroutines"
+            hosted_by: "Product Udemy"
+            date: "2023-04-15"
+            location: "Jakarta"
+            details: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
+            event_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg"
+          - name: "udemy: golang goroutines"
+            hosted_by: "Product Udemy"
+            date: "2023-04-15"
+            location: "Jakarta"
+            details: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
+            event_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg"
+          - name: "udemy: golang goroutines"
+            hosted_by: "Product Udemy"
+            date: "2023-04-15"
+            location: "Jakarta"
+            details: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
+            event_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg"
+
+      EventCreate:
+        type: object
+        properties:
+          name: 
+            type: string  
+            description: name event 
+          hosted_by: 
+            type: string 
+            description: host event 
+          date: 
+            type: string 
+            description: date event  
+          location: 
+            type: string  
+            description: location event  
+          details: 
+            type: string 
+            description: details event 
+          event_picture: 
+            type: string 
+            format: binary
+        example: 
+          name: "soundrenaline2023"
+          hosted_by": "Ravel Entertaiment"
+          date: "2023-04-14"
+          location: "Jakarta"
+          details: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
+          event_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg"
+
+      EventUpdate:
+        type: object 
+        properties: 
+          name: 
+            type: string  
+            description: Name of the event 
+          hosted_by: 
+            type: string 
+            description: Name of the event host 
+          date: 
+            type: string 
+            format: date 
+            description: Date of the event in ISO format (YYYY-MM-DD) 
+          location: 
+            type: string 
+            description: Location of the event 
+          details: 
+            type: string 
+            description: Details of the event 
+          event_picture: 
+            type: string 
+            format: binary
+            description: Image of the event 
+        example: 
+          code: 200
+          message: "Success updated an event"
+          data:
+            name: "Soundrenaline 2023"
+            hosted_by: "Ravel Entertainment"
+            date: "2023-08-05"
+            location: "Jakarta"
+            details: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s."
+            event_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg"
+
+      RequestTransactionCreate:
+        type: object
+        properties:
+          event_id:
+            type: number
+            example: 1
+          person:
+            type: number
+            example: 2
+          payment_method:
+            type: string
+            enum: [credit_card, debit_card, bank_transfer, e-wallet]
+            example: "credit_card"
+      
+      ResponseTransactionCreate:
+            type: object
+            properties:
+              code:
+                type: integer
+                example: 201
+              message:
+                type: string
+                example: "Success created a transaction"
+              data:
+                type: object
+                properties:
+                  invoice:
+                    type: string
+                    example: "MT00002570"
+                  user_id:
+                    type: number
+                    example: 1
+                  event_id:
+                    type: number
+                    example: 1
+                  event_date:
+                    type: string
+                    format: date-time
+                    example: "2023-04-25 10:15:00"
+                  purchase_startdate:
+                    type: string
+                    format: date-time
+                    example: "2023-04-16 10:15:00"
+                  purchase_enddate:
+                    type: string
+                    format: date-time
+                    example: "2023-04-17 10:15:00"
+                  status:
+                    type: string
+                    example: "pending"
+                  status_date:
+                    type: string
+                    example: "2023-04-17 10:15:00"
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                          example: "Naruto & Hinata Wedding Day"
+                        person:
+                          type: number
+                          example: 2
+                        price:
+                          type: number
+                          example: 100
+                  subtotal:
+                    type: number
+                    example: 200
+                  tax:
+                    type: object
+                    properties:
+                      description:
+                        type: string
+                        example: "Sales tax (10%)"
+                      amount:
+                        type: number
+                        example: 10
+                    example:
+                      description: "Sales tax (10%)"
+                      amount: 10
+                  total_price:
+                    type: number
+                    example: 220
+                  payment_type:
+                    type: string
+                    enum: [free, paid]
+                    example: "paid"
+                  payment_method:
+                    type: string
+                    enum: [credit_card, debit_card, bank_transfer, e-wallet]
+                    example: "credit_card"
+
+      ResponseTransactionGet:
+        type: object
+        properties:
+          code:
+            type: integer
+            example: 200
+          message:
+            type: string
+            example: "Success retrieved transaction data"
+          data:
+            type: object
+            properties:
+              invoice:
+                type: string
+                example: "MT00002570"
+              user_id:
+                type: number
+                example: 1
+              event_id:
+                type: number
+                example: 1
+              event_date:
+                type: string
+                format: date-time
+                example: "2023-04-25 10:15:00"
+              purchase_startdate:
+                type: string
+                format: date-time
+                example: "2023-04-16 10:15:00"
+              purchase_enddate:
+                type: string
+                format: date-time
+                example: "2023-04-17 10:15:00"
+              status:
+                type: string
+                example: "pending"
+              status_date:
+                type: string
+                example: "2023-04-17 10:15:00"
+              items:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      example: "Naruto & Hinata Wedding Day"
+                    person:
+                      type: number
+                      example: 2
+                    price:
+                      type: number
+                      example: 100
+              subtotal:
+                type: number
+                example: 200
+              tax:
+                type: object
+                properties:
+                  description:
+                    type: string
+                    example: "Sales tax (10%)"
+                  amount:
+                    type: number
+                    example: 10
+                example:
+                  description: "Sales tax (10%)"
+                  amount: 10
+              total_price:
+                type: number
+                example: 220
+              payment_type:
+                type: string
+                enum: [free, paid]
+                example: "paid"
+              payment_method:
+                type: string
+                enum: [credit_card, debit_card, bank_transfer, e-wallet]
+                example: "credit_card"
+
+      RequestAttendeesCreate:
+        type: object
+        properties:
+          user_id:
+            type: integer
+            description: User ID who attends the event
+            example: 2
+          event_id:
+            type: integer
+            description: Event ID that the attendee is registered for
+            example: 3
+          event_category:
+            type: string
+            description: Category of the event
+            example: Music
+          ticket_type:
+            type: string
+            enum: [free, paid]
+            description: Type of ticket
+            example: paid
+          quantity:
+            type: integer
+            minimum: 1
+            description: Number of tickets to be purchased
+            example: 4
+        required:
+          - user_id
+          - event_id
+          - event_category
+          - ticket_type
+          - quantity
+
+      ResponseEventAttendees:
+        type: object
+        properties:
+          code:
+            type: integer
+            example: 201
+          message:
+            type: string
+            example: "Success created a transaction"
+          data:
+            type: array
+            items:
+              type: object
+              properties:
+                id:
+                  type: integer
+                  description: ID of the event attendee
+                user_id:
+                  type: integer
+                  description: User ID who attends the event
+                event_id:
+                  type: integer
+                  description: Event ID that the attendee is registered for
+                event_category:
+                  type: string
+                  description: Category of the event
+                ticket_type:
+                  type: string
+                  enum: [free, paid]
+                  description: Type of ticket
+                quantity:
+                  type: integer
+                  minimum: 1
+                  description: Number of tickets purchased
+        example:
+          code: 201
+          message: "Success created a transaction"
+          data:
+            - id: 1
+              user_id: 1
+              event_id: 3
+              event_category: Music
+              ticket_type: paid
+              quantity: 2
+            - id: 2
+              user_id: 2
+              event_id: 3
+              event_category: Music
+              ticket_type: paid
+              quantity: 4
+            - id: 3
+              user_id: 3
+              event_id: 3
+              event_category: Music
+              ticket_type: paid
+              quantity: 2
             
-    RequestReviewCreate:
-      type: object
-      properties:
-        review:
-          type: string
-    
-    ResponseReviewCreate:
-      type: object
-      properties:
-        code:
-          type: integer
-          example: 200
-        message:
-          type: string
-          example: "Success created a transaction"
-        data:
-          properties:
-            username:
-              type: string
-            image:
-              type: string
-              format: binary
-            review:
-              type: string
-          example:
-            - username: "peterzalai"
-              image: "peterzalai.png"
-              review: "Seems quite difficult to give an expression, overall good"
+      RequestReviewCreate:
+        type: object
+        properties:
+          event_id:
+            type: number
+            example: 1
+          review:
+            type: string
+            example: "Seems quite difficult to give an expression, overall good"
+      
+      ResponseReviewCreate:
+        type: object
+        properties:
+          code:
+            type: integer
+            example: 201
+          message:
+            type: string
+            example: "Success created a review"
+          data:
+            properties:
+              username:
+                type: string
+              image:
+                type: string
+                format: binary
+              review:
+                type: string
+            example:
+                username: "peterzalai"
+                image: "peterzalai.png"
+                review: "Seems quite difficult to give an expression, overall good"
 
-    RequestReviewEdit:
-      type: object
-      properties:
-        review:
-          type: string
+      RequestReviewEdit:
+        type: object
+        properties:
+          review:
+            type: string
+            example: "A review is a longer, more formal write-up concerning someones work over a set period of time."
 
-    ResponseReviewEdit:
-      type: object
-      properties:
-        code:
-          type: integer
-          example: 200
-        message:
-          type: string
-          example: "Success edited a transaction"
-        data:
-          properties:
-            username:
-              type: string
-            image:
-              type: string
-              format: binary
-            review:
-              type: string
-          example:
-            - username: "peterzalai"
-              image: "peterzalai.png"
-              review: "Seems quite difficult to give an expression, overall good"
+      ResponseReviewEdit:
+        type: object
+        properties:
+          code:
+            type: integer
+            example: 200
+          message:
+            type: string
+            example: "Success edited a transaction"
+          data:
+            properties:
+              username:
+                type: string
+              image:
+                type: string
+                format: binary
+              review:
+                type: string
+            example:
+              - username: "peterzalai"
+                image: "peterzalai.png"
+                review: "Seems quite difficult to give an expression, overall good"
+
