@@ -10,19 +10,31 @@ import (
 )
 
 func JWTMiddleware() echo.MiddlewareFunc {
+	// Initialize configuration
+	cfg, err := config.InitConfiguration()
+	if err != nil {
+		panic(err)
+	}
+
 	return echoJWT.WithConfig(echoJWT.Config{
-		SigningKey:    []byte(config.JWTKEY),
-		SigningMethod: "HS256",
+		SigningKey:    []byte(cfg.JWTConfig.Secret),
+		SigningMethod: cfg.JWTConfig.SigningMethod,
 	})
 }
 
 func CreateToken(userId uint) (string, error) {
+	// Initialize configuration
+	cfg, err := config.InitConfiguration()
+	if err != nil {
+		panic(err)
+	}
+
 	claims := jwt.MapClaims{}
 	claims["authorized"] = true
 	claims["userId"] = userId
 	claims["exp"] = time.Now().Add(time.Hour * 24).Unix()
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString([]byte(config.JWTKEY))
+	return token.SignedString([]byte(cfg.JWTConfig.Secret))
 }
 
 func ExtractToken(e echo.Context) uint {
