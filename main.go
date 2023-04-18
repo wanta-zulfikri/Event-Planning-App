@@ -2,17 +2,14 @@ package main
 
 import (
 	"Event-Planning-App/config"
-	"Event-Planning-App/config/database"
 	"log"
 )
 
 func main() {
 	// Database connection
-	cfg, err := config.InitConfiguration()
-	db, err := database.GetConnection(cfg)
-	if err != nil {
-		log.Fatalf("cannot connect to database: %v", err)
-	}
+	cfg := config.InitConfiguration()
+	db, _ := config.GetConnection(cfg)
+	config.Migrate(db)
 
 	// Check database connection
 	sqlDb, err := db.DB()
