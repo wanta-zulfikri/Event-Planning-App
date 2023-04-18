@@ -4,8 +4,6 @@ import (
 	"log"
 	"os"
 	"strconv"
-
-	"github.com/joho/godotenv"
 )
 
 var JWTSecret = os.Getenv("JWTSecret")
