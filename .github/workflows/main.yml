@@ -39,4 +39,4 @@ jobs:
             docker stop ${{ secrets.CNAME }}
             docker rm ${{ secrets.CNAME }}
             docker rmi ${{ secrets.DOCKERHUB_USERNAME }}/be16:latest
-            docker run --name ${{ secrets.CNAME }} -d -p 8080:8000 --link="myevent" -e Username=${{ secrets.DBUSER }} -e Password=${{ secrets.DBPASS }} -e Host=${{ secrets.DBHOST }} -e Port=${{ secrets.DBPORT }} -e Name=${{ secrets.DBNAME }} -e JWTKEY=${{ secrets.JWT_KEY }} ${{ secrets.DOCKERHUB_USERNAME }}/be16:latest
+              docker run --name ${{ secrets.CNAME }} -d --network="host" -e Username=${{ secrets.DBUSER }} -e Password=${{ secrets.DBPASS }} -e Host=${{ secrets.DBHOST }} -e Port=${{ secrets.DBPORT }} -e Name=${{ secrets.DBNAME }} -e JWTKEY=${{ secrets.JWT_KEY }} ${{ secrets.DOCKERHUB_USERNAME }}/be16:latest
