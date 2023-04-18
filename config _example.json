@@ -3,7 +3,7 @@
     "Port" : "8080"
     },
     "Database":{
-        "Host": "localhost",
+        "Host": "",
         "Port": "3306",
         "Username": "root",
         "Password": "",
