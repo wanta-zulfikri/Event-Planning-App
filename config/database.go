@@ -20,21 +20,17 @@ func GetConnection(config Configuration) (*gorm.DB, error) {
 	if err != nil {
 		return nil, fmt.Errorf("unable to connect to database: %v", err)
 	}
-
 	sqlDB, err := db.DB()
 	if err != nil {
 		return nil, fmt.Errorf("unable to access database sql: %v", err)
 	}
-
-	sqlDB.SetMaxIdleConns(5)
-	sqlDB.SetMaxOpenConns(50)
-	sqlDB.SetConnMaxIdleTime(5 * time.Minute)
-	sqlDB.SetConnMaxLifetime(60 * time.Minute)
-
+	sqlDB.SetMaxIdleConns(1)
+	sqlDB.SetMaxOpenConns(5)
+	sqlDB.SetConnMaxIdleTime(1 * time.Minute)
+	sqlDB.SetConnMaxLifetime(1 * time.Minute)
 	err = sqlDB.Ping()
 	if err != nil {
 		return nil, fmt.Errorf("unable to establish a good connection to the database: %v", err)
 	}
-
 	return db, nil
 }
