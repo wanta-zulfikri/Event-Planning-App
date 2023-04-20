@@ -12,8 +12,8 @@ type LoginInput struct {
 }
 
 type UpdateInput struct {
-	Username string `json:"username"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
-	Image    string
+	Username string `form:"username"`
+	Email    string `form:"email"`
+	Password string `form:"password"`
+	Image    string `form:"image"`
 }

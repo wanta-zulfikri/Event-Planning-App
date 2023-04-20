@@ -1,31 +1,67 @@
 package helper
 
 import (
+	"Event-Planning-App/config/common"
 	"context"
 	"io"
+	"log"
 	"mime/multipart"
 	"time"
 
 	"cloud.google.com/go/storage"
+	"github.com/labstack/echo/v4"
+	"google.golang.org/api/option"
 )
 
-type StorageGCP struct {
-	ClG        *storage.Client
+type StorageGCPConfig struct {
+	GCPClient  *storage.Client
 	ProjectID  string
 	BucketName string
 	Path       string
 }
 
-func (s *StorageGCP) UploadFile(file multipart.File, fileName string) error {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*20)
-	defer cancel()
-	wc := s.ClG.Bucket(s.BucketName).Object(s.Path + fileName).NewWriter(ctx)
-	if _, err := io.Copy(wc, file); err != nil {
-		return err
+func UploadImage(c echo.Context, file *multipart.FileHeader) (string, error) {
+	if file == nil {
+		return "", nil
+	}
+	image, err := file.Open()
+	if err != nil {
+		return "", err
+	}
+	defer image.Close()
+	sgcp := StorageGCPConfig{
+		GCPClient:  InitGCPClient(),
+		ProjectID:  common.ProjectID,
+		BucketName: common.BucketName,
+		Path:       common.Path,
 	}
 
-	if err := wc.Close(); err != nil {
-		return err
+	imageURL, err := sgcp.UploadFile(image, file.Filename)
+	if err != nil {
+		return "", err
 	}
-	return nil
+	return imageURL, nil
+}
+
+func InitGCPClient() *storage.Client {
+	ctx := context.Background()
+	client, err := storage.NewClient(ctx, option.WithCredentialsFile(common.Credential))
+	if err != nil {
+		log.Fatal(err)
+	}
+	return client
+}
+
+func (s *StorageGCPConfig) UploadFile(file io.Reader, fileName string) (string, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*20)
+	defer cancel()
+	wc := s.GCPClient.Bucket(s.BucketName).Object(s.Path + fileName).NewWriter(ctx)
+	if _, err := io.Copy(wc, file); err != nil {
+		return "", err
+	}
+	if err := wc.Close(); err != nil {
+		return "", err
+	}
+	image := "https://storage.googleapis.com/" + s.BucketName + "/" + s.Path + fileName
+	return image, nil
 }

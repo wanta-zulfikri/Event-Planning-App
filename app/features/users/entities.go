@@ -9,6 +9,7 @@ type Core struct {
 	Username string
 	Email    string
 	Password string
+	Image    string
 }
 
 type Repository interface {
@@ -23,7 +24,7 @@ type Service interface {
 	Register(newUser Core) error
 	Login(email string, password string) (Core, error)
 	GetProfile(email string) (Core, error)
-	UpdateProfile(email, username, newEmail, password string) error
+	UpdateProfile(email, username, newEmail, password, image string) error
 	DeleteProfile(email string) error
 }
 

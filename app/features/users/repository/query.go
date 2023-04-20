@@ -64,6 +64,7 @@ func (ar *UserRepository) GetProfile(email string) (users.Core, error) {
 		Username: input.Username,
 		Email:    input.Email,
 		Password: input.Password,
+		Image:    input.Image,
 	}, nil
 }
 
@@ -80,6 +81,7 @@ func (ar *UserRepository) UpdateProfile(email string, updatedUser users.Core) er
 	input.Username = updatedUser.Username
 	input.Email = updatedUser.Email
 	input.Password = updatedUser.Password
+	input.Image = updatedUser.Image
 	input.UpdatedAt = time.Now()
 
 	if err := ar.db.Save(&input).Error; err != nil {

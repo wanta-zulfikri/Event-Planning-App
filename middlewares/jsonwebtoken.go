@@ -1,7 +1,7 @@
 package middlewares
 
 import (
-	"Event-Planning-App/config"
+	"Event-Planning-App/config/common"
 	"fmt"
 	"strings"
 	"time"
@@ -16,7 +16,7 @@ func CreateJWT(email string) (string, error) {
 		Subject:   email,
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	signedToken, err := token.SignedString([]byte(config.JWTSecret))
+	signedToken, err := token.SignedString([]byte(common.JWTSecret))
 	if err != nil {
 		return "", err
 	}
@@ -33,7 +33,7 @@ func ValidateJWT(authHeader string) (string, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
-		return []byte(config.JWTSecret), nil
+		return []byte(common.JWTSecret), nil
 	})
 	if err != nil {
 		return "", fmt.Errorf("invalid or expired token")
