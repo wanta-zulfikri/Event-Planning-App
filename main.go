@@ -6,14 +6,15 @@ import (
 	userLogic "Event-Planning-App/app/features/users/service"
 	"Event-Planning-App/app/routes"
 	"Event-Planning-App/config"
+	"fmt"
 
 	"github.com/labstack/echo/v4"
 )
 
 func main() {
 	e := echo.New()
-	cfg := config.InitConfiguration()
-	db, _ := config.GetConnection(cfg)
+	cfg := config.GetConfiguration()
+	db, _ := config.GetConnection(*cfg)
 	config.Migrate(db)
 
 	userModel := userRepo.New(db)
@@ -22,5 +23,5 @@ func main() {
 
 	routes.Route(e, userController)
 
-	e.Start(":8080")
+	e.Logger.Fatal(e.Start(fmt.Sprintf(":%s", cfg.Port)))
 }

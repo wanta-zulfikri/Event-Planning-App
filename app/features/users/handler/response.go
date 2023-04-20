@@ -5,6 +5,8 @@ type LoginResponse struct {
 }
 
 type UserResponse struct {
-	Username string `json:"user_name" form:"user_name"`
-	Email    string `json:"email" form:"email"`
+	ID       string `json:"id"`
+	Username string `json:"username"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
 }

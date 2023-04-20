@@ -5,7 +5,6 @@ import (
 	"Event-Planning-App/helper"
 	"Event-Planning-App/middlewares"
 	"net/http"
-	"strconv"
 
 	"github.com/jinzhu/copier"
 	"github.com/labstack/echo/v4"
@@ -41,37 +40,48 @@ func (uc *UserController) Login() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var input LoginInput
 		if err := c.Bind(&input); err != nil {
-			c.Logger().Error(err.Error())
+			c.Logger().Error("Failed to bind input: ", err)
 			code, res := helper.ResponseFormat(http.StatusBadRequest, "Bad Request", nil)
 			return c.JSON(code, res)
 		}
 
-		res, err := uc.s.Login(input.Email, input.Password)
+		user, err := uc.s.Login(input.Email, input.Password)
 		if err != nil {
-			if err.Error() == "Email not found" || err.Error() == "Invalid password" {
-				code, res := helper.ResponseFormat(http.StatusNotFound, "The requested resource was not found. Please check your email and password input.", nil)
-				return c.JSON(code, res)
-			}
-			c.Logger().Error(err.Error())
+			c.Logger().Error("Failed to login: ", err)
 			code, res := helper.ResponseFormat(http.StatusInternalServerError, "Internal Server Error", nil)
 			return c.JSON(code, res)
 		}
 
-		token, _ := middlewares.CreateToken(res.ID)
-		result := &LoginResponse{Token: token}
+		token, err := middlewares.CreateJWT(user.Email)
+		if err != nil {
+			c.Logger().Error("Failed to create JWT token: ", err)
+			code, res := helper.ResponseFormat(http.StatusInternalServerError, "Internal Server Error", nil)
+			return c.JSON(code, res)
+		}
 
 		return c.JSON(http.StatusOK, helper.DataResponse{
 			Code:    http.StatusOK,
 			Message: "Successful login, please use this token for further access.",
-			Data:    result,
+			Data:    map[string]interface{}{"token": token},
 		})
 	}
 }
 
 func (uc *UserController) GetProfile() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		userID := int(middlewares.ExtractToken(c))
-		data, err := uc.s.GetProfile(userID)
+		tokenString := c.Request().Header.Get("Authorization")
+		if tokenString == "" {
+			code, res := helper.ResponseFormat(http.StatusUnauthorized, "Unauthorized. Token is missing.", nil)
+			return c.JSON(code, res)
+		}
+
+		email, err := middlewares.ValidateJWT(tokenString)
+		if err != nil {
+			code, res := helper.ResponseFormat(http.StatusUnauthorized, "Unauthorized. "+err.Error(), nil)
+			return c.JSON(code, res)
+		}
+
+		data, err := uc.s.GetProfile(email)
 		if err != nil {
 			c.Logger().Error("User not found", err.Error())
 			code, res := helper.ResponseFormat(http.StatusNotFound, "The requested resource was not found. Please check your email and password input.", nil)
@@ -79,24 +89,42 @@ func (uc *UserController) GetProfile() echo.HandlerFunc {
 		}
 		res := UserResponse{}
 		copier.Copy(&res, &data)
-		return c.JSON(helper.SuccessResponse(http.StatusOK, "profile successfully displayed", res))
+		return c.JSON(http.StatusOK, helper.DataResponse{
+			Code:    http.StatusOK,
+			Message: "Successful Operation",
+			Data:    map[string]interface{}{"res": res},
+		})
 	}
 }
 
 func (uc *UserController) UpdateProfile() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		id := middlewares.ExtractToken(c)
-		var req UserUpdateInput
-		if err := c.Bind(&req); err != nil {
-			c.Logger().Errorf("Error binding request: %v", err)
-			code, res := helper.ResponseFormat(http.StatusBadRequest, "Bad Request: "+err.Error(), nil)
+		tokenString := c.Request().Header.Get("Authorization")
+		if tokenString == "" {
+			code, res := helper.ResponseFormat(http.StatusUnauthorized, "Unauthorized. Token is missing.", nil)
 			return c.JSON(code, res)
 		}
-		if err := uc.s.UpdateProfile(id, req.Username, req.Email, req.Password); err != nil {
-			c.Logger().Errorf("Error updating profile: %v", err)
-			code, res := helper.ResponseFormat(http.StatusInternalServerError, "Internal Server Error: "+err.Error(), nil)
+
+		email, err := middlewares.ValidateJWT(tokenString)
+		if err != nil {
+			code, res := helper.ResponseFormat(http.StatusUnauthorized, "Unauthorized. "+err.Error(), nil)
 			return c.JSON(code, res)
 		}
+
+		var input UpdateInput
+		if err := c.Bind(&input); err != nil {
+			c.Logger().Error("Failed to bind input: ", err)
+			code, res := helper.ResponseFormat(http.StatusBadRequest, "Bad Request", nil)
+			return c.JSON(code, res)
+		}
+
+		err = uc.s.UpdateProfile(email, input.Username, input.Email, input.Password)
+		if err != nil {
+			c.Logger().Error("Failed to update profile: ", err)
+			code, res := helper.ResponseFormat(http.StatusInternalServerError, "Internal Server Error", nil)
+			return c.JSON(code, res)
+		}
+
 		code, res := helper.ResponseFormat(http.StatusOK, "Profile updated successfully", nil)
 		return c.JSON(code, res)
 	}
@@ -104,17 +132,21 @@ func (uc *UserController) UpdateProfile() echo.HandlerFunc {
 
 func (uc *UserController) DeleteProfile() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		userID, err := strconv.ParseUint(c.Param("id"), 10, 32)
-		if err != nil {
-			c.Logger().Error("Failed to parse user ID", err.Error())
-			return c.JSON(http.StatusBadRequest, map[string]interface{}{
-				"code":    http.StatusBadRequest,
-				"message": "Bad Request",
-			})
+		tokenString := c.Request().Header.Get("Authorization")
+		if tokenString == "" {
+			code, res := helper.ResponseFormat(http.StatusUnauthorized, "Unauthorized. Token is missing.", nil)
+			return c.JSON(code, res)
 		}
 
-		if err := uc.s.DeleteProfile(uint(userID)); err != nil {
-			c.Logger().Error("Failed to delete profile", err.Error())
+		email, err := middlewares.ValidateJWT(tokenString)
+		if err != nil {
+			code, res := helper.ResponseFormat(http.StatusUnauthorized, "Unauthorized. "+err.Error(), nil)
+			return c.JSON(code, res)
+		}
+
+		err = uc.s.DeleteProfile(email)
+		if err != nil {
+			c.Logger().Error("Error deleting profile", err.Error())
 			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
 				"code":    http.StatusInternalServerError,
 				"message": "Internal Server Error",
@@ -123,7 +155,7 @@ func (uc *UserController) DeleteProfile() echo.HandlerFunc {
 
 		return c.JSON(http.StatusOK, map[string]interface{}{
 			"code":    http.StatusOK,
-			"message": "Success delete profile",
+			"message": "Account deleted successfully",
 		})
 	}
 }

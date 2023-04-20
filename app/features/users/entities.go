@@ -14,17 +14,17 @@ type Core struct {
 type Repository interface {
 	Register(newUser Core) (Core, error)
 	Login(email, password string) (Core, error)
-	GetProfile(userID int) (Core, error)
-	UpdateProfile(id uint, updatedUser Core) error
-	DeleteProfile(userID uint) error
+	GetProfile(email string) (Core, error)
+	UpdateProfile(email string, updatedUser Core) error
+	DeleteProfile(email string) error
 }
 
 type Service interface {
 	Register(newUser Core) error
 	Login(email string, password string) (Core, error)
-	GetProfile(userID int) (Core, error)
-	UpdateProfile(id uint, username, email, password string) error
-	DeleteProfile(userID uint) error
+	GetProfile(email string) (Core, error)
+	UpdateProfile(email, username, newEmail, password string) error
+	DeleteProfile(email string) error
 }
 
 type Handler interface {

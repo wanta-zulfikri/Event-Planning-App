@@ -20,90 +20,88 @@ func New(db *gorm.DB) *UserRepository {
 }
 
 func (ar *UserRepository) Register(newUser users.Core) (users.Core, error) {
-	var inputUser = User{}
+	var input = User{}
 	hashedPassword, err := helper.HashedPassword(newUser.Password)
 	if err != nil {
 		log.Println("Hashing password error", err.Error())
 		return users.Core{}, err
 	}
 
-	inputUser.Username = newUser.Username
-	inputUser.Email = newUser.Email
-	inputUser.Password = hashedPassword
+	input.Username = newUser.Username
+	input.Email = newUser.Email
+	input.Password = hashedPassword
 
-	if err := ar.db.Table("users").Create(&inputUser).Error; err != nil {
-		log.Println("Register error, email "+inputUser.Email+" has been registered", err.Error())
+	if err := ar.db.Table("users").Create(&input).Error; err != nil {
+		log.Println("Register error, email "+input.Email+" has been registered", err.Error())
 		return users.Core{}, err
 	}
 	return newUser, nil
 }
 
 func (ar *UserRepository) Login(email, password string) (users.Core, error) {
-	result := User{}
-	if err := ar.db.Where("email = ?", email).Find(&result).Error; err != nil {
-		log.Println("Email not found", err.Error())
+	var input User
+	if err := ar.db.Where("email = ?", email).Find(&input).Error; err != nil {
 		return users.Core{}, errors.New("Email not found")
 	}
 
-	if err := helper.VerifyPassword(result.Password, password); err != nil {
-		log.Println("Invalid password")
+	if err := helper.VerifyPassword(input.Password, password); err != nil {
 		return users.Core{}, errors.New("Invalid password")
 	}
-	return users.Core{Username: result.Username, Email: result.Email}, nil
+
+	return users.Core{Email: input.Email}, nil
 }
 
-func (ar *UserRepository) GetProfile(userID int) (users.Core, error) {
-	tmp := User{}
-	tx := ar.db.Where("id = ?", userID).First(&tmp)
-	if tx.RowsAffected < 1 {
-		log.Println("Terjadi error saat first user (data tidak ditemukan)")
+func (ar *UserRepository) GetProfile(email string) (users.Core, error) {
+	var input User
+	result := ar.db.Where("email = ?", email).Find(&input)
+	if result.Error != nil {
+		return users.Core{}, result.Error
+	}
+	if result.RowsAffected == 0 {
 		return users.Core{}, errors.New("user not found")
 	}
-	if tx.Error != nil {
-		log.Println("Terjadi Kesalahan")
-		return users.Core{}, tx.Error
-	}
-	return users.Core{}, nil
+	return users.Core{
+		Username: input.Username,
+		Email:    input.Email,
+		Password: input.Password,
+	}, nil
 }
 
-func (ar *UserRepository) UpdateProfile(userID uint, updatedUser users.Core) error {
-	userInput := User{}
-	if err := ar.db.Where("id = ?", userID).Find(&userInput).Error; err != nil {
+func (ar *UserRepository) UpdateProfile(email string, updatedUser users.Core) error {
+	input := User{}
+	if err := ar.db.Where("email = ?", email).First(&input).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return fmt.Errorf("user with ID %v not found", userID)
+			return fmt.Errorf("user with email %v not found", email)
 		}
-		log.Print("Failed to query user by ID", err)
+		log.Print("Failed to query user by email", err)
 		return err
 	}
 
-	userInput.Username = updatedUser.Username
-	userInput.Email = updatedUser.Email
-	userInput.Password = updatedUser.Password
-	userInput.UpdatedAt = time.Now()
+	input.Username = updatedUser.Username
+	input.Email = updatedUser.Email
+	input.Password = updatedUser.Password
+	input.UpdatedAt = time.Now()
 
-	if err := ar.db.Save(&userInput).Error; err != nil {
+	if err := ar.db.Save(&input).Error; err != nil {
 		log.Print("Failed to update user", err)
 		return err
 	}
 	return nil
 }
 
-func (ar *UserRepository) DeleteProfile(userID uint) error {
-	user := User{}
-	if userID == 0 {
-		return fmt.Errorf("Terjadi kesalahan input ID")
-	}
-	if err := ar.db.Find(&user, userID).Error; err != nil {
+func (ar *UserRepository) DeleteProfile(email string) error {
+	input := User{}
+	if err := ar.db.Where("email = ?", email).Find(&input).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return fmt.Errorf("ID user %v tidak ditemukan", userID)
+			return fmt.Errorf("user with email %v not found", email)
 		}
-		log.Println("Terjadi error saat mengambil user dengan ID", err)
+		log.Print("Failed to query user by email", err)
 		return err
 	}
 
-	user.DeletedAt = gorm.DeletedAt{Time: time.Now(), Valid: true}
+	input.DeletedAt = gorm.DeletedAt{Time: time.Now(), Valid: true}
 
-	if err := ar.db.Save(&user).Error; err != nil {
+	if err := ar.db.Save(&input).Error; err != nil {
 		log.Println("Terjadi error saat melakukan user buku", err)
 		return err
 	}
