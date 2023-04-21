@@ -1,0 +1,23 @@
+mode: set
+github.com/wanta-zulfikri/Event-Planning-App/app/features/users/service/service.go:18.44,20.2 1 1
+github.com/wanta-zulfikri/Event-Planning-App/app/features/users/service/service.go:22.59,24.16 2 0
+github.com/wanta-zulfikri/Event-Planning-App/app/features/users/service/service.go:27.2,27.12 1 0
+github.com/wanta-zulfikri/Event-Planning-App/app/features/users/service/service.go:24.16,26.3 1 0
+github.com/wanta-zulfikri/Event-Planning-App/app/features/users/service/service.go:30.81,32.16 2 1
+github.com/wanta-zulfikri/Event-Planning-App/app/features/users/service/service.go:35.2,35.18 1 1
+github.com/wanta-zulfikri/Event-Planning-App/app/features/users/service/service.go:32.16,34.3 1 1
+github.com/wanta-zulfikri/Event-Planning-App/app/features/users/service/service.go:38.69,40.16 2 1
+github.com/wanta-zulfikri/Event-Planning-App/app/features/users/service/service.go:43.2,43.18 1 1
+github.com/wanta-zulfikri/Event-Planning-App/app/features/users/service/service.go:40.16,42.3 1 1
+github.com/wanta-zulfikri/Event-Planning-App/app/features/users/service/service.go:46.95,48.16 2 1
+github.com/wanta-zulfikri/Event-Planning-App/app/features/users/service/service.go:51.2,57.63 2 1
+github.com/wanta-zulfikri/Event-Planning-App/app/features/users/service/service.go:60.2,60.12 1 0
+github.com/wanta-zulfikri/Event-Planning-App/app/features/users/service/service.go:48.16,50.3 1 0
+github.com/wanta-zulfikri/Event-Planning-App/app/features/users/service/service.go:57.63,59.3 1 0
+github.com/wanta-zulfikri/Event-Planning-App/app/features/users/service/service.go:63.58,64.17 1 1
+github.com/wanta-zulfikri/Event-Planning-App/app/features/users/service/service.go:67.2,68.16 2 1
+github.com/wanta-zulfikri/Event-Planning-App/app/features/users/service/service.go:75.2,75.12 1 1
+github.com/wanta-zulfikri/Event-Planning-App/app/features/users/service/service.go:64.17,66.3 1 0
+github.com/wanta-zulfikri/Event-Planning-App/app/features/users/service/service.go:68.16,69.45 1 1
+github.com/wanta-zulfikri/Event-Planning-App/app/features/users/service/service.go:72.3,73.51 2 1
+github.com/wanta-zulfikri/Event-Planning-App/app/features/users/service/service.go:69.45,71.4 1 0

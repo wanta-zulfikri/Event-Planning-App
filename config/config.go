@@ -3,35 +3,60 @@ package config
 import (
 	"log"
 	"os"
-	"strconv"
+	"sync"
+
+	"github.com/wanta-zulfikri/Event-Planning-App/config/common"
+
+	"github.com/joho/godotenv"
 )
 
-var JWTSecret = os.Getenv("JWTSecret")
-
 type Configuration struct {
-	Host     string
-	Port     int
-	Username string
-	Password string
-	Name     string
+	Port     string
+	Database struct {
+		Driver   string
+		Host     string
+		Name     string
+		Address  string
+		Port     string
+		Username string
+		Password string
+	}
 }
 
-func InitConfiguration() Configuration {
-	// err := godotenv.Load()
-	// if err != nil {
-	// 	log.Println("Cannot load environment variables")
-	// }
+var lock = &sync.Mutex{}
+var appConfig *Configuration
 
-	port, err := strconv.Atoi(os.Getenv("Port"))
+func GetConfiguration() *Configuration {
+	lock.Lock()
+	defer lock.Unlock()
+
+	if appConfig == nil {
+		appConfig = InitConfiguration()
+	}
+
+	return appConfig
+}
+
+func InitConfiguration() *Configuration {
+
+	err := godotenv.Load()
 	if err != nil {
-		log.Println("Invalid port number")
+		log.Fatal("Error loading .env file")
 	}
 
-	return Configuration{
-		Host:     os.Getenv("Host"),
-		Port:     port,
-		Username: os.Getenv("Username"),
-		Password: os.Getenv("Password"),
-		Name:     os.Getenv("Name"),
-	}
+	var defaultConfig Configuration
+	defaultConfig.Port = os.Getenv("AppPort")
+	defaultConfig.Database.Host = os.Getenv("Host")
+	defaultConfig.Database.Port = os.Getenv("Port")
+	defaultConfig.Database.Username = os.Getenv("Username")
+	defaultConfig.Database.Password = os.Getenv("Password")
+	defaultConfig.Database.Name = os.Getenv("Name")
+	common.JWTSecret = os.Getenv("JWTSecret")
+	common.Credential = os.Getenv("Credential")
+	common.ProjectID = os.Getenv("ProjectID")
+	common.BucketName = os.Getenv("BucketName")
+	common.Path = os.Getenv("Path")
+
+	return &defaultConfig
+
 }
