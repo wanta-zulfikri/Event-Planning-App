@@ -1,8 +1,8 @@
 package routes
 
 import (
-	"Event-Planning-App/app/features/users"
-	"Event-Planning-App/config/common"
+	"github.com/wanta-zulfikri/Event-Planning-App/app/features/users"
+	"github.com/wanta-zulfikri/Event-Planning-App/config/common"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"

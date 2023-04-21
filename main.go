@@ -1,12 +1,13 @@
 package main
 
 import (
-	userHandler "Event-Planning-App/app/features/users/handler"
-	userRepo "Event-Planning-App/app/features/users/repository"
-	userLogic "Event-Planning-App/app/features/users/service"
-	"Event-Planning-App/app/routes"
-	"Event-Planning-App/config"
 	"fmt"
+
+	userHandler "github.com/wanta-zulfikri/Event-Planning-App/app/features/users/handler"
+	userRepo "github.com/wanta-zulfikri/Event-Planning-App/app/features/users/repository"
+	userLogic "github.com/wanta-zulfikri/Event-Planning-App/app/features/users/service"
+	"github.com/wanta-zulfikri/Event-Planning-App/app/routes"
+	"github.com/wanta-zulfikri/Event-Planning-App/config"
 
 	"github.com/labstack/echo/v4"
 )

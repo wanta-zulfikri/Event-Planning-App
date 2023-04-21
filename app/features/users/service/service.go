@@ -1,11 +1,12 @@
 package service
 
 import (
-	"Event-Planning-App/app/features/users"
-	"Event-Planning-App/helper"
 	"errors"
 	"fmt"
 	"log"
+
+	"github.com/wanta-zulfikri/Event-Planning-App/app/features/users"
+	"github.com/wanta-zulfikri/Event-Planning-App/helper"
 
 	"gorm.io/gorm"
 )
@@ -54,21 +55,21 @@ func (us *UserService) UpdateProfile(email, username, newEmail, password, image 
 		Image:    image,
 	}
 	if err := us.m.UpdateProfile(email, updatedUser); err != nil {
-		return fmt.Errorf("failed to update profile: %v", err)
+		return fmt.Errorf("Error while updating %s: %v", email, err)
 	}
 	return nil
 }
 
 func (us *UserService) DeleteProfile(email string) error {
 	if email == "" {
-		return fmt.Errorf("Email tidak valid")
+		return fmt.Errorf("Invalid email")
 	}
 	err := us.m.DeleteProfile(email)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return fmt.Errorf("User dengan email %v tidak ditemukan", email)
+			return fmt.Errorf("Email: %v ,not found", email)
 		}
-		log.Printf("Terjadi kesalahan saat menghapus data user dengan email %s: %v", email, err)
+		log.Printf("Error while deleting %s: %v", email, err)
 		return fmt.Errorf("Terjadi masalah pada server")
 	}
 	return nil

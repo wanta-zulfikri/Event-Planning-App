@@ -1,12 +1,13 @@
 package repository
 
 import (
-	"Event-Planning-App/app/features/users"
-	"Event-Planning-App/helper"
 	"errors"
 	"fmt"
 	"log"
 	"time"
+
+	"github.com/wanta-zulfikri/Event-Planning-App/app/features/users"
+	"github.com/wanta-zulfikri/Event-Planning-App/helper"
 
 	"gorm.io/gorm"
 )

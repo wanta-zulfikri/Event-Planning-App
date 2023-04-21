@@ -1,10 +1,11 @@
 package middlewares
 
 import (
-	"Event-Planning-App/config/common"
 	"fmt"
 	"strings"
 	"time"
+
+	"github.com/wanta-zulfikri/Event-Planning-App/config/common"
 
 	"github.com/golang-jwt/jwt"
 )

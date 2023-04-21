@@ -1,10 +1,11 @@
 package handler
 
 import (
-	"Event-Planning-App/app/features/users"
-	"Event-Planning-App/helper"
-	"Event-Planning-App/middlewares"
 	"net/http"
+
+	"github.com/wanta-zulfikri/Event-Planning-App/app/features/users"
+	"github.com/wanta-zulfikri/Event-Planning-App/helper"
+	"github.com/wanta-zulfikri/Event-Planning-App/middlewares"
 
 	"github.com/jinzhu/copier"
 	"github.com/labstack/echo/v4"

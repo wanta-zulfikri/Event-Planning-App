@@ -1,7 +1,7 @@
 package config
 
 import (
-	"Event-Planning-App/app/features/users/repository"
+	"github.com/wanta-zulfikri/Event-Planning-App/app/features/users/repository"
 
 	"gorm.io/gorm"
 )
