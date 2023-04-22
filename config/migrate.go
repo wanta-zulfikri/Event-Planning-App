@@ -1,11 +1,9 @@
 package config
 
-import (
-	"github.com/wanta-zulfikri/Event-Planning-App/app/features/users/repository"
-
-	"gorm.io/gorm"
-)
+import "gorm.io/gorm"
 
 func Migrate(db *gorm.DB) {
-	db.AutoMigrate(repository.User{})
+	migrator := db.Migrator()
+	migrator.CreateTable(&repository.User{})
+	migrator.CreateTable(&repository.Events{})
 }

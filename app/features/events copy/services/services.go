@@ -1,6 +1,8 @@
 package services
 
 import (
+	"errors"
+
 	"github.com/wanta-zulfikri/Event-Planning-App/app/features/events"
 )
 
@@ -12,10 +14,10 @@ func New(r events.Repository) events.Service {
 	return &EventService{r: r}
 }
 
-func (es *EventService) CreateEvent(newEvent events.Core) error {
-	_, err := es.r.CreateEvent(newEvent)
+func (es *EventService) GetEventByEventID(id int) (events.Events, error) {
+	event, err := es.r.GetEventByEventID(id)
 	if err != nil {
-		return err
+		return events.Events{}, errors.New("terdapat masalah pada server")
 	}
-	return nil
+	return event, nil
 }
