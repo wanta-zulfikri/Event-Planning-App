@@ -56,6 +56,8 @@ func InitConfiguration() *Configuration {
 	common.ProjectID = os.Getenv("ProjectID")
 	common.BucketName = os.Getenv("BucketName")
 	common.Path = os.Getenv("Path")
+	common.MIDTRANS_CLIENT_KEY = os.Getenv("MIDTRANS_CLIENT_KEY")
+	common.MIDTRANS_SERVER_KEY = os.Getenv("MIDTRANS_SERVER_KEY")
 
 	return &defaultConfig
 

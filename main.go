@@ -1,15 +1,8 @@
 package main
 
 import (
-	"fmt"
-
-	userHandler "github.com/wanta-zulfikri/Event-Planning-App/app/features/users/handler"
-	userRepo "github.com/wanta-zulfikri/Event-Planning-App/app/features/users/repository"
-	userLogic "github.com/wanta-zulfikri/Event-Planning-App/app/features/users/service"
-	"github.com/wanta-zulfikri/Event-Planning-App/app/routes"
-	"github.com/wanta-zulfikri/Event-Planning-App/config"
-
-	"github.com/labstack/echo/v4"
+	"Event-Planning-App/config"
+	"log"
 )
 
 func main() {
@@ -18,11 +11,14 @@ func main() {
 	db, _ := config.GetConnection(*cfg)
 	config.Migrate(db)
 
-	userModel := userRepo.New(db)
-	userService := userLogic.New(userModel)
-	userController := userHandler.New(userService)
-
-	routes.Route(e, userController)
-
-	e.Logger.Fatal(e.Start(fmt.Sprintf(":%s", cfg.Port)))
+	// Check database connection
+	sqlDb, err := db.DB()
+	if err != nil {
+		log.Fatalf("cannot get sql.DB instance: %v", err)
+	}
+	err = sqlDb.Ping()
+	if err != nil {
+		log.Fatalf("cannot ping database: %v", err)
+	}
+	log.Println("Connected with database!")
 }

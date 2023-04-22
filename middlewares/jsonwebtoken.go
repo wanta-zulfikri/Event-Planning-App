@@ -5,8 +5,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/golang-jwt/jwt"
-	"github.com/labstack/echo/v4"
 	"github.com/wanta-zulfikri/Event-Planning-App/config/common"
 
 	"github.com/golang-jwt/jwt"
@@ -50,14 +48,11 @@ func ValidateJWT(authHeader string) (string, error) {
 		return "", fmt.Errorf("invalid or expired token")
 	}
 	return email, nil
-} 
+}
 
-func ExtractToken(e echo.Context) uint {
-	user := e.Get("user").(*jwt.Token)
-	if user.Valid {
-		claims := user.Claims.(jwt.MapClaims)
-		userId := claims["userId"].(float64)
-		return uint(userId)
-	}
-	return 0
+func GetUserID(token *jwt.Token) int {
+	parse := token.Claims.(jwt.MapClaims)
+	id := int(parse["id"].(float64))
+
+	return id
 }

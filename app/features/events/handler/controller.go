@@ -1,150 +1,68 @@
 package handler
 
 import (
-	"Event-Planning-App/app/features/events"
-	"Event-Planning-App/helper"
-	"Event-Planning-App/middlewares"
 	"net/http"
-	"strconv"
 
-	"github.com/jinzhu/copier"
 	"github.com/labstack/echo/v4"
-
+	"github.com/wanta-zulfikri/Event-Planning-App/app/features/events"
+	"github.com/wanta-zulfikri/Event-Planning-App/helper"
+	"github.com/wanta-zulfikri/Event-Planning-App/middlewares"
 )
 
-type EventHandler struct {
-	srv events.EventService
+type EventController struct {
+	s events.Service
 }
 
-func New(service events.EventService) *EventHandler {
-	return &EventHandler{
-		srv: service,
-	}
-} 
-
-func (ev *EventHandler) Add(c echo.Context) error {
-	addInput := EventRequest{} 
-	addInput.UserID = uint(middlewares.ExtractToken(c)) 
-	if err := c.Bind(&addInput); err != nil {
-		c.Logger().Error("terjadi kesalahan bind", err.Error()) 
-		return c.JSON(helper.ErrorResponse(err))
-	} 
-
-	newEvent := events.Core{}
-	copier.Copy(&newEvent, addInput) 
-
-	file, _ := c.FormFile("Image") 
-
-	err := ev.srv.Add(newEvent, file) 
-	if err != nil {
-		c.Logger().Error("terjadi kesalahan saat add event",  err.Error())
-		return c.JSON(helper.ErrorResponse(err))
-	}
-	return c.JSON(helper.SuccessResponse(http.StatusCreated, "add event successfully"))
+func New(h events.Service) events.Handler {
+	return &EventController{s: h}
 }
 
-
-func (ev *EventHandler) MyEvent(c echo.Context) error {
-	userID := int(middlewares.ExtractToken(c)) 
-	var pageNumber int = 1 
-	pageParam := c.QueryParam("page") 
-	if pageParam != "" {
-		pageConv, errConv := strconv.Atoi(pageParam) 
-		if errConv != nil {
-			c.Logger().Error("terjadi kesalahan") 
-			return c.JSON(http.StatusInternalServerError,helper.Response("Failed, page must number"))
-
-		} else {
-			pageNumber = pageConv
+func (ec *EventController) CreateEvent() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		tokenString := c.Request().Header.Get("Authorization")
+		if tokenString == "" {
+			return c.JSON(http.StatusUnauthorized, helper.ResponseFormat(http.StatusUnauthorized, "Unauthorized. Token is missing.", nil))
 		}
-	}
 
-	data, err := ev.srv.MyEvent(userID, pageNumber)
-	if err != nil {
-		c.Logger().Error("terjadi kesalahan") 
-		return c.JSON(http.StatusInternalServerError, helper.Response("Failed, error read data"))
-	} 
-	dataResponse := CoreToGetAllEventResp(data) 
-	return c.JSON(http.StatusOK, helper.ResponseWithData("Success", dataResponse))
-} 
-
-func (ev *EventHandler) GetAll(c echo.Context) error {
-	var pageNumber int = 1 
-	pageParam := c.QueryParam("page") 
-	if pageParam != "" {
-		pageConv, errConv := strconv.Atoi(pageParam) 
-		if errConv != nil {
-			c.Logger().Error("terjadi kesalahan")  
-			return c.JSON(http.StatusInternalServerError, helper.Response("Failed, page must number"))
-
-		} else {
-			pageNumber = pageConv
+		_, err := middlewares.ValidateJWT(tokenString)
+		if err != nil {
+			return c.JSON(http.StatusUnauthorized, helper.ResponseFormat(http.StatusUnauthorized, "Unauthorized. "+err.Error(), nil))
 		}
+
+		var input events.Core
+		if err := c.Bind(&input); err != nil {
+			c.Logger().Error(err.Error())
+			return c.JSON(http.StatusBadRequest, helper.ResponseFormat(http.StatusBadRequest, "Bad Request", nil))
+		}
+
+		file, err := c.FormFile("image")
+		if err != nil {
+			c.Logger().Error("Failed to get image: ", err)
+			return c.JSON(http.StatusBadRequest, helper.ResponseFormat(http.StatusBadRequest, "Bad Request", nil))
+		}
+
+		image, err := helper.UploadImage(c, file)
+		if err != nil {
+			c.Logger().Error("Failed to upload image: ", err)
+			return c.JSON(http.StatusInternalServerError, helper.ResponseFormat(http.StatusInternalServerError, "Internal Server Error", nil))
+		}
+
+		newEvent := events.Core{
+			Title:       input.Title,
+			Description: input.Description,
+			EventDate:   input.EventDate,
+			EventTime:   input.EventTime,
+			Status:      input.Status,
+			Category:    input.Category,
+			Location:    input.Location,
+			Image:       image,
+		}
+
+		err = ec.s.CreateEvent(newEvent)
+		if err != nil {
+			c.Logger().Error("Failed to create event: ", err)
+			return c.JSON(http.StatusInternalServerError, helper.ResponseFormat(http.StatusInternalServerError, "Internal Server Error", nil))
+		}
+		return c.JSON(http.StatusCreated, helper.ResponseFormat(http.StatusCreated, "Event created successfully", nil))
 	}
-
-	nameParam := c.QueryParam("name") 
-	data, err := ev.srv.GetAll(pageNumber, nameParam) 
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, helper.Response("Failed, error read data"))
-	} 
-	dataResponse := CoreToGetAllEventResp(data)
-	return c.JSON(http.StatusOK, helper.ResponseWithData("success", dataResponse))
-} 
-
-func (ev *EventHandler) Update(c echo.Context) error {
-	userID := int(middlewares.ExtractToken(c)) 
-	eventID, errCnv := strconv.Atoi(c.Param("id")) 
-	if errCnv != nil {
-		c.Logger().Error("event tidak ditemukan") 
-		return errCnv
-	} 
-
-	updateInput := EventRequest{} 
-	if err := c.Bind(&updateInput); err != nil {
-		c.Logger().Error("terjadi kesalahan bind", err.Error())
-		return c.JSON(helper.ErrorResponse(err))
-	} 
-
-	file, _ := c.FormFile("Image") 
-
-	updateEvent := events.Core{} 
-	copier.Copy(&updateEvent, &updateInput) 
-	err := ev.srv.Update(userID, eventID, updateEvent, file) 
-	if err != nil{
-		c.Logger().Error("terjadi kesalahan update event", err.Error()) 
-		return c.JSON(helper.ErrorResponse(err))
-	} 
-	return c.JSON(helper.SuccessResponse(http.StatusOK, "update event successfully updated"))
-} 
-
-func (ev *EventHandler) GetEventById(c echo.Context) error {
-	eventID, errCnv := strconv.Atoi(c.Param("id")) 
-	if errCnv != nil {
-		c.Logger().Error("terjadi kesalahan ") 
-		return errCnv
-	}
-	data, err := ev.srv.GetEventById(eventID) 
-	if err != nil {
-		c.Logger().Error("terjadi kesalahan", err.Error()) 
-		return c.JSON(helper.ErrorResponse(err))
-	} 
-	res := MyEventResponse{} 
-	copier.Copy(&res, &data) 
-	return c.JSON(helper.SuccessResponse(http.StatusOK, "detail event successfully displayed",res))
-} 
-
-
-func (ev *EventHandler) DeleteEvent(C echo.Context) error {
-	userID := int(middlewares.ExtractToken(C)) 
-	eventID, errCnv := strconv.Atoi(C.Param("id")) 
-	if errCnv != nil {
-		C.Logger().Error("terjadi kesalahan") 
-		return errCnv
-	} 
-	err := ev.srv.DeleteEvent(userID, eventID) 
-	if err != nil {
-		C.Logger().Error("terjadi kesalahan", err.Error()) 
-		return C.JSON(helper.ErrorResponse(err)) 
-	} 
-	return C.JSON(helper.SuccessResponse(http.StatusOK, "detail event deleted"))
 }
