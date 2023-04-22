@@ -16,7 +16,7 @@ func New(db *gorm.DB) *EventRepository {
 }
 
 func (er *EventRepository) CreateEvent(newEvent events.Core) (events.Core, error) {
-	input := events.Events{
+	input := events.Event{
 		Title:       newEvent.Title,
 		Description: newEvent.Description,
 		EventDate:   newEvent.EventDate,
@@ -29,8 +29,20 @@ func (er *EventRepository) CreateEvent(newEvent events.Core) (events.Core, error
 
 	err := er.db.Table("events").Create(&input).Error
 	if err != nil {
-		log.Println("Terjadi error saat membuat daftar event baru", err.Error())
+		log.Println("Error creating new event: ", err.Error())
 		return events.Core{}, err
 	}
-	return newEvent, nil
+
+	createdEvent := events.Core{
+		Id:          input.ID,
+		Title:       input.Title,
+		Description: input.Description,
+		EventDate:   input.EventDate,
+		EventTime:   input.EventTime,
+		Status:      input.Status,
+		Category:    input.Category,
+		Location:    input.Location,
+		Image:       input.Image,
+	}
+	return createdEvent, nil
 }

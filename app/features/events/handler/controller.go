@@ -29,7 +29,7 @@ func (ec *EventController) CreateEvent() echo.HandlerFunc {
 			return c.JSON(http.StatusUnauthorized, helper.ResponseFormat(http.StatusUnauthorized, "Unauthorized. "+err.Error(), nil))
 		}
 
-		var input events.Core
+		var input RequestCreateEvent
 		if err := c.Bind(&input); err != nil {
 			c.Logger().Error(err.Error())
 			return c.JSON(http.StatusBadRequest, helper.ResponseFormat(http.StatusBadRequest, "Bad Request", nil))

@@ -8,5 +8,6 @@ import (
 
 func Migrate(db *gorm.DB) {
 	migrator := db.Migrator()
-	migrator.CreateTable(&repository.User{}, &events.Events{})
+	migrator.CreateTable(&repository.User{})
+	migrator.CreateTable(&events.Event{})
 }

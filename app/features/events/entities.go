@@ -6,18 +6,20 @@ import (
 )
 
 type Core struct {
-	ID          int
-	Title       string
-	Description string
-	EventDate   string
-	EventTime   string
+	Id          uint
+	UserID      uint
+	Title       string `validate:"required"`
+	Description string `validate:"required"`
+	Hosted_by   string `validate:"required"`
+	EventDate   string `validate:"required"`
+	EventTime   string `validate:"required"`
 	Status      string
-	Category    string
+	Category    string `validate:"required"`
 	Location    string
 	Image       string
 }
 
-type Events struct {
+type Event struct {
 	gorm.Model
 	Title       string `json:"title" gorm:"type:varchar(100);not null"`
 	Description string `json:"description" gorm:"type:varchar(225);not null"`
