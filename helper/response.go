@@ -5,6 +5,7 @@ import (
 	"strings"
 )
 
+
 type DataResponse struct {
 	Code    int         `json:"code"`
 	Message string      `json:"message"`
@@ -108,4 +109,13 @@ func Response(message string) map[string]any {
 	return map[string]any{
 		"message": message,
 	}
+}
+func ResponseFormat(code int, message string, data interface{}) map[string]interface{} {
+	res := make(map[string]interface{})
+	res["code"] = code
+	res["message"] = message
+	if data != nil {
+		res["data"] = data
+	}
+	return res
 }

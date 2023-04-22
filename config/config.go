@@ -5,10 +5,10 @@ import (
 	"os"
 	"sync"
 
+	"github.com/wanta-zulfikri/Event-Planning-App/config/common"
+
 	"github.com/joho/godotenv"
 )
-
-var JWTSecret string
 
 type Configuration struct {
 	Port     string
@@ -51,7 +51,11 @@ func InitConfiguration() *Configuration {
 	defaultConfig.Database.Username = os.Getenv("Username")
 	defaultConfig.Database.Password = os.Getenv("Password")
 	defaultConfig.Database.Name = os.Getenv("Name")
-	JWTSecret = os.Getenv("JWTSecret")
+	common.JWTSecret = os.Getenv("JWTSecret")
+	common.Credential = os.Getenv("Credential")
+	common.ProjectID = os.Getenv("ProjectID")
+	common.BucketName = os.Getenv("BucketName")
+	common.Path = os.Getenv("Path")
 
 	return &defaultConfig
 

@@ -1,13 +1,15 @@
 package middlewares
 
 import (
-	"Event-Planning-App/config"
 	"fmt"
 	"strings"
 	"time"
 
 	"github.com/golang-jwt/jwt"
 	"github.com/labstack/echo/v4"
+	"github.com/wanta-zulfikri/Event-Planning-App/config/common"
+
+	"github.com/golang-jwt/jwt"
 )
 
 func CreateJWT(email string) (string, error) {
@@ -17,7 +19,7 @@ func CreateJWT(email string) (string, error) {
 		Subject:   email,
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	signedToken, err := token.SignedString([]byte(config.JWTSecret))
+	signedToken, err := token.SignedString([]byte(common.JWTSecret))
 	if err != nil {
 		return "", err
 	}
@@ -34,7 +36,7 @@ func ValidateJWT(authHeader string) (string, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
-		return []byte(config.JWTSecret), nil
+		return []byte(common.JWTSecret), nil
 	})
 	if err != nil {
 		return "", fmt.Errorf("invalid or expired token")
