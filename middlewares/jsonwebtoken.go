@@ -49,3 +49,10 @@ func ValidateJWT(authHeader string) (string, error) {
 	}
 	return email, nil
 }
+
+func GetUserID(token *jwt.Token) int {
+	parse := token.Claims.(jwt.MapClaims)
+	id := int(parse["id"].(float64))
+
+	return id
+}
