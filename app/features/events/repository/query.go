@@ -16,7 +16,7 @@ func New(db *gorm.DB) *EventRepository {
 }
 
 func (er *EventRepository) CreateEvent(newEvent events.Core) (events.Core, error) {
-	input := Events{
+	input := events.Events{
 		Title:       newEvent.Title,
 		Description: newEvent.Description,
 		EventDate:   newEvent.EventDate,
