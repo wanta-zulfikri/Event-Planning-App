@@ -1,7 +1,9 @@
 package routes
 
-import (
+import ( 
+
 	"github.com/wanta-zulfikri/Event-Planning-App/app/features/events"
+	"github.com/wanta-zulfikri/Event-Planning-App/app/features/reviews"
 	"github.com/wanta-zulfikri/Event-Planning-App/app/features/users"
 	"github.com/wanta-zulfikri/Event-Planning-App/config/common"
 
@@ -9,10 +11,10 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 )
 
-func Route(e *echo.Echo, uc users.Handler, ec events.Handler) {
+func Route(e *echo.Echo, uc users.Handler, ec events.Handler, rc reviews.Handler) {
 	e.Pre(middleware.RemoveTrailingSlash())
 	e.Use(middleware.CORS())
-	e.Use(middleware.Logger())
+	e.Use(middleware.Logger()) 
 	//authentication
 	e.POST("/register", uc.Register())
 	e.POST("/login", uc.Login())
@@ -24,5 +26,8 @@ func Route(e *echo.Echo, uc users.Handler, ec events.Handler) {
 	e.POST("/events", ec.CreateEvent(), middleware.JWT([]byte(common.JWTSecret)))
 	//transactions
 
-	//reviews
+	//reviews 
+	e.POST("/reviews", rc.UpdateReview(), middleware.JWT([]byte(common.JWTsecret))) 
+	e.PUT("/reviews", rc.UpdateReview(), middleware.JWT([]byte(common.JWTsecret))) 
+	e.DELETE("/reviews", rc.DeleteReview(), middleware.JWT([]byte(common.JWTsecret)))
 }

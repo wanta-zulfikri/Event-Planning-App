@@ -1,8 +1,11 @@
 package main
 
 import (
-	"fmt"
-
+	"fmt" 
+    
+	reviewHandler "github.com/wanta-zulfikri/Event-Planning-App/app/features/review/handler"
+	reviewRepo "github.com/wanta-zulfikri/Event-Planning-App/app/features/review/repository"
+	reviewLogic "github.com/wanta-zulfikri/Event-Planning-App/app/features/review/service"
 	eventHandler "github.com/wanta-zulfikri/Event-Planning-App/app/features/events/handler"
 	eventRepo "github.com/wanta-zulfikri/Event-Planning-App/app/features/events/repository"
 	eventLogic "github.com/wanta-zulfikri/Event-Planning-App/app/features/events/services"
