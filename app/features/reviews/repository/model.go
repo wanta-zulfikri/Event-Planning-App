@@ -3,8 +3,12 @@ package repository
 import "gorm.io/gorm"
 
 type Review struct {
-	gorm.Model
-	UserID  uint   `gorm:"not null"`
-	EventID uint   `gorm:"not null;foreignKey:EventID"`
-	Review  string `gorm:"not null"`
-}
+	gorm.Model 
+	ID      uint     `gorm:"type:varchar(100)"`
+	UserID  uint     `gorm:"type:varchar(100)"`
+	EventID uint     `gorm:"type:varchar(100)"`
+	Review  string   `gorm:"type:varchar(255)"` 
+	DeletedAt gorm.DeletedAt `gorm:"index"`
+} 
+
+

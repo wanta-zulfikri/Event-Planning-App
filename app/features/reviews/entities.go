@@ -1,9 +1,42 @@
 package reviews
 
+import (
+	"github.com/labstack/echo/v4"
+	"gorm.io/gorm"
+)
+
 type Core struct {
-	ID          uint   `gorm:"primaryKey"`
-	UserID      uint   `gorm:"not null"`
-	EventID     uint   `gorm:"not null;foreignKey:EventID"`
-	ReviewScore int    `gorm:"not null"`
-	ReviewText  string `gorm:"not null"`
+	ID          uint   
+	UserID      uint   
+	EventID     uint   
+	ReviewScore int    
+	ReviewText  string 
+}
+
+type Repository interface {
+	WriteReview(newReview Core) (Core, error)
+	UpdateReview(id uint, updateReview Core) error  
+	DeleteReview(id uint) error 
+}
+
+type Service interface {
+	WriteReview(newReview Core) error 
+	UpdateReview(id uint, updateReview Core) error 
+	DeleteReview(id uint) error 
+}
+
+type Handler interface {
+	WriteReview() echo.HandlerFunc 
+	UpdateReview() echo.HandlerFunc 
+	DeleteReview() echo.HandlerFunc
+}  
+
+type Review struct {
+	ID      	uint   
+	UserID  	uint   
+	EventID 	uint   
+	ReviewScore  int 
+	ReviewText string 
+	DeletedAt gorm.DeletedAt `gorm:"index"`
+
 }
