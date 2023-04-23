@@ -3,9 +3,12 @@ package main
 import (
 	"fmt" 
     
-	reviewHandler "github.com/wanta-zulfikri/Event-Planning-App/app/features/review/handler"
-	reviewRepo "github.com/wanta-zulfikri/Event-Planning-App/app/features/review/repository"
-	reviewLogic "github.com/wanta-zulfikri/Event-Planning-App/app/features/review/service"
+	attendancesHandler "github.com/wanta-zulfikri/Event-Planning-App/app/features/attendances/handler"
+	attendancesRepo "github.com/wanta-zulfikri/Event-Planning-App/app/features/attendances/repository"
+	attendancesLogic "github.com/wanta-zulfikri/Event-Planning-App/app/features/attendances/services"
+	reviewHandler "github.com/wanta-zulfikri/Event-Planning-App/app/features/reviews/handler"
+	reviewRepo "github.com/wanta-zulfikri/Event-Planning-App/app/features/reviews/repository"
+	reviewLogic "github.com/wanta-zulfikri/Event-Planning-App/app/features/reviews/services"
 	eventHandler "github.com/wanta-zulfikri/Event-Planning-App/app/features/events/handler"
 	eventRepo "github.com/wanta-zulfikri/Event-Planning-App/app/features/events/repository"
 	eventLogic "github.com/wanta-zulfikri/Event-Planning-App/app/features/events/services"
@@ -35,9 +38,15 @@ func main() {
 	eventController := eventHandler.New(eventService)
 	ticketModel := ticketRepo.New(db)
 	ticketService := ticketLogic.New(ticketModel)
-	ticketController := ticketHandler.New(ticketService)
+	ticketController := ticketHandler.New(ticketService) 
+	reviewModel := reviewRepo.New(db) 
+	reviewService := reviewLogic.New(reviewModel) 
+	reviewController := reviewHandler.New(reviewService) 
+	attendancesModel := attendancesRepo.New(db) 
+	attendancesService := attendancesLogic.New(attendancesModel) 
+	attendancesController := attendancesHandler.New(attendancesService)
 
-	routes.Route(e, userController, eventController, ticketController)
+	routes.Route(e, userController, eventController, ticketController, reviewController, attendancesController)
 
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%s", cfg.Port)))
 }
