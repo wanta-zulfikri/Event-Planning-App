@@ -9,19 +9,40 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 )
 
+const (
+	usersPath  = "/users"
+	eventsPath = "/events"
+)
+
+var jwtSecret = []byte(common.JWTSecret)
+
 func Route(e *echo.Echo, uc users.Handler, ec events.Handler) {
 	e.Pre(middleware.RemoveTrailingSlash())
 	e.Use(middleware.CORS())
 	e.Use(middleware.Logger())
-	//authentication
-	e.POST("/register", uc.Register())
-	e.POST("/login", uc.Login())
-	//users
-	e.GET("/users", uc.GetProfile(), middleware.JWT([]byte(common.JWTSecret)))
-	e.PUT("/users", uc.UpdateProfile(), middleware.JWT([]byte(common.JWTSecret)))
-	e.DELETE("/users", uc.DeleteProfile(), middleware.JWT([]byte(common.JWTSecret)))
-	//events
-	e.POST("/events", ec.CreateEvent(), middleware.JWT([]byte(common.JWTSecret)))
+
+	authMiddleware := middleware.JWT(jwtSecret)
+
+	authRoutes := e.Group("")
+	authRoutes.POST("/register", uc.Register())
+	authRoutes.POST("/login", uc.Login())
+
+	usersRoutes := e.Group(usersPath, authMiddleware)
+	usersRoutes.GET("", uc.GetProfile())
+	usersRoutes.PUT("", uc.UpdateProfile())
+	usersRoutes.DELETE("", uc.DeleteProfile())
+
+	eventsRoutes := e.Group(eventsPath, authMiddleware)
+	eventsRoutes.GET("", ec.GetEvents())
+	eventsRoutes.POST("", ec.CreateEvent())
+	eventsRoutes.GET("/:id", ec.GetEvent())
+	eventsRoutes.PUT("/:id", ec.UpdateEvent())
+	eventsRoutes.DELETE("/:id", ec.DeleteEvent())
+
+	//tickets
+
+	//attendances
+
 	//transactions
 
 	//reviews
