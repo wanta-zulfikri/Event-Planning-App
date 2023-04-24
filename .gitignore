@@ -1,3 +1,2 @@
 *.env
-*auth.json 
-*config.json 
+*auth.json
