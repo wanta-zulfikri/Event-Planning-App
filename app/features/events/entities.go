@@ -14,12 +14,13 @@ type Core struct {
 	Category    string
 	Location    string
 	Image       string
-	UserID      uint //hostedby : username didapat dari jwt
+	Username    string //hostedby : username didapat dari jwt
+	UserID      uint
 }
 
 type Repository interface {
 	GetEvents() ([]Core, error)
-	CreateEvent(newEvent Core) (Core, error)
+	CreateEvent(newEvent Core, id uint) (Core, error)
 	GetEvent(id uint) (Core, error)
 	UpdateEvent(id uint, updatedEvent Core) error
 	DeleteEvent(id uint) error
@@ -27,7 +28,7 @@ type Repository interface {
 
 type Service interface {
 	GetEvents() ([]Core, error)
-	CreateEvent(newEvent Core) error
+	CreateEvent(newEvent Core, id uint) error
 	GetEvent(id uint) (Core, error)
 	UpdateEvent(id uint, updatedEvent Core) error
 	DeleteEvent(id uint) error

@@ -1,6 +1,8 @@
 package repository
 
-import "gorm.io/gorm"
+import (
+	"gorm.io/gorm"
+)
 
 type Ticket struct {
 	gorm.Model
@@ -9,5 +11,4 @@ type Ticket struct {
 	TicketPrice    uint
 	TicketQuantity uint
 	EventID        uint
-	TransactionID  uint
 }

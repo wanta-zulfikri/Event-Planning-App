@@ -9,7 +9,7 @@ type RequestCreateEvent struct {
 	Category    string `form:"category"`
 	Location    string `form:"location"`
 	Image       string `form:"image"`
-	UserID      uint   `form:"userid"`
+	Username    string `form:"username"`
 }
 
 type RequestUpdateEvent struct {
@@ -21,5 +21,5 @@ type RequestUpdateEvent struct {
 	Category    string `form:"category"`
 	Location    string `form:"location"`
 	Image       string `form:"image"`
-	UserID      uint   `form:"userid"`
+	Username    string `form:"username"`
 }

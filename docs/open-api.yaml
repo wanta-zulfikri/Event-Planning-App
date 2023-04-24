@@ -7,30 +7,21 @@ info:
   contact:
     name: Developer 
     email: dimas.yudhana@gmail.com
-  license:
-    name: APACHE 2.0
-    url: https://www.apache.org/licenses/LICENSE-2.0
 
 externalDocs:
   description: Visit the Event Planning App GitHub repository for more information.
   url: https://github.com/wanta-zulfikri/Event-Planning-App.git
 
 servers:
-  - url: http://{environment}
-    description: "Event Planning App RESTful API Servers"
-    variables:
-      environment:
-        enum:
-          - SwaggerHub API Auto Mocking
-          - peterzalai.biz.id
-          - localhost:8080
-        default: SwaggerHub API Auto Mocking
-  - url: https://virtserver.swaggerhub.com/dimasyudhana/EventappRESTfulAPI/1.0
-    description: "SwaggerHub API Auto Mocking"
-  - url: http://peterzalai.biz.id/
-    description: "Deployment server"
-  - url: https://localhost:8080/
-    description: "Development server"
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/dimasyudhana/EventappRESTfulAPI/1.0.1
+  - description: Production
+    url: https://
+  - description: Demo
+    url: http://public_ip
+  - description: Testing
+    url: https://localhost:8080
 
 paths:
   /register:
