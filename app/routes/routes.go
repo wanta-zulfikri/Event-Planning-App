@@ -12,10 +12,10 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 )
 
-func Route(e *echo.Echo, uc users.Handler, ec events.Handler, rc reviews.Handler, tc tickets.Handler, as attendances.Handler) {
+func Route(e *echo.Echo, uc users.Handler, ec events.Handler, tc tickets.Handler, as attendances.Handler, rc reviews.Handler) {
 	e.Pre(middleware.RemoveTrailingSlash())
 	e.Use(middleware.CORS())
-	e.Use(middleware.Logger()) 
+	e.Use(middleware.Logger())
 	//authentication
 	e.POST("/register", uc.Register())
 	e.POST("/login", uc.Login())
@@ -36,12 +36,12 @@ func Route(e *echo.Echo, uc users.Handler, ec events.Handler, rc reviews.Handler
 	e.PUT("/tickets/:id", tc.UpdateTicket(), middleware.JWT([]byte(common.JWTSecret)))
 	e.DELETE("/tickets/:id", tc.DeleteTicket(), middleware.JWT([]byte(common.JWTSecret)))
 	//attendancees
-	e.POST("/attendances", as.CreateAttendance(), middleware.JWT([]byte(common.JWTSecret))) 
+	e.POST("/attendances", as.CreateAttendance(), middleware.JWT([]byte(common.JWTSecret)))
 	e.GET("/attendances", as.GetAttendance(), middleware.JWT([]byte(common.JWTSecret)))
 	//transactions
 
-	//reviews 
-	e.POST("/reviews", rc.UpdateReview(), middleware.JWT([]byte(common.JWTSecret))) 
-	e.PUT("/reviews", rc.UpdateReview(), middleware.JWT([]byte(common.JWTSecret))) 
+	//reviews
+	e.POST("/reviews", rc.WriteReview(), middleware.JWT([]byte(common.JWTSecret)))
+	e.PUT("/reviews", rc.UpdateReview(), middleware.JWT([]byte(common.JWTSecret)))
 	e.DELETE("/reviews", rc.DeleteReview(), middleware.JWT([]byte(common.JWTSecret)))
 }

@@ -2,23 +2,12 @@ package tickets
 
 import (
 	"github.com/labstack/echo/v4"
-	"gorm.io/gorm"
 )
 
 type Core struct {
 	ID             uint
 	TicketType     string
 	TicketCategory string
-	TicketPrice    uint
-	TicketQuantity uint
-	EventID        uint
-	TransactionID  uint
-}
-
-type Ticket struct {
-	gorm.Model
-	TicketType     string `gorm:"type:varchar(20)"`
-	TicketCategory string `gorm:"type:varchar(20)"`
 	TicketPrice    uint
 	TicketQuantity uint
 	EventID        uint

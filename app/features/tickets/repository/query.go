@@ -25,7 +25,7 @@ func (tr *TicketRepository) GetTickets() ([]tickets.Core, error) {
 }
 
 func (tr *TicketRepository) CreateTicket(newTicket tickets.Core) (tickets.Core, error) {
-	input := tickets.Ticket{
+	input := Ticket{
 		TicketType:     newTicket.TicketType,
 		TicketCategory: newTicket.TicketCategory,
 		TicketPrice:    newTicket.TicketPrice,
@@ -47,7 +47,7 @@ func (tr *TicketRepository) CreateTicket(newTicket tickets.Core) (tickets.Core, 
 }
 
 func (tr *TicketRepository) GetTicket(id uint) (tickets.Core, error) {
-	var input tickets.Ticket
+	var input Ticket
 	result := tr.db.Where("id = ?", id).Find(&input)
 	if result.Error != nil {
 		return tickets.Core{}, result.Error
@@ -64,7 +64,7 @@ func (tr *TicketRepository) GetTicket(id uint) (tickets.Core, error) {
 }
 
 func (tr *TicketRepository) UpdateTicket(id uint, updatedTicket tickets.Core) error {
-	input := tickets.Ticket{}
+	input := Ticket{}
 	if err := tr.db.Where("id = ?", id).First(&input).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return err
@@ -84,7 +84,7 @@ func (tr *TicketRepository) UpdateTicket(id uint, updatedTicket tickets.Core) er
 }
 
 func (tr *TicketRepository) DeleteTicket(id uint) error {
-	input := tickets.Ticket{}
+	input := Ticket{}
 	if err := tr.db.Where("id = ?", id).Find(&input).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return err

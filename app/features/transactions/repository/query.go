@@ -3,6 +3,7 @@ package repository
 import (
 	"errors"
 
+	"github.com/wanta-zulfikri/Event-Planning-App/app/features/tickets/repository"
 	"github.com/wanta-zulfikri/Event-Planning-App/app/features/transactions"
 	"github.com/wanta-zulfikri/Event-Planning-App/helper"
 	"gorm.io/gorm"
@@ -17,14 +18,14 @@ func NewTransactionRepository(db *gorm.DB) *TransactionRepository {
 }
 
 func (tr *TransactionRepository) CreateTransaction(newTransaction transactions.Core) (transactions.Core, error) {
-	input := transactions.Transaction{
+	input := Transaction{
 		Model:             gorm.Model{},
 		Invoice:           newTransaction.Invoice,
 		PurchaseStartDate: newTransaction.PurchaseStartDate,
 		PurchaseEndDate:   newTransaction.PurchaseEndDate,
 		Status:            newTransaction.Status,
 		StatusDate:        newTransaction.StatusDate,
-		Tickets:           []transactions.Ticket{},
+		Tickets:           []repository.Ticket{},
 		Subtotal:          newTransaction.Subtotal,
 		GrandTotal:        newTransaction.GrandTotal,
 		UserID:            newTransaction.UserID,
@@ -37,7 +38,7 @@ func (tr *TransactionRepository) CreateTransaction(newTransaction transactions.C
 	}
 
 	for _, ticket := range newTransaction.Tickets {
-		ticketInput := transactions.Ticket{
+		ticketInput := repository.Ticket{
 			TransactionID:  input.ID, // set foreign key ke transaksi yang baru saja dibuat
 			TicketType:     ticket.TicketType,
 			TicketCategory: ticket.TicketCategory,
@@ -68,10 +69,10 @@ func (tr *TransactionRepository) CreateTransaction(newTransaction transactions.C
 	return createdTransaction, nil
 }
 
-func (tr *TransactionRepository) GetInvoice(Invoice string) (*transactions.Transaction, error) {
-	transaction := &transactions.Transaction{}
+func (tr *TransactionRepository) GetInvoice(Invoice string) (*Transaction, error) {
+	transaction := &Transaction{}
 
-	err := tr.db.Model(&transactions.Transaction{}).Where("invoice = ?", transaction).Take(&transaction).Error
+	err := tr.db.Model(&Transaction{}).Where("invoice = ?", transaction).Take(&transaction).Error
 
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {

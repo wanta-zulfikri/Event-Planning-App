@@ -2,20 +2,9 @@ package attendances
 
 import (
 	"github.com/labstack/echo/v4"
-	"gorm.io/gorm"
 )
 
 type Core struct {
-	ID            uint
-	UserID        uint
-	EventID       uint
-	EventCategory string
-	TicketType    string
-	Quantity      string
-}
-
-type Attendances struct {
-	gorm.Model
 	ID            uint
 	UserID        uint
 	EventID       uint

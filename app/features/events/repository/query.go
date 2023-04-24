@@ -25,7 +25,7 @@ func (er *EventRepository) GetEvents() ([]events.Core, error) {
 }
 
 func (er *EventRepository) CreateEvent(newEvent events.Core) (events.Core, error) {
-	input := events.Event{
+	input := Event{
 		Title:       newEvent.Title,
 		Description: newEvent.Description,
 		EventDate:   newEvent.EventDate,
@@ -57,7 +57,7 @@ func (er *EventRepository) CreateEvent(newEvent events.Core) (events.Core, error
 }
 
 func (er *EventRepository) GetEvent(id uint) (events.Core, error) {
-	var input events.Event
+	var input Event
 	result := er.db.Where("id = ?", id).Find(&input)
 	if result.Error != nil {
 		return events.Core{}, result.Error
@@ -79,7 +79,7 @@ func (er *EventRepository) GetEvent(id uint) (events.Core, error) {
 }
 
 func (er *EventRepository) UpdateEvent(id uint, updatedEvent events.Core) error {
-	input := events.Event{}
+	input := Event{}
 	if err := er.db.Where("id = ?", id).First(&input).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return err
@@ -104,11 +104,12 @@ func (er *EventRepository) UpdateEvent(id uint, updatedEvent events.Core) error 
 }
 
 func (er *EventRepository) DeleteEvent(id uint) error {
-	input := events.Event{}
+	input := Event{}
 	if err := er.db.Where("id = ?", id).Find(&input).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return err
 		}
+
 		return err
 	}
 

@@ -21,7 +21,7 @@ func New(db *gorm.DB) *UserRepository {
 }
 
 func (ar *UserRepository) Register(newUser users.Core) (users.Core, error) {
-	var input = users.User{}
+	var input = User{}
 	hashedPassword, err := helper.HashedPassword(newUser.Password)
 	if err != nil {
 		log.Println("Hashing password error", err.Error())
@@ -40,7 +40,7 @@ func (ar *UserRepository) Register(newUser users.Core) (users.Core, error) {
 }
 
 func (ar *UserRepository) Login(email, password string) (users.Core, error) {
-	var input users.User
+	var input User
 	if err := ar.db.Where("email = ?", email).Find(&input).Error; err != nil {
 		return users.Core{}, errors.New("Email not found")
 	}
@@ -49,12 +49,12 @@ func (ar *UserRepository) Login(email, password string) (users.Core, error) {
 		return users.Core{}, errors.New("Invalid password")
 	}
 
-	return users.Core{Email: input.Email}, nil
+	return users.Core{ID: input.ID, Email: input.Email, Username: input.Username}, nil
 }
 
-func (ar *UserRepository) GetProfile(email string) (users.Core, error) {
-	var input users.User
-	result := ar.db.Where("email = ?", email).Find(&input)
+func (ar *UserRepository) GetProfile(id uint) (users.Core, error) {
+	var input User
+	result := ar.db.Where("id = ?", id).Find(&input)
 	if result.Error != nil {
 		return users.Core{}, result.Error
 	}
@@ -69,13 +69,13 @@ func (ar *UserRepository) GetProfile(email string) (users.Core, error) {
 	}, nil
 }
 
-func (ar *UserRepository) UpdateProfile(email string, updatedUser users.Core) error {
-	input := users.User{}
-	if err := ar.db.Where("email = ?", email).First(&input).Error; err != nil {
+func (ar *UserRepository) UpdateProfile(id uint, updatedUser users.Core) error {
+	input := User{}
+	if err := ar.db.Where("id = ?", id).First(&input).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return fmt.Errorf("user with email %v not found", email)
+			return fmt.Errorf("user with id %v not found", id)
 		}
-		log.Print("Failed to query user by email", err)
+		log.Print("Failed to query user by id", err)
 		return err
 	}
 
@@ -92,13 +92,13 @@ func (ar *UserRepository) UpdateProfile(email string, updatedUser users.Core) er
 	return nil
 }
 
-func (ar *UserRepository) DeleteProfile(email string) error {
-	input := users.User{}
-	if err := ar.db.Where("email = ?", email).Find(&input).Error; err != nil {
+func (ar *UserRepository) DeleteProfile(id uint) error {
+	input := User{}
+	if err := ar.db.Where("id = ?", id).Find(&input).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return fmt.Errorf("user with email %v not found", email)
+			return fmt.Errorf("user with id %v not found", id)
 		}
-		log.Print("Failed to query user by email", err)
+		log.Print("Failed to query user by id", err)
 		return err
 	}
 

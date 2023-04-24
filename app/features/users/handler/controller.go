@@ -1,7 +1,9 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/wanta-zulfikri/Event-Planning-App/app/features/users"
 	"github.com/wanta-zulfikri/Event-Planning-App/helper"
@@ -48,7 +50,7 @@ func (uc *UserController) Login() echo.HandlerFunc {
 			return c.JSON(http.StatusInternalServerError, helper.ResponseFormat(http.StatusInternalServerError, "Internal Server Error", nil))
 		}
 
-		token, err := middlewares.CreateJWT(user.Email)
+		token, err := middlewares.CreateJWT(user.ID, user.Email, user.Username)
 		if err != nil {
 			c.Logger().Error("Failed to create JWT token: ", err)
 			return c.JSON(http.StatusInternalServerError, helper.ResponseFormat(http.StatusInternalServerError, "Internal Server Error", nil))
@@ -69,12 +71,17 @@ func (uc *UserController) GetProfile() echo.HandlerFunc {
 			return c.JSON(http.StatusUnauthorized, helper.ResponseFormat(http.StatusUnauthorized, "Unauthorized. Token is missing.", nil))
 		}
 
-		email, err := middlewares.ValidateJWT(tokenString)
+		idString, err := middlewares.ValidateJWT(tokenString)
 		if err != nil {
 			return c.JSON(http.StatusUnauthorized, helper.ResponseFormat(http.StatusUnauthorized, "Unauthorized. "+err.Error(), nil))
 		}
 
-		data, err := uc.s.GetProfile(email)
+		id, err := strconv.ParseUint(fmt.Sprint(idString), 10, 64)
+		if err != nil {
+			return c.JSON(http.StatusUnauthorized, helper.ResponseFormat(http.StatusUnauthorized, "Unauthorized. Invalid token.", nil))
+		}
+
+		data, err := uc.s.GetProfile(uint(id))
 		if err != nil {
 			c.Logger().Error("User not found", err.Error())
 			return c.JSON(http.StatusBadRequest, helper.ResponseFormat(http.StatusNotFound, "The requested resource was not found. Please check your email and password input.", nil))
@@ -96,9 +103,14 @@ func (uc *UserController) UpdateProfile() echo.HandlerFunc {
 			return c.JSON(http.StatusUnauthorized, helper.ResponseFormat(http.StatusUnauthorized, "Unauthorized. Token is missing.", nil))
 		}
 
-		email, err := middlewares.ValidateJWT(tokenString)
+		idString, err := middlewares.ValidateJWT(tokenString)
 		if err != nil {
 			return c.JSON(http.StatusUnauthorized, helper.ResponseFormat(http.StatusUnauthorized, "Unauthorized. "+err.Error(), nil))
+		}
+
+		id, err := strconv.ParseUint(fmt.Sprint(idString), 10, 64)
+		if err != nil {
+			return c.JSON(http.StatusUnauthorized, helper.ResponseFormat(http.StatusUnauthorized, "Unauthorized. Invalid token.", nil))
 		}
 
 		var input UpdateInput
@@ -119,7 +131,7 @@ func (uc *UserController) UpdateProfile() echo.HandlerFunc {
 			return c.JSON(http.StatusInternalServerError, helper.ResponseFormat(http.StatusInternalServerError, "Internal Server Error", nil))
 		}
 
-		err = uc.s.UpdateProfile(email, input.Username, input.Email, input.Password, image)
+		err = uc.s.UpdateProfile(uint(id), input.Username, input.Email, input.Password, image)
 		if err != nil {
 			c.Logger().Error("Failed to update profile: ", err)
 			return c.JSON(http.StatusInternalServerError, helper.ResponseFormat(http.StatusInternalServerError, "Internal Server Error", nil))
@@ -136,12 +148,17 @@ func (uc *UserController) DeleteProfile() echo.HandlerFunc {
 			return c.JSON(http.StatusUnauthorized, helper.ResponseFormat(http.StatusUnauthorized, "Unauthorized. Token is missing.", nil))
 		}
 
-		email, err := middlewares.ValidateJWT(tokenString)
+		idString, err := middlewares.ValidateJWT(tokenString)
 		if err != nil {
 			return c.JSON(http.StatusUnauthorized, helper.ResponseFormat(http.StatusUnauthorized, "Unauthorized. "+err.Error(), nil))
 		}
 
-		err = uc.s.DeleteProfile(email)
+		id, err := strconv.ParseUint(fmt.Sprint(idString), 10, 64)
+		if err != nil {
+			return c.JSON(http.StatusUnauthorized, helper.ResponseFormat(http.StatusUnauthorized, "Unauthorized. Invalid token.", nil))
+		}
+
+		err = uc.s.DeleteProfile(uint(id))
 		if err != nil {
 			c.Logger().Error("Error deleting profile", err.Error())
 			return c.JSON(http.StatusInternalServerError, helper.ResponseFormat(http.StatusInternalServerError, "Internal Server Error", nil))
