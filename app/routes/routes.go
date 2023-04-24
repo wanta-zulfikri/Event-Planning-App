@@ -1,7 +1,7 @@
 package routes
 
-import ( 
-
+import (
+	"github.com/wanta-zulfikri/Event-Planning-App/app/features/attendances"
 	"github.com/wanta-zulfikri/Event-Planning-App/app/features/events"
 	"github.com/wanta-zulfikri/Event-Planning-App/app/features/reviews"
 	"github.com/wanta-zulfikri/Event-Planning-App/app/features/tickets"
@@ -12,7 +12,7 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 )
 
-func Route(e *echo.Echo, uc users.Handler, ec events.Handler, rc reviews.Handler, tc tickets.Handler) {
+func Route(e *echo.Echo, uc users.Handler, ec events.Handler, rc reviews.Handler, tc tickets.Handler, as attendances.Handler) {
 	e.Pre(middleware.RemoveTrailingSlash())
 	e.Use(middleware.CORS())
 	e.Use(middleware.Logger()) 
@@ -36,11 +36,12 @@ func Route(e *echo.Echo, uc users.Handler, ec events.Handler, rc reviews.Handler
 	e.PUT("/tickets/:id", tc.UpdateTicket(), middleware.JWT([]byte(common.JWTSecret)))
 	e.DELETE("/tickets/:id", tc.DeleteTicket(), middleware.JWT([]byte(common.JWTSecret)))
 	//attendancees
-
+	e.POST("/attendances", as.CreateAttendance(), middleware.JWT([]byte(common.JWTSecret))) 
+	e.GET("/attendances", as.GetAttendance(), middleware.JWT([]byte(common.JWTSecret)))
 	//transactions
 
 	//reviews 
-	e.POST("/reviews", rc.UpdateReview(), middleware.JWT([]byte(common.JWTsecret))) 
-	e.PUT("/reviews", rc.UpdateReview(), middleware.JWT([]byte(common.JWTsecret))) 
-	e.DELETE("/reviews", rc.DeleteReview(), middleware.JWT([]byte(common.JWTsecret)))
+	e.POST("/reviews", rc.UpdateReview(), middleware.JWT([]byte(common.JWTSecret))) 
+	e.PUT("/reviews", rc.UpdateReview(), middleware.JWT([]byte(common.JWTSecret))) 
+	e.DELETE("/reviews", rc.DeleteReview(), middleware.JWT([]byte(common.JWTSecret)))
 }
