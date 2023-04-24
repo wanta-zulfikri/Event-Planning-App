@@ -1,7 +1,6 @@
 package handler
 
 // import (
-// 	"fmt"
 // 	"net/http"
 
 // 	"github.com/golang-jwt/jwt"
@@ -15,32 +14,30 @@ package handler
 // 	s transactions.Service
 // }
 
-// func New(h transactions.Service) transactions.Handler {
-// 	return &TransactionController{s: h}
+// func New(s transactions.Service) transactions.Handler {
+// 	return &TransactionController{s: s}
 // }
 
 // type TransactionInput struct {
-// 	event_name      string // receive this event id from unique valu of event name
-// 	ticket_category string
-// 	ticket_quantity uint
-// 	payment_method  string
+// 	EventName      string `json:"event_name"`
+// 	TicketCategory string `json:"ticket_category"`
+// 	TicketQuantity uint   `json:"ticket_quantity"`
 // }
 
 // func (tc *TransactionController) CreateTransaction() echo.HandlerFunc {
 // 	return func(c echo.Context) error {
 // 		var input = struct {
-// 			Data []int `json:"data"`
+// 			Data []TransactionInput `json:"data"`
 // 		}{}
 // 		if err := c.Bind(&input); err != nil {
 // 			c.Logger().Error(err.Error())
 // 			return c.JSON(http.StatusBadRequest, helper.ResponseFormat(http.StatusBadRequest, "Bad Request", nil))
 // 		}
-// 		fmt.Println(len(input.Data))
 // 		if len(input.Data) == 0 {
 // 			return c.JSON(http.StatusBadRequest, helper.ResponseFormat(http.StatusBadRequest, "Data tidak boleh kosong", nil))
 // 		}
 // 		userId := middlewares.GetUserID(c.Get("user").(*jwt.Token))
-// 		err := tc.s.CreateTransaction(transactions.Core{}, userId)
+// 		err := tc.s.CreateTransaction(userId, input.Data)
 // 		if err != nil {
 // 			return c.JSON(http.StatusInternalServerError, helper.ResponseFormat(http.StatusInternalServerError, "Internal Server Error", nil))
 // 		}

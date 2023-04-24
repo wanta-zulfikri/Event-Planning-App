@@ -21,7 +21,7 @@ func New(db *gorm.DB) *UserRepository {
 }
 
 func (ar *UserRepository) Register(newUser users.Core) (users.Core, error) {
-	var input = User{}
+	var input = users.User{}
 	hashedPassword, err := helper.HashedPassword(newUser.Password)
 	if err != nil {
 		log.Println("Hashing password error", err.Error())
@@ -40,7 +40,7 @@ func (ar *UserRepository) Register(newUser users.Core) (users.Core, error) {
 }
 
 func (ar *UserRepository) Login(email, password string) (users.Core, error) {
-	var input User
+	var input users.User
 	if err := ar.db.Where("email = ?", email).Find(&input).Error; err != nil {
 		return users.Core{}, errors.New("Email not found")
 	}
@@ -53,7 +53,7 @@ func (ar *UserRepository) Login(email, password string) (users.Core, error) {
 }
 
 func (ar *UserRepository) GetProfile(email string) (users.Core, error) {
-	var input User
+	var input users.User
 	result := ar.db.Where("email = ?", email).Find(&input)
 	if result.Error != nil {
 		return users.Core{}, result.Error
@@ -70,7 +70,7 @@ func (ar *UserRepository) GetProfile(email string) (users.Core, error) {
 }
 
 func (ar *UserRepository) UpdateProfile(email string, updatedUser users.Core) error {
-	input := User{}
+	input := users.User{}
 	if err := ar.db.Where("email = ?", email).First(&input).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return fmt.Errorf("user with email %v not found", email)
@@ -93,7 +93,7 @@ func (ar *UserRepository) UpdateProfile(email string, updatedUser users.Core) er
 }
 
 func (ar *UserRepository) DeleteProfile(email string) error {
-	input := User{}
+	input := users.User{}
 	if err := ar.db.Where("email = ?", email).Find(&input).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return fmt.Errorf("user with email %v not found", email)

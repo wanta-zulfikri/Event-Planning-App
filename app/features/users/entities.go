@@ -2,6 +2,8 @@ package users
 
 import (
 	"github.com/labstack/echo/v4"
+	"github.com/wanta-zulfikri/Event-Planning-App/app/features/events"
+	"gorm.io/gorm"
 )
 
 type Core struct {
@@ -10,6 +12,23 @@ type Core struct {
 	Email    string
 	Password string
 	Image    string
+	Events   []events.Core
+}
+
+type User struct {
+	gorm.Model
+	Username string         `json:"username" gorm:"type:varchar(100);not null"`
+	Email    string         `json:"email" gorm:"primaryKey"`
+	Password string         `json:"password" gorm:"type:varchar(100);not null"`
+	Image    string         `json:"image" gorm:"type:varchar(100)"`
+	Events   []events.Event `gorm:"foreignKey:UserID"`
+}
+
+func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
+	if u.Image == "" {
+		u.Image = "https://storage.googleapis.com/grouproject/book/images.jpeg"
+	}
+	return nil
 }
 
 type Repository interface {

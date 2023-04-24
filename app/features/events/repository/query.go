@@ -18,7 +18,7 @@ func New(db *gorm.DB) *EventRepository {
 
 func (er *EventRepository) GetEvents() ([]events.Core, error) {
 	var cores []events.Core
-	if err := er.db.Table("events").Find(&cores).Error; err != nil {
+	if err := er.db.Table("events").Where("deleted_at IS NULL").Find(&cores).Error; err != nil {
 		return nil, err
 	}
 	return cores, nil
@@ -34,6 +34,7 @@ func (er *EventRepository) CreateEvent(newEvent events.Core) (events.Core, error
 		Category:    newEvent.Category,
 		Location:    newEvent.Location,
 		Image:       newEvent.Image,
+		UserID:      newEvent.UserID,
 	}
 
 	err := er.db.Table("events").Create(&input).Error
@@ -50,6 +51,7 @@ func (er *EventRepository) CreateEvent(newEvent events.Core) (events.Core, error
 		Category:    input.Category,
 		Location:    input.Location,
 		Image:       input.Image,
+		UserID:      input.UserID,
 	}
 	return createdEvent, nil
 }
@@ -72,6 +74,7 @@ func (er *EventRepository) GetEvent(id uint) (events.Core, error) {
 		Category:    input.Category,
 		Location:    input.Location,
 		Image:       input.Image,
+		UserID:      input.UserID,
 	}, nil
 }
 
@@ -91,6 +94,7 @@ func (er *EventRepository) UpdateEvent(id uint, updatedEvent events.Core) error 
 	input.Category = updatedEvent.Category
 	input.Location = updatedEvent.Location
 	input.Image = updatedEvent.Image
+	input.UserID = updatedEvent.UserID
 	input.UpdatedAt = time.Now()
 
 	if err := er.db.Save(&input).Error; err != nil {

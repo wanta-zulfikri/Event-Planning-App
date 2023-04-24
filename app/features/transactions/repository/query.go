@@ -16,18 +16,62 @@ func NewTransactionRepository(db *gorm.DB) *TransactionRepository {
 	return &TransactionRepository{db: db}
 }
 
-func (tr *TransactionRepository) CreateTransaction(newTransaction *transactions.Core) error {
-	err := tr.db.Model(&Transaction{}).Create(newTransaction).Error
-	if err != nil {
-		return err
+func (tr *TransactionRepository) CreateTransaction(newTransaction transactions.Core) (transactions.Core, error) {
+	input := transactions.Transaction{
+		Model:             gorm.Model{},
+		Invoice:           newTransaction.Invoice,
+		PurchaseStartDate: newTransaction.PurchaseStartDate,
+		PurchaseEndDate:   newTransaction.PurchaseEndDate,
+		Status:            newTransaction.Status,
+		StatusDate:        newTransaction.StatusDate,
+		Tickets:           []transactions.Ticket{},
+		Subtotal:          newTransaction.Subtotal,
+		GrandTotal:        newTransaction.GrandTotal,
+		UserID:            newTransaction.UserID,
+		EventID:           newTransaction.EventID,
 	}
-	return nil
+
+	err := tr.db.Create(&input).Error
+	if err != nil {
+		return transactions.Core{}, err
+	}
+
+	for _, ticket := range newTransaction.Tickets {
+		ticketInput := transactions.Ticket{
+			TransactionID:  input.ID, // set foreign key ke transaksi yang baru saja dibuat
+			TicketType:     ticket.TicketType,
+			TicketCategory: ticket.TicketCategory,
+			TicketPrice:    ticket.TicketPrice,
+			TicketQuantity: ticket.TicketQuantity,
+			EventID:        ticket.EventID,
+		}
+
+		err = tr.db.Create(&ticketInput).Error
+		if err != nil {
+			return transactions.Core{}, err
+		}
+	}
+
+	createdTransaction := transactions.Core{
+		ID:                input.ID,
+		Invoice:           input.Invoice,
+		PurchaseStartDate: input.PurchaseStartDate,
+		PurchaseEndDate:   input.PurchaseEndDate,
+		Status:            input.Status,
+		StatusDate:        input.StatusDate,
+		Subtotal:          input.Subtotal,
+		GrandTotal:        input.GrandTotal,
+		UserID:            input.UserID,
+		EventID:           input.EventID,
+		Tickets:           newTransaction.Tickets,
+	}
+	return createdTransaction, nil
 }
 
-func (tr *TransactionRepository) GetInvoice(Invoice string) (*Transaction, error) {
-	transaction := &Transaction{}
+func (tr *TransactionRepository) GetInvoice(Invoice string) (*transactions.Transaction, error) {
+	transaction := &transactions.Transaction{}
 
-	err := tr.db.Model(&Transaction{}).Where("invoice = ?", transaction).Take(&transaction).Error
+	err := tr.db.Model(&transactions.Transaction{}).Where("invoice = ?", transaction).Take(&transaction).Error
 
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {

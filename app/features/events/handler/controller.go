@@ -59,6 +59,7 @@ func (ec *EventController) GetEvents() echo.HandlerFunc {
 				Category:    event.Category,
 				Location:    event.Location,
 				Image:       event.Image,
+				Hostedby:    event.UserID,
 			}
 			formattedEvents = append(formattedEvents, formattedEvent)
 		}
@@ -66,7 +67,7 @@ func (ec *EventController) GetEvents() echo.HandlerFunc {
 		page := c.QueryParam("page")
 		perPage := c.QueryParam("per_page")
 		if page != "" || perPage == "" {
-			perPage = "5"
+			perPage = "3"
 		}
 		pageInt := 1
 		if page != "" {
@@ -136,6 +137,7 @@ func (ec *EventController) CreateEvent() echo.HandlerFunc {
 			Category:    input.Category,
 			Location:    input.Location,
 			Image:       image,
+			UserID:      input.UserID,
 		}
 
 		err = ec.s.CreateEvent(newEvent)
@@ -219,6 +221,7 @@ func (ec *EventController) UpdateEvent() echo.HandlerFunc {
 			Status:      input.Status,
 			Category:    input.Category,
 			Location:    input.Location,
+			UserID:      input.UserID,
 		}
 
 		file, err := c.FormFile("image")
