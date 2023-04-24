@@ -23,8 +23,8 @@ func (es *EventService) GetEvents() ([]events.Core, error) {
 	return events, nil
 }
 
-func (es *EventService) CreateEvent(newEvent events.Core) error {
-	_, err := es.r.CreateEvent(newEvent)
+func (es *EventService) CreateEvent(newEvent events.Core, id uint) error {
+	_, err := es.r.CreateEvent(newEvent, id)
 	if err != nil {
 		return err
 	}

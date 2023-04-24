@@ -14,7 +14,7 @@ type Transaction struct {
 	PurchaseEndDate   time.Time
 	Status            string
 	StatusDate        time.Time
-	Tickets           []repository.Ticket `gorm:"foreignKey:TransactionID"`
+	Tickets           []*repository.Ticket `gorm:"many2many:transaction_tickets;"`
 	Subtotal          uint
 	GrandTotal        uint
 	UserID            uint `gorm:"foreignKey:ID"`

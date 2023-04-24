@@ -24,7 +24,7 @@ func (er *EventRepository) GetEvents() ([]events.Core, error) {
 	return cores, nil
 }
 
-func (er *EventRepository) CreateEvent(newEvent events.Core) (events.Core, error) {
+func (er *EventRepository) CreateEvent(newEvent events.Core, id uint) (events.Core, error) {
 	input := Event{
 		Title:       newEvent.Title,
 		Description: newEvent.Description,
@@ -34,7 +34,8 @@ func (er *EventRepository) CreateEvent(newEvent events.Core) (events.Core, error
 		Category:    newEvent.Category,
 		Location:    newEvent.Location,
 		Image:       newEvent.Image,
-		UserID:      newEvent.UserID,
+		Username:    newEvent.Username,
+		UserID:      id,
 	}
 
 	err := er.db.Table("events").Create(&input).Error
@@ -51,7 +52,7 @@ func (er *EventRepository) CreateEvent(newEvent events.Core) (events.Core, error
 		Category:    input.Category,
 		Location:    input.Location,
 		Image:       input.Image,
-		UserID:      input.UserID,
+		Username:    input.Username,
 	}
 	return createdEvent, nil
 }
@@ -74,7 +75,7 @@ func (er *EventRepository) GetEvent(id uint) (events.Core, error) {
 		Category:    input.Category,
 		Location:    input.Location,
 		Image:       input.Image,
-		UserID:      input.UserID,
+		Username:    input.Username,
 	}, nil
 }
 
@@ -94,7 +95,7 @@ func (er *EventRepository) UpdateEvent(id uint, updatedEvent events.Core) error 
 	input.Category = updatedEvent.Category
 	input.Location = updatedEvent.Location
 	input.Image = updatedEvent.Image
-	input.UserID = updatedEvent.UserID
+	input.Username = updatedEvent.Username
 	input.UpdatedAt = time.Now()
 
 	if err := er.db.Save(&input).Error; err != nil {

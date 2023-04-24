@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"math"
 	"net/http"
 	"strconv"
@@ -59,7 +60,7 @@ func (ec *EventController) GetEvents() echo.HandlerFunc {
 				Category:    event.Category,
 				Location:    event.Location,
 				Image:       event.Image,
-				Hostedby:    event.UserID,
+				Username:    event.Username,
 			}
 			formattedEvents = append(formattedEvents, formattedEvent)
 		}
@@ -100,19 +101,31 @@ func (ec *EventController) GetEvents() echo.HandlerFunc {
 
 func (ec *EventController) CreateEvent() echo.HandlerFunc {
 	return func(c echo.Context) error {
+		var input RequestCreateEvent
 		tokenString := c.Request().Header.Get("Authorization")
 		if tokenString == "" {
 			return c.JSON(http.StatusUnauthorized, helper.ResponseFormat(http.StatusUnauthorized, "Unauthorized. Token is missing.", nil))
 		}
-
-		_, err := middlewares.ValidateJWT(tokenString)
+		idString, err := middlewares.ValidateJWT(tokenString)
 		if err != nil {
 			return c.JSON(http.StatusUnauthorized, helper.ResponseFormat(http.StatusUnauthorized, "Unauthorized. "+err.Error(), nil))
 		}
 
-		var input RequestCreateEvent
+		id, err := strconv.ParseUint(fmt.Sprint(idString), 10, 64)
+		if err != nil {
+			return c.JSON(http.StatusUnauthorized, helper.ResponseFormat(http.StatusUnauthorized, "Unauthorized. Invalid token.", nil))
+		}
+		username, err := middlewares.ValidateJWTUsername(tokenString)
+		if err != nil {
+			return c.JSON(http.StatusUnauthorized, helper.ResponseFormat(http.StatusUnauthorized, "Unauthorized. "+err.Error(), nil))
+		}
+
+		if username == "" {
+			return c.JSON(http.StatusUnauthorized, helper.ResponseFormat(http.StatusUnauthorized, "Unauthorized. Invalid token.", nil))
+		}
+
 		if err := c.Bind(&input); err != nil {
-			c.Logger().Error(err.Error())
+			c.Logger().Error("Failed to bind input: ", err)
 			return c.JSON(http.StatusBadRequest, helper.ResponseFormat(http.StatusBadRequest, "Bad Request", nil))
 		}
 
@@ -127,7 +140,6 @@ func (ec *EventController) CreateEvent() echo.HandlerFunc {
 			c.Logger().Error("Failed to upload image: ", err)
 			return c.JSON(http.StatusInternalServerError, helper.ResponseFormat(http.StatusInternalServerError, "Internal Server Error", nil))
 		}
-
 		newEvent := events.Core{
 			Title:       input.Title,
 			Description: input.Description,
@@ -137,10 +149,10 @@ func (ec *EventController) CreateEvent() echo.HandlerFunc {
 			Category:    input.Category,
 			Location:    input.Location,
 			Image:       image,
-			UserID:      input.UserID,
+			Username:    username,
 		}
 
-		err = ec.s.CreateEvent(newEvent)
+		err = ec.s.CreateEvent(newEvent, uint(id))
 		if err != nil {
 			c.Logger().Error("Failed to create event: ", err)
 			return c.JSON(http.StatusInternalServerError, helper.ResponseFormat(http.StatusInternalServerError, "Internal Server Error", nil))
@@ -161,13 +173,7 @@ func (ec *EventController) GetEvent() echo.HandlerFunc {
 			return c.JSON(http.StatusUnauthorized, helper.ResponseFormat(http.StatusUnauthorized, "Unauthorized. "+err.Error(), nil))
 		}
 
-		inputID := c.Param("id")
-		if inputID == "" {
-			c.Logger().Error(err.Error())
-			return c.JSON(http.StatusBadRequest, helper.ResponseFormat(http.StatusBadRequest, "Bad Request", nil))
-		}
-
-		id, err := strconv.ParseUint(inputID, 10, 32)
+		id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 		if err != nil {
 			c.Logger().Error(err.Error())
 			return c.JSON(http.StatusBadRequest, helper.ResponseFormat(http.StatusBadRequest, "Bad Request", nil))
@@ -178,38 +184,62 @@ func (ec *EventController) GetEvent() echo.HandlerFunc {
 			c.Logger().Error(err.Error())
 			return c.JSON(http.StatusInternalServerError, helper.ResponseFormat(http.StatusInternalServerError, "Internal Server Error", nil))
 		}
-		return c.JSON(http.StatusOK, helper.ResponseFormat(http.StatusOK, "Success get an event", event))
+
+		response := ResponseGetEvents{
+			Title:       event.Title,
+			Description: event.Description,
+			EventDate:   event.EventDate,
+			EventTime:   event.EventTime,
+			Status:      event.Status,
+			Category:    event.Category,
+			Location:    event.Location,
+			Image:       event.Image,
+			Username:    event.Username,
+		}
+
+		return c.JSON(http.StatusOK, helper.ResponseFormat(http.StatusOK, "Success get an event", response))
 	}
 }
 
 func (ec *EventController) UpdateEvent() echo.HandlerFunc {
 	return func(c echo.Context) error {
+		var input RequestUpdateEvent
 		tokenString := c.Request().Header.Get("Authorization")
 		if tokenString == "" {
 			return c.JSON(http.StatusUnauthorized, helper.ResponseFormat(http.StatusUnauthorized, "Unauthorized. Token is missing.", nil))
 		}
 
-		_, err := middlewares.ValidateJWT(tokenString)
+		username, err := middlewares.ValidateJWTUsername(tokenString)
 		if err != nil {
 			return c.JSON(http.StatusUnauthorized, helper.ResponseFormat(http.StatusUnauthorized, "Unauthorized. "+err.Error(), nil))
 		}
 
-		inputID := c.Param("id")
-		if inputID == "" {
-			c.Logger().Error(err.Error())
-			return c.JSON(http.StatusBadRequest, helper.ResponseFormat(http.StatusBadRequest, "Bad Request", nil))
+		if username == "" {
+			return c.JSON(http.StatusUnauthorized, helper.ResponseFormat(http.StatusUnauthorized, "Unauthorized. Invalid token.", nil))
 		}
 
-		id, err := strconv.ParseUint(inputID, 10, 32)
+		id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 		if err != nil {
-			c.Logger().Error(err.Error())
+			c.Logger().Error("Failed to parse ID from URL param: ", err)
 			return c.JSON(http.StatusBadRequest, helper.ResponseFormat(http.StatusBadRequest, "Bad Request", nil))
 		}
 
-		var input RequestUpdateEvent
 		if err := c.Bind(&input); err != nil {
-			c.Logger().Error("Failed to bind input: ", err)
+			c.Logger().Error("Failed to bind input from request body: ", err)
 			return c.JSON(http.StatusBadRequest, helper.ResponseFormat(http.StatusBadRequest, "Bad Request", nil))
+		}
+
+		file, err := c.FormFile("image")
+		var image string
+		if err != nil && err != http.ErrMissingFile {
+			c.Logger().Error("Failed to get image from form file: ", err)
+			return c.JSON(http.StatusBadRequest, helper.ResponseFormat(http.StatusBadRequest, "Bad Request", nil))
+		} else if file != nil {
+			image, err = helper.UploadImage(c, file)
+			if err != nil {
+				c.Logger().Error("Failed to upload image: ", err)
+				return c.JSON(http.StatusInternalServerError, helper.ResponseFormat(http.StatusInternalServerError, "Internal Server Error", nil))
+			}
 		}
 
 		updatedEvent := events.Core{
@@ -221,23 +251,8 @@ func (ec *EventController) UpdateEvent() echo.HandlerFunc {
 			Status:      input.Status,
 			Category:    input.Category,
 			Location:    input.Location,
-			UserID:      input.UserID,
-		}
-
-		file, err := c.FormFile("image")
-		if err != nil {
-			c.Logger().Error("Failed to get image: ", err)
-			return c.JSON(http.StatusBadRequest, helper.ResponseFormat(http.StatusBadRequest, "Bad Request", nil))
-		}
-
-		if file != nil {
-			image, err := helper.UploadImage(c, file)
-			if err != nil {
-				c.Logger().Error("Failed to upload image: ", err)
-				return c.JSON(http.StatusInternalServerError, helper.ResponseFormat(http.StatusInternalServerError, "Internal Server Error", nil))
-			}
-
-			updatedEvent.Image = image
+			Image:       image,
+			Username:    username,
 		}
 
 		err = ec.s.UpdateEvent(updatedEvent.ID, updatedEvent)
@@ -246,7 +261,7 @@ func (ec *EventController) UpdateEvent() echo.HandlerFunc {
 			return c.JSON(http.StatusInternalServerError, helper.ResponseFormat(http.StatusInternalServerError, "Internal Server Error", nil))
 		}
 
-		return c.JSON(http.StatusOK, helper.ResponseFormat(http.StatusCreated, "Event updated successfully", nil))
+		return c.JSON(http.StatusOK, helper.ResponseFormat(http.StatusOK, "Event updated successfully", nil))
 	}
 }
 
@@ -262,13 +277,7 @@ func (ec *EventController) DeleteEvent() echo.HandlerFunc {
 			return c.JSON(http.StatusUnauthorized, helper.ResponseFormat(http.StatusUnauthorized, "Unauthorized. "+err.Error(), nil))
 		}
 
-		inputID := c.Param("id")
-		if inputID == "" {
-			c.Logger().Error(err.Error())
-			return c.JSON(http.StatusBadRequest, helper.ResponseFormat(http.StatusBadRequest, "Bad Request", nil))
-		}
-
-		id, err := strconv.ParseUint(inputID, 10, 32)
+		id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 		if err != nil {
 			c.Logger().Error(err.Error())
 			return c.JSON(http.StatusBadRequest, helper.ResponseFormat(http.StatusBadRequest, "Bad Request", nil))

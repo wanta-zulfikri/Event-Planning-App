@@ -25,7 +25,7 @@ func (tr *TransactionRepository) CreateTransaction(newTransaction transactions.C
 		PurchaseEndDate:   newTransaction.PurchaseEndDate,
 		Status:            newTransaction.Status,
 		StatusDate:        newTransaction.StatusDate,
-		Tickets:           []repository.Ticket{},
+		Tickets:           []*repository.Ticket{},
 		Subtotal:          newTransaction.Subtotal,
 		GrandTotal:        newTransaction.GrandTotal,
 		UserID:            newTransaction.UserID,
@@ -39,7 +39,6 @@ func (tr *TransactionRepository) CreateTransaction(newTransaction transactions.C
 
 	for _, ticket := range newTransaction.Tickets {
 		ticketInput := repository.Ticket{
-			TransactionID:  input.ID, // set foreign key ke transaksi yang baru saja dibuat
 			TicketType:     ticket.TicketType,
 			TicketCategory: ticket.TicketCategory,
 			TicketPrice:    ticket.TicketPrice,
