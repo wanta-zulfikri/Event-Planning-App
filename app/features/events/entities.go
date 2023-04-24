@@ -14,7 +14,7 @@ type Core struct {
 	Category    string
 	Location    string
 	Image       string
-	Username    string //hostedby : username didapat dari jwt
+	Hostedby    string //hostedby : username didapat dari jwt
 	UserID      uint
 }
 

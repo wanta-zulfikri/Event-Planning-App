@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/labstack/echo/v4"
-	"github.com/wanta-zulfikri/Event-Planning-App/app/features/tickets/repository"
+	"github.com/wanta-zulfikri/Event-Planning-App/app/features/tickets"
 	"github.com/wanta-zulfikri/Event-Planning-App/app/features/transactions/payment"
 )
 
@@ -15,7 +15,7 @@ type Core struct {
 	PurchaseEndDate   time.Time
 	Status            string
 	StatusDate        time.Time
-	Tickets           []repository.Ticket
+	Tickets           []tickets.Core
 	Subtotal          uint
 	GrandTotal        uint
 	UserID            uint

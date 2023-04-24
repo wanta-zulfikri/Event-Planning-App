@@ -25,11 +25,11 @@ func (tr *TransactionRepository) CreateTransaction(newTransaction transactions.C
 		PurchaseEndDate:   newTransaction.PurchaseEndDate,
 		Status:            newTransaction.Status,
 		StatusDate:        newTransaction.StatusDate,
-		Tickets:           []*repository.Ticket{},
-		Subtotal:          newTransaction.Subtotal,
-		GrandTotal:        newTransaction.GrandTotal,
-		UserID:            newTransaction.UserID,
-		EventID:           newTransaction.EventID,
+		// Tickets:           []*repository.Ticket{},
+		Subtotal:   newTransaction.Subtotal,
+		GrandTotal: newTransaction.GrandTotal,
+		UserID:     newTransaction.UserID,
+		EventID:    newTransaction.EventID,
 	}
 
 	err := tr.db.Create(&input).Error

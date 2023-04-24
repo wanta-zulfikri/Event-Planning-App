@@ -11,4 +11,5 @@ type Ticket struct {
 	TicketPrice    uint
 	TicketQuantity uint
 	EventID        uint
+	Invoice        string
 }

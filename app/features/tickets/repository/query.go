@@ -2,6 +2,7 @@ package repository
 
 import (
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/wanta-zulfikri/Event-Planning-App/app/features/tickets"
@@ -24,12 +25,19 @@ func (tr *TicketRepository) GetTickets() ([]tickets.Core, error) {
 	return cores, nil
 }
 
-func (tr *TicketRepository) CreateTicket(newTicket tickets.Core) (tickets.Core, error) {
+func (tr *TicketRepository) CreateTicket(newTicket tickets.Core, eventid uint64) (tickets.Core, error) {
+	var count int64
+	tr.db.Table("events").Where("id = ?", eventid).Count(&count)
+	if count == 0 {
+		return tickets.Core{}, fmt.Errorf("event with ID %d does not exist", eventid)
+	}
+
 	input := Ticket{
 		TicketType:     newTicket.TicketType,
 		TicketCategory: newTicket.TicketCategory,
 		TicketPrice:    newTicket.TicketPrice,
 		TicketQuantity: newTicket.TicketQuantity,
+		EventID:        uint(eventid),
 	}
 
 	err := tr.db.Table("tickets").Create(&input).Error
@@ -42,6 +50,7 @@ func (tr *TicketRepository) CreateTicket(newTicket tickets.Core) (tickets.Core, 
 		TicketCategory: input.TicketCategory,
 		TicketPrice:    input.TicketPrice,
 		TicketQuantity: input.TicketQuantity,
+		EventID:        input.EventID,
 	}
 	return createdTicket, nil
 }

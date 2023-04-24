@@ -16,7 +16,7 @@ type Core struct {
 
 type Repository interface {
 	GetTickets() ([]Core, error)
-	CreateTicket(newTicket Core) (Core, error)
+	CreateTicket(newTicket Core, eventid uint64) (Core, error)
 	GetTicket(id uint) (Core, error)
 	UpdateTicket(id uint, updatedTicket Core) error
 	DeleteTicket(id uint) error
@@ -24,7 +24,7 @@ type Repository interface {
 
 type Service interface {
 	GetTickets() ([]Core, error)
-	CreateTicket(newTicket Core) error
+	CreateTicket(newTicket Core, eventid uint64) error
 	GetTicket(id uint) (Core, error)
 	UpdateTicket(id uint, updatedTicket Core) error
 	DeleteTicket(id uint) error
