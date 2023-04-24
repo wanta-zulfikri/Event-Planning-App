@@ -35,15 +35,15 @@ func (us *UserService) Login(email string, password string) (users.Core, error) 
 	return user, nil
 }
 
-func (us *UserService) GetProfile(email string) (users.Core, error) {
-	user, err := us.m.GetProfile(email)
+func (us *UserService) GetProfile(id uint) (users.Core, error) {
+	user, err := us.m.GetProfile(id)
 	if err != nil {
 		return users.Core{}, err
 	}
 	return user, nil
 }
 
-func (us *UserService) UpdateProfile(email, username, newEmail, password, image string) error {
+func (us *UserService) UpdateProfile(id uint, username, newEmail, password, image string) error {
 	hashedPassword, err := helper.HashedPassword(password)
 	if err != nil {
 		return fmt.Errorf("failed to hash password: %v", err)
@@ -54,22 +54,22 @@ func (us *UserService) UpdateProfile(email, username, newEmail, password, image 
 		Password: string(hashedPassword),
 		Image:    image,
 	}
-	if err := us.m.UpdateProfile(email, updatedUser); err != nil {
-		return fmt.Errorf("Error while updating %s: %v", email, err)
+	if err := us.m.UpdateProfile(id, updatedUser); err != nil {
+		return fmt.Errorf("Error while updating %d: %v", id, err)
 	}
 	return nil
 }
 
-func (us *UserService) DeleteProfile(email string) error {
-	if email == "" {
+func (us *UserService) DeleteProfile(id uint) error {
+	if id == 0 {
 		return fmt.Errorf("Invalid email")
 	}
-	err := us.m.DeleteProfile(email)
+	err := us.m.DeleteProfile(id)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return fmt.Errorf("Email: %v ,not found", email)
+			return fmt.Errorf("Email: %v ,not found", id)
 		}
-		log.Printf("Error while deleting %s: %v", email, err)
+		log.Printf("Error while deleting %d: %v", id, err)
 		return fmt.Errorf("Terjadi masalah pada server")
 	}
 	return nil

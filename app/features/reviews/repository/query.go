@@ -18,13 +18,10 @@ func New(db *gorm.DB) *ReviewRepository {
 }
 
 func (rr *ReviewRepository) WriteReview(newReview reviews.Core) (reviews.Core, error) {
-	input := reviews.Review{
-		ID: 		 newReview.ID,
-		UserID:      newReview.UserID,
-		EventID:     newReview.EventID,   
-		ReviewScore: newReview.ReviewScore,
-		ReviewText:  newReview.ReviewText,
-		
+	input := Review{
+		UserID:  newReview.UserID,
+		EventID: newReview.EventID,
+		Review:  newReview.Review,
 	}
 
 	err := rr.db.Table("review").Create(&input).Error
@@ -34,51 +31,46 @@ func (rr *ReviewRepository) WriteReview(newReview reviews.Core) (reviews.Core, e
 	}
 
 	createdReview := reviews.Core{
-		ID: 		 input.ID,
-		UserID:      input.UserID,
-		EventID:     input.EventID,   
-		ReviewScore: input.ReviewScore,
-		ReviewText:  input.ReviewText, 
-		
+		UserID:  input.UserID,
+		EventID: input.EventID,
+		Review:  input.Review,
 	}
 	return createdReview, nil
-} 
+}
 
 func (rr *ReviewRepository) UpdateReview(id uint, updateReview reviews.Core) error {
-	input := reviews.Review{} 
+	input := Review{}
 	if err := rr.db.Where("id = ?", id).First(&input).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return err 
-		} 
-		return err 
+			return err
+		}
+		return err
 
-	} 
+	}
 
-	input.ID = updateReview.ID 
-	input.UserID = updateReview.UserID 
-	input.EventID = updateReview.EventID 
-	input.ReviewScore = updateReview.ReviewScore 
-	input.ReviewText = updateReview.ReviewText 
+	input.UserID = updateReview.UserID
+	input.EventID = updateReview.EventID
+	input.Review = updateReview.Review
 
 	if err := rr.db.Save(&input).Error; err != nil {
-		return err 
-	} 
+		return err
+	}
 	return nil
 }
 
 func (rr *ReviewRepository) DeleteReview(id uint) error {
-	input := reviews.Review{} 
+	input := Review{}
 	if err := rr.db.Where("id = ?", id).Find(&input).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return err 
+			return err
 		}
-		return err 
-	}  
+		return err
+	}
 
-	input.DeletedAt = gorm.DeletedAt{Time: time.Now(),Valid: true } 
+	input.DeletedAt = gorm.DeletedAt{Time: time.Now(), Valid: true}
 
 	if err := rr.db.Save(&input).Error; err != nil {
-			return err 
-	} 
+		return err
+	}
 	return nil
 }

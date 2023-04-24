@@ -9,4 +9,5 @@ type ResponseGetEvents struct {
 	Category    string `json:"category"`
 	Location    string `json:"location"`
 	Image       string `json:"image"`
+	Hostedby    uint   `json:"hostedby"`
 }

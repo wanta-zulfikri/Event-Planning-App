@@ -18,14 +18,14 @@ func New(db *gorm.DB) *EventRepository {
 
 func (er *EventRepository) GetEvents() ([]events.Core, error) {
 	var cores []events.Core
-	if err := er.db.Table("events").Find(&cores).Error; err != nil {
+	if err := er.db.Table("events").Where("deleted_at IS NULL").Find(&cores).Error; err != nil {
 		return nil, err
 	}
 	return cores, nil
 }
 
 func (er *EventRepository) CreateEvent(newEvent events.Core) (events.Core, error) {
-	input := events.Event{
+	input := Event{
 		Title:       newEvent.Title,
 		Description: newEvent.Description,
 		EventDate:   newEvent.EventDate,
@@ -34,6 +34,7 @@ func (er *EventRepository) CreateEvent(newEvent events.Core) (events.Core, error
 		Category:    newEvent.Category,
 		Location:    newEvent.Location,
 		Image:       newEvent.Image,
+		UserID:      newEvent.UserID,
 	}
 
 	err := er.db.Table("events").Create(&input).Error
@@ -50,12 +51,13 @@ func (er *EventRepository) CreateEvent(newEvent events.Core) (events.Core, error
 		Category:    input.Category,
 		Location:    input.Location,
 		Image:       input.Image,
+		UserID:      input.UserID,
 	}
 	return createdEvent, nil
 }
 
 func (er *EventRepository) GetEvent(id uint) (events.Core, error) {
-	var input events.Event
+	var input Event
 	result := er.db.Where("id = ?", id).Find(&input)
 	if result.Error != nil {
 		return events.Core{}, result.Error
@@ -72,11 +74,12 @@ func (er *EventRepository) GetEvent(id uint) (events.Core, error) {
 		Category:    input.Category,
 		Location:    input.Location,
 		Image:       input.Image,
+		UserID:      input.UserID,
 	}, nil
 }
 
 func (er *EventRepository) UpdateEvent(id uint, updatedEvent events.Core) error {
-	input := events.Event{}
+	input := Event{}
 	if err := er.db.Where("id = ?", id).First(&input).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return err
@@ -91,6 +94,7 @@ func (er *EventRepository) UpdateEvent(id uint, updatedEvent events.Core) error 
 	input.Category = updatedEvent.Category
 	input.Location = updatedEvent.Location
 	input.Image = updatedEvent.Image
+	input.UserID = updatedEvent.UserID
 	input.UpdatedAt = time.Now()
 
 	if err := er.db.Save(&input).Error; err != nil {
@@ -100,11 +104,12 @@ func (er *EventRepository) UpdateEvent(id uint, updatedEvent events.Core) error 
 }
 
 func (er *EventRepository) DeleteEvent(id uint) error {
-	input := events.Event{}
+	input := Event{}
 	if err := er.db.Where("id = ?", id).Find(&input).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return err
 		}
+
 		return err
 	}
 

@@ -1,15 +1,17 @@
 package repository
 
 import (
+	"github.com/wanta-zulfikri/Event-Planning-App/app/features/events/repository"
 	"gorm.io/gorm"
 )
 
 type User struct {
 	gorm.Model
-	Username string `json:"username" gorm:"type:varchar(100);not null"`
-	Email    string `json:"email" gorm:"primaryKey;type:varchar(100);unique"`
-	Password string `json:"password" gorm:"type:varchar(100);not null"`
-	Image    string `json:"image" gorm:"type:varchar(100);not null"`
+	Username string             `json:"username" gorm:"type:varchar(100);not null"`
+	Email    string             `json:"email" gorm:"primaryKey"`
+	Password string             `json:"password" gorm:"type:varchar(100);not null"`
+	Image    string             `json:"image" gorm:"type:varchar(100)"`
+	Events   []repository.Event `gorm:"foreignKey:UserID"`
 }
 
 func (u *User) BeforeCreate(tx *gorm.DB) (err error) {

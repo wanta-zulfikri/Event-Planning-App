@@ -2,19 +2,9 @@ package attendances
 
 import (
 	"github.com/labstack/echo/v4"
-	"gorm.io/gorm"
 )
-type Core struct {
-	ID            uint 
-	UserID        uint 
-	EventID       uint 
-	EventCategory string
-	TicketType    string
-	Quantity      string
-}
 
-type Attendances struct {
-	gorm.Model
+type Core struct {
 	ID            uint
 	UserID        uint
 	EventID       uint
@@ -24,17 +14,16 @@ type Attendances struct {
 }
 
 type Repository interface {
-	CreateAttendance(newAttendance Core) (Core, error) 
+	CreateAttendance(newAttendance Core) (Core, error)
 	GetAttendance(id uint) (Core, error)
 }
 
 type Service interface {
-	CreateAttendance(newAttendance Core) error 
+	CreateAttendance(newAttendance Core) error
 	GetAttendance(id uint) (Core, error)
 }
 
 type Handler interface {
-	CreateAttendance() echo.HandlerFunc 
+	CreateAttendance() echo.HandlerFunc
 	GetAttendance() echo.HandlerFunc
-
 }
