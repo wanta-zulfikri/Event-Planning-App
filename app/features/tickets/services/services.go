@@ -23,8 +23,8 @@ func (ts *TicketService) GetTickets() ([]tickets.Core, error) {
 	return tickets, nil
 }
 
-func (ts *TicketService) CreateTicket(newTicket tickets.Core) error {
-	_, err := ts.r.CreateTicket(newTicket)
+func (ts *TicketService) CreateTicket(newTicket tickets.Core, eventid uint64) error {
+	_, err := ts.r.CreateTicket(newTicket, eventid)
 	if err != nil {
 		return err
 	}

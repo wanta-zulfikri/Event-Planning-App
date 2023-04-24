@@ -60,7 +60,7 @@ func (ec *EventController) GetEvents() echo.HandlerFunc {
 				Category:    event.Category,
 				Location:    event.Location,
 				Image:       event.Image,
-				Username:    event.Username,
+				Hostedby:    event.Hostedby,
 			}
 			formattedEvents = append(formattedEvents, formattedEvent)
 		}
@@ -149,7 +149,7 @@ func (ec *EventController) CreateEvent() echo.HandlerFunc {
 			Category:    input.Category,
 			Location:    input.Location,
 			Image:       image,
-			Username:    username,
+			Hostedby:    username,
 		}
 
 		err = ec.s.CreateEvent(newEvent, uint(id))
@@ -194,7 +194,7 @@ func (ec *EventController) GetEvent() echo.HandlerFunc {
 			Category:    event.Category,
 			Location:    event.Location,
 			Image:       event.Image,
-			Username:    event.Username,
+			Hostedby:    event.Hostedby,
 		}
 
 		return c.JSON(http.StatusOK, helper.ResponseFormat(http.StatusOK, "Success get an event", response))
@@ -252,7 +252,7 @@ func (ec *EventController) UpdateEvent() echo.HandlerFunc {
 			Category:    input.Category,
 			Location:    input.Location,
 			Image:       image,
-			Username:    username,
+			Hostedby:    username,
 		}
 
 		err = ec.s.UpdateEvent(updatedEvent.ID, updatedEvent)

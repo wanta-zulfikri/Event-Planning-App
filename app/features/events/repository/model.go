@@ -17,7 +17,7 @@ type Event struct {
 	Category     string                     `gorm:"type:varchar(20)"`
 	Location     string                     `gorm:"type:varchar(100)"`
 	Image        string                     `gorm:"type:varchar(100)"`
-	Username     string                     `gorm:"type:varchar(100)"`
+	Hostedby     string                     `gorm:"type:varchar(100)"`
 	UserID       uint                       `gorm:"onUpdate:CASCADE,onDelete:SET NULL"`
 	Tickets      []tickets.Ticket           `gorm:"foreignKey:EventID"`
 	Transactions []transactions.Transaction `gorm:"foreignKey:EventID"`

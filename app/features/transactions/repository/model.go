@@ -3,7 +3,6 @@ package repository
 import (
 	"time"
 
-	"github.com/wanta-zulfikri/Event-Planning-App/app/features/tickets/repository"
 	"gorm.io/gorm"
 )
 
@@ -14,9 +13,9 @@ type Transaction struct {
 	PurchaseEndDate   time.Time
 	Status            string
 	StatusDate        time.Time
-	Tickets           []*repository.Ticket `gorm:"many2many:transaction_tickets;"`
-	Subtotal          uint
-	GrandTotal        uint
-	UserID            uint `gorm:"foreignKey:ID"`
-	EventID           uint
+	// Tickets           []*tickets.Ticket `gorm:"many2many:transaction_tickets;"`
+	Subtotal   uint
+	GrandTotal uint
+	UserID     uint `gorm:"foreignKey:ID"`
+	EventID    uint
 }

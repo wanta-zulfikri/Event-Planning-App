@@ -62,7 +62,7 @@ func (tc *TicketController) GetTickets() echo.HandlerFunc {
 		page := c.QueryParam("page")
 		perPage := c.QueryParam("per_page")
 		if page != "" || perPage == "" {
-			perPage = "5"
+			perPage = "3"
 		}
 		pageInt := 1
 		if page != "" {
@@ -105,6 +105,11 @@ func (tc *TicketController) CreateTicket() echo.HandlerFunc {
 			return c.JSON(http.StatusUnauthorized, helper.ResponseFormat(http.StatusUnauthorized, "Unauthorized. "+err.Error(), nil))
 		}
 
+		eventID, err := strconv.ParseUint(c.QueryParam("eventId"), 10, 64)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, helper.ResponseFormat(http.StatusBadRequest, "Bad Request. Event ID is missing.", nil))
+		}
+
 		var input RequestCreateTicket
 		if err := c.Bind(&input); err != nil {
 			c.Logger().Error(err.Error())
@@ -116,9 +121,10 @@ func (tc *TicketController) CreateTicket() echo.HandlerFunc {
 			TicketCategory: input.TicketCategory,
 			TicketPrice:    input.TicketPrice,
 			TicketQuantity: input.TicketQuantity,
+			EventID:        uint(eventID),
 		}
 
-		err = tc.s.CreateTicket(newTicket)
+		err = tc.s.CreateTicket(newTicket, eventID)
 		if err != nil {
 			c.Logger().Error("Failed to create ticket: ", err)
 			return c.JSON(http.StatusInternalServerError, helper.ResponseFormat(http.StatusInternalServerError, "Internal Server Error", nil))
