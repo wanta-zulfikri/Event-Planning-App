@@ -1,13 +1,40 @@
 package attendances
 
+import (
+	"github.com/labstack/echo/v4"
+	"gorm.io/gorm"
+)
+
 type Core struct {
-	ID      uint
-	UserID  uint
-	EventID uint
+	ID            uint
+	UserID        uint
+	EventID       uint
+	EventCategory string
+	TicketType    string
+	Quantity      string
 }
 
 type Attendances struct {
-	ID      uint `gorm:"primaryKey"`
-	UserID  uint `gorm:"not null;foreignKey:User"`
-	EventID uint `gorm:"not null;foreignKey:Event"`
+	gorm.Model
+	ID            uint
+	UserID        uint
+	EventID       uint
+	EventCategory string
+	TicketType    string
+	Quantity      string
+}
+
+type Repository interface {
+	CreateAttendance(newAttendance Core) (Core, error)
+	GetAttendance(id uint) (Core, error)
+}
+
+type Service interface {
+	CreateAttendance(newAttendance Core) error
+	GetAttendance(id uint) (Core, error)
+}
+
+type Handler interface {
+	CreateAttendance() echo.HandlerFunc
+	GetAttendance() echo.HandlerFunc
 }
