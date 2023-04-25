@@ -24,11 +24,11 @@ func Route(e *echo.Echo, uc users.Handler, ec events.Handler, tc tickets.Handler
 	e.PUT("/users", uc.UpdateProfile(), middleware.JWT([]byte(common.JWTSecret)))
 	e.DELETE("/users", uc.DeleteProfile(), middleware.JWT([]byte(common.JWTSecret)))
 	//events
-	e.GET("/events", ec.GetEvents(), middleware.JWT([]byte(common.JWTSecret)))
-	e.POST("/events", ec.CreateEvent(), middleware.JWT([]byte(common.JWTSecret)))
-	e.GET("/events/:id", ec.GetEvent(), middleware.JWT([]byte(common.JWTSecret)))
-	e.PUT("/events/:id", ec.UpdateEvent(), middleware.JWT([]byte(common.JWTSecret)))
-	e.DELETE("/events/:id", ec.DeleteEvent(), middleware.JWT([]byte(common.JWTSecret)))
+	// e.GET("/events", ec.GetEvents(), middleware.JWT([]byte(common.JWTSecret)))
+	e.POST("/events", ec.CreateEventWithTickets(), middleware.JWT([]byte(common.JWTSecret)))
+	// e.GET("/events/:id", ec.GetEvent(), middleware.JWT([]byte(common.JWTSecret)))
+	// e.PUT("/events/:id", ec.UpdateEvent(), middleware.JWT([]byte(common.JWTSecret)))
+	// e.DELETE("/events/:id", ec.DeleteEvent(), middleware.JWT([]byte(common.JWTSecret)))
 	//tickets
 	e.GET("/tickets", tc.GetTickets(), middleware.JWT([]byte(common.JWTSecret)))
 	e.POST("/tickets", tc.CreateTicket(), middleware.JWT([]byte(common.JWTSecret)))
