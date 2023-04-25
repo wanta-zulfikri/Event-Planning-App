@@ -18,6 +18,12 @@ jobs:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
     -
+      shell: bash
+      env:
+        GCP: ${{ secrets.GCP }}
+      run: |
+          echo "$GCP" > auth.json
+    -
       name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
     -
