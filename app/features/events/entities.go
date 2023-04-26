@@ -2,7 +2,6 @@ package events
 
 import (
 	"github.com/labstack/echo/v4"
-	"gorm.io/gorm"
 )
 
 type Core struct {
@@ -15,13 +14,14 @@ type Core struct {
 	Category    string
 	Location    string
 	Image       string
-	Hostedby    string //hostedby : username didapat dari jwt
+	Hostedby    string //hostedby : username didapat dari JWT Token
 	UserID      uint
-	Tickets     []TicketCore
+	Tickets     []TicketCore `gorm:"foreignKey:EventID"`
 }
 
-type TicketCore struct { //new struct TicketCore
-	Title          string
+type TicketCore struct {
+	ID             uint
+	EventID        uint
 	TicketType     string
 	TicketCategory string
 	TicketPrice    uint
@@ -29,15 +29,25 @@ type TicketCore struct { //new struct TicketCore
 }
 
 type Repository interface {
-	CreateEventWithTickets(tx *gorm.DB, event Core, userID uint) error
-	CreateEvent(tx *gorm.DB, event Core, userID uint) error
-	CreateTickets(tx *gorm.DB, event Core, eventID uint) error
+	CreateEventWithTickets(event Core, userID uint) error
+	GetEvents() ([]Core, error)
+	GetEvent(eventid, userid uint) (Core, error)
+	UpdateEvent(id uint, updatedEvent Core) error
+	DeleteEvent(id uint) error
 }
 
 type Service interface {
 	CreateEventWithTickets(event Core, userID uint) error
+	GetEvents() ([]Core, error)
+	GetEvent(eventid, userid uint) (Core, error)
+	UpdateEvent(id uint, updatedEvent Core) error
+	DeleteEvent(id uint) error
 }
 
 type Handler interface {
 	CreateEventWithTickets() echo.HandlerFunc
+	GetEvents() echo.HandlerFunc
+	GetEvent() echo.HandlerFunc
+	UpdateEvent() echo.HandlerFunc
+	DeleteEvent() echo.HandlerFunc
 }

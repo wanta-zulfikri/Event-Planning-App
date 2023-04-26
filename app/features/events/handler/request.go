@@ -24,6 +24,7 @@ type RequestUpdateEvent struct {
 	Username    string `form:"username"`
 }
 
+// image masuk di update event
 type RequestCreateEventWithTickets struct {
 	Title       string                `json:"title"`
 	Description string                `json:"description"`
