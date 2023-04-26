@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/wanta-zulfikri/Event-Planning-App/app/features/events"
+	"github.com/wanta-zulfikri/Event-Planning-App/app/features/tickets/repository"
 	"gorm.io/gorm"
 )
 
@@ -16,6 +17,53 @@ func New(db *gorm.DB) *EventRepository {
 	return &EventRepository{db: db}
 }
 
+func (er *EventRepository) CreateEventWithTickets(event events.Core, userID uint) error {
+	tx := er.db.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	// create event
+	newEvent := Event{
+		Title:       event.Title,
+		Description: event.Description,
+		EventDate:   event.EventDate,
+		EventTime:   event.EventTime,
+		Status:      event.Status,
+		Category:    event.Category,
+		Location:    event.Location,
+		Image:       event.Image,
+		Hostedby:    event.Hostedby,
+		UserID:      userID,
+	}
+	err := tx.Table("events").Create(&newEvent).Error
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	// create tickets
+	tickets := make([]repository.Ticket, len(event.Tickets))
+	for i, ticket := range event.Tickets {
+		tickets[i] = repository.Ticket{
+			TicketType:     ticket.TicketType,
+			TicketCategory: ticket.TicketCategory,
+			TicketPrice:    ticket.TicketPrice,
+			TicketQuantity: ticket.TicketQuantity,
+			EventID:        newEvent.ID,
+		}
+	}
+	err = tx.Table("tickets").CreateInBatches(tickets, len(tickets)).Error
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	return tx.Commit().Error
+}
+
 func (er *EventRepository) GetEvents() ([]events.Core, error) {
 	var cores []events.Core
 	if err := er.db.Table("events").Where("deleted_at IS NULL").Find(&cores).Error; err != nil {
@@ -24,42 +72,9 @@ func (er *EventRepository) GetEvents() ([]events.Core, error) {
 	return cores, nil
 }
 
-func (er *EventRepository) CreateEvent(newEvent events.Core, id uint) (events.Core, error) {
-	input := Event{
-		Title:       newEvent.Title,
-		Description: newEvent.Description,
-		EventDate:   newEvent.EventDate,
-		EventTime:   newEvent.EventTime,
-		Status:      newEvent.Status,
-		Category:    newEvent.Category,
-		Location:    newEvent.Location,
-		Image:       newEvent.Image,
-		Hostedby:    newEvent.Hostedby,
-		UserID:      id,
-	}
-
-	err := er.db.Table("events").Create(&input).Error
-	if err != nil {
-		return events.Core{}, err
-	}
-
-	createdEvent := events.Core{
-		Title:       input.Title,
-		Description: input.Description,
-		EventDate:   input.EventDate,
-		EventTime:   input.EventTime,
-		Status:      input.Status,
-		Category:    input.Category,
-		Location:    input.Location,
-		Image:       input.Image,
-		Hostedby:    input.Hostedby,
-	}
-	return createdEvent, nil
-}
-
-func (er *EventRepository) GetEvent(id uint) (events.Core, error) {
+func (er *EventRepository) GetEvent(eventid, userid uint) (events.Core, error) {
 	var input Event
-	result := er.db.Where("id = ?", id).Find(&input)
+	result := er.db.Where("id = ? AND user_id = ?", eventid, userid).Find(&input)
 	if result.Error != nil {
 		return events.Core{}, result.Error
 	}

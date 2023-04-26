@@ -15,6 +15,15 @@ func New(r events.Repository) events.Service {
 	return &EventService{r: r}
 }
 
+func (s *EventService) CreateEventWithTickets(event events.Core, userID uint) error {
+	err := s.r.CreateEventWithTickets(event, userID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (es *EventService) GetEvents() ([]events.Core, error) {
 	events, err := es.r.GetEvents()
 	if err != nil {
@@ -23,16 +32,8 @@ func (es *EventService) GetEvents() ([]events.Core, error) {
 	return events, nil
 }
 
-func (es *EventService) CreateEvent(newEvent events.Core, id uint) error {
-	_, err := es.r.CreateEvent(newEvent, id)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (es *EventService) GetEvent(id uint) (events.Core, error) {
-	event, err := es.r.GetEvent(id)
+func (es *EventService) GetEvent(eventid, userid uint) (events.Core, error) {
+	event, err := es.r.GetEvent(eventid, userid)
 	if err != nil {
 		return events.Core{}, err
 	}

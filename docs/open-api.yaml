@@ -154,12 +154,12 @@ paths:
     post:
       tags:
         - Events
-      summary: Create a new event
-      description: Endpoint create event to the web-application
+      summary: Create a new event include with its tickets
+      description: Endpoint create a new event include with its tickets to the web-application
       requestBody:
         required: true
         content:
-          multipart/form-data:
+          application/json:
             schema:
               $ref: "#/components/schemas/EventCreate"
       responses:
@@ -251,6 +251,85 @@ paths:
         - name: id
           in: path
           description: Event ID
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200': 
+          description: Success deleting event  
+          content: 
+            application/json: 
+              schema: 
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: "Success deleted an event"
+        '400':
+          $ref: '#/components/responses/Response400'
+        '401':
+          $ref: '#/components/responses/Response401'  
+        '404':
+          $ref: '#/components/responses/Response404'
+        '500':
+          $ref: '#/components/responses/Response500'
+      security:
+        - bearerAuth: []
+    
+  /tickets/{id}:
+    put: 
+      tags: 
+        - Tickets
+      summary: Update an ticket by event ID 
+      security: 
+        - bearerAuth: [] 
+      parameters:
+        - name: id
+          in: path
+          description: Event ID
+          required: true
+          schema:
+            type: integer
+      requestBody: 
+        description: The updated event 
+        required: true 
+        content: 
+          multipart/form-data: 
+            schema:
+              $ref: "#/components/schemas/TicketUpdate" 
+      responses: 
+          '200': 
+            $ref: "#/components/responses/Response200TicketUpdate" 
+          '400': 
+            $ref: "#/components/responses/Response400"
+          '401':
+            $ref: "#/components/responses/Response401"
+          '404': 
+            description: Event not found 
+            content: 
+              application/json: 
+                schema: 
+                  type: object 
+                  properties: 
+                    message: 
+                      type: string 
+                  example: 
+                    message: "Event not found" 
+          '500': 
+            $ref: "#/components/responses/Response500"
+    
+    delete:
+      tags:
+        - Tickets
+      summary: Delete an tickets by event ID
+      description: Delete ticket information by event ID
+      parameters:
+        - name: id
+          in: path
+          description: Tickets ID
           required: true
           schema:
             type: integer
@@ -700,6 +779,13 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/EventUpdate'
+
+    Response200TicketUpdate:
+      description: Successful response for updating a ticket
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/TicketUpdate'
 
     Response201EventCreate:
       description: Successful Create an Event
@@ -1154,24 +1240,10 @@ components:
         location: 
           type: string 
           description: Location of the event 
-        ticket_type:
-          type: string
-          description: Type of ticket, either free or paid
-        ticket_category:
-          type: string
-          description: Category of the ticket, such as VIP or regular
-        ticket_price:
-          type: integer
-          description: Price of the ticket in IDR
-        ticket_quantity:
-          type: integer
-          description: Quantity of the ticket available
         image: 
           type: string 
           format: binary
           description: Image of the event 
-        reviews:
-          type: string
       example:
         code: 200
         message: "Successful Operation"
@@ -1184,36 +1256,14 @@ components:
           status: "open"
           category: "Music"
           location: "Jakarta"
-          ticket:
-          - ticket_type: "paid"
-            ticket_category: "VIP"
-            ticket_price: 500000
-            ticket_quantity: 100
-          - ticket_type: "paid"
-            ticket_category: "Reguler"
-            ticket_price: 250000
-            ticket_quantity: 350
           image: "image.png"
-          reviews:
-            - username: "peterzalai"
-              image: "peterzalai.png"
-              review: "A review is a longer, more formal write-up concerning someones work over a set period of time."
-            - username: "Carlo"
-              image: "janedoe.png"
-              review: "I really enjoyed this event! The performers were amazing and the venue was beautiful."
-            - username: "EmilyB"
-              image: "emilyb.png"
-              review: "This was such a fun event! Can't wait for the next one!"
-            - username: "DavidH"
-              image: "davidh.png"
-              review: "I have been to many events in the past, but this one was truly special. I would definitely go again!"
-            - username: "MikeJ"
-              image: "mikej.png"
-              review: "I had high expectations for this event and it did not disappoint! I would definitely attend again."
 
     EventList:
       type: object
       properties: 
+        id: 
+          type: integer
+          description: Event ID 
         name: 
           type: string  
           description: Nama acara 
@@ -1236,67 +1286,78 @@ components:
         code: 200
         message: "Successful Operation"
         data: 
-        - name: "udemy: golang goroutines"
+        - id: "1"
+          name: "udemy: golang goroutines"
           hosted_by: "Product Udemy"
           date: "2023-04-15"
           location: "Jakarta"
           details: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
           event_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg"
-        - name: "udemy: golang goroutines"
+        - id: "2"
+          name: "udemy: golang goroutines"
           hosted_by: "Product Udemy"
           date: "2023-04-15"
           location: "Jakarta"
           details: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
           event_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg"
-        - name: "udemy: golang goroutines"
+        - id: "3"
+          name: "udemy: golang goroutines"
           hosted_by: "Product Udemy"
           date: "2023-04-15"
           location: "Jakarta"
           details: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
           event_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg"
-        - name: "udemy: golang goroutines"
+        - id: "4"
+          name: "udemy: golang goroutines"
           hosted_by: "Product Udemy"
           date: "2023-04-15"
           location: "Jakarta"
           details: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
           event_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg"
-        - name: "udemy: golang goroutines"
+        - id: "5"
+          name: "udemy: golang goroutines"
           hosted_by: "Product Udemy"
           date: "2023-04-15"
           location: "Jakarta"
           details: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
           event_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg"
-        - name: "udemy: golang goroutines"
+        - id: "6"
+          name: "udemy: golang goroutines"
           hosted_by: "Product Udemy"
           date: "2023-04-15"
           location: "Jakarta"
           details: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
           event_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg"
-        - name: "udemy: golang goroutines"
+        - id: "7"
+          name: "udemy: golang goroutines"
           hosted_by: "Product Udemy"
           date: "2023-04-15"
           location: "Jakarta"
           details: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
           event_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg"
-        - name: "udemy: golang goroutines"
+        - id: "8"
+          name: "udemy: golang goroutines"
           hosted_by: "Product Udemy"
           date: "2023-04-15"
           location: "Jakarta"
           details: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
           event_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg"
-        - name: "udemy: golang goroutines"
+        - id: "8"
+          name: "udemy: golang goroutines"
           hosted_by: "Product Udemy"
           date: "2023-04-15"
           location: "Jakarta"
           details: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
           event_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg"
-        - name: "udemy: golang goroutines"
+        - id: "9"
+          name: "udemy: golang goroutines"
           hosted_by: "Product Udemy"
           date: "2023-04-15"
           location: "Jakarta"
           details: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
           event_picture: "https://kurabsent.s3.amazonaws.com/2022-07-06%2006%3A40%3A47.jpg"
-        - name: "udemy: golang goroutines"
+        - id: "10"
+          name: "udemy: golang goroutines"
           hosted_by: "Product Udemy"
           date: "2023-04-15"
           location: "Jakarta"
@@ -1327,33 +1388,52 @@ components:
           description: Date of the event in ISO format (YYYY-MM-DD)
         time: 
           type: string 
-          format: date-time 
-          description: Time of the event 
+          format: time 
+          description: Time of the event in 24-hour format (HH:MM:SS)
         status:
           type: string
-          description: Status closed/open
+          description: Status of the event, open or closed
         category:
           type: string
-          description: Category Music/Sport/etc
+          description: Category of the event, such as music, sport, etc.
         location: 
           type: string 
           description: Location of the event 
         ticket_type:
           type: string
-          description: Free/Paid
+          description: Type of ticket, either free or paid
         ticket_category:
           type: string
-          description: VIP/Reguler
+          description: Category of the ticket, such as VIP or regular
         ticket_price:
           type: integer
-          description: Price is depend on ticket category
+          description: Price of the ticket in IDR
         ticket_quantity:
           type: integer
-          description: Quntity is depend on ticket category
+          description: Quantity of the ticket available
         image: 
           type: string 
           format: binary
           description: Image of the event 
+      example: 
+          title: "Soundrenaline 2023"
+          details: "Lorem Ipsum is simply dummy text of the printing and typesetting industry."
+          hosted_by: "Ravel Entertainment"
+          date: "2023-08-05"
+          time: "10:10:00"
+          status: "open"
+          category: "Music"
+          location: "Jakarta"
+          event_picture: "default_image_gcp.png"
+          ticket:
+          - ticket_type: "paid"
+            ticket_category: "VIP"
+            ticket_price: 500000
+            ticket_quantity: 100
+          - ticket_type: "paid"
+            ticket_category: "Reguler"
+            ticket_price: 250000
+            ticket_quantity: 350
 
     ResponseEventCreate:
       type: object 
@@ -1384,19 +1464,7 @@ components:
         location: 
           type: string 
           description: Location of the event 
-        ticket_type:
-          type: string
-          description: Type of ticket, either free or paid
-        ticket_category:
-          type: string
-          description: Category of the ticket, such as VIP or regular
-        ticket_price:
-          type: integer
-          description: Price of the ticket in IDR
-        ticket_quantity:
-          type: integer
-          description: Quantity of the ticket available
-        image: 
+        event_picture: 
           type: string 
           format: binary
           description: Image of the event 
@@ -1412,6 +1480,7 @@ components:
           status: "open"
           category: "Music"
           location: "Jakarta"
+          image: "default_image_gcp.png"
           ticket:
           - ticket_type: "paid"
             ticket_category: "VIP"
@@ -1421,7 +1490,6 @@ components:
             ticket_category: "Reguler"
             ticket_price: 250000
             ticket_quantity: 350
-          image: "/9j/4AAQSkZJRgABAQEASABIAAD/4gxYSUNDX1BST0ZJTEUAAQEAAAxITGlubwIQAABtbnRyUkdCIFhZWiAH2QADABs..."
 
     EventUpdate:
       type: object 
@@ -1452,6 +1520,14 @@ components:
         location: 
           type: string 
           description: Location of the event 
+        image: 
+          type: string 
+          format: binary
+          description: Image of the event 
+      
+    TicketUpdate:
+      type: object 
+      properties: 
         ticket_type:
           type: string
           description: Type of ticket, either free or paid
@@ -1463,34 +1539,16 @@ components:
           description: Price of the ticket in IDR
         ticket_quantity:
           type: integer
-          description: Quantity of the ticket available
-        image: 
-          type: string 
-          format: binary
-          description: Image of the event 
+          description: Quantity of the ticket available  
       example: 
         code: 200
-        message: "Success updated an event"
+        message: "Success updated a ticket"
         data:
-          title: "Soundrenaline 2023"
-          details: "Lorem Ipsum is simply dummy text of the printing and typesetting industry."
-          hosted_by: "Ravel Entertainment"
-          date: "2023-08-05"
-          time: "10:10:00"
-          status: "open"
-          category: "Music"
-          location: "Jakarta"
-          ticket:
-          - ticket_type: "paid"
-            ticket_category: "VIP"
-            ticket_price: 500000
-            ticket_quantity: 100
-          - ticket_type: "paid"
-            ticket_category: "Reguler"
-            ticket_price: 250000
-            ticket_quantity: 350
-          image: "/9j/4AAQSkZJRgABAQEASABIAAD/4gxYSUNDX1BST0ZJTEUAAQEAAAxITGlubwIQAABtbnRyUkdCIFhZWiAH2QADABs..."
-
+          ticket_type: "paid"
+          ticket_category: "VIP"
+          ticket_price: 500000
+          ticket_quantity: 100        
+          
     RequestTransactionCreate:
       type: object
       properties:
