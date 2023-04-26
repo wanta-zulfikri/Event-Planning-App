@@ -1,3 +1,4 @@
+
 package handler
 
 import (
@@ -37,10 +38,9 @@ func (rc *ReviewController) WriteReview() echo.HandlerFunc {
 		}
 
 		newReview := reviews.Core{
-			ID:      input.ID,
-			UserID:  input.UserID,
 			EventID: input.EventID,
-			Review:  input.Review,
+			Review:  input.Review, 
+		
 		}
 
 		err = rc.n.WriteReview(newReview)
@@ -80,13 +80,24 @@ func (rc *ReviewController) UpdateReview() echo.HandlerFunc {
 		if err := c.Bind(&input); err != nil {
 			c.Logger().Error("Failed to bind input:", err)
 			return c.JSON(http.StatusBadRequest, helper.ResponseFormat(http.StatusBadRequest, "Bad Request", nil))
-		}
+		} 
+
+		// file, err := c.FormFile("image")
+		// var image string
+		// if err != nil && err != http.ErrMissingFile {
+		// 	c.Logger().Error("Failed to get image from form file: ", err)
+		// 	return c.JSON(http.StatusBadRequest, helper.ResponseFormat(http.StatusBadRequest, "Bad Request", nil))
+		// } else if file != nil {
+		// 	image, err = helper.UploadImage(c, file)
+		// 	if err != nil {
+		// 		c.Logger().Error("Failed to upload image: ", err)
+		// 		return c.JSON(http.StatusInternalServerError, helper.ResponseFormat(http.StatusInternalServerError, "Internal Server Error", nil))
+		// 	}
+		// }
 
 		updatedReview := reviews.Core{
 			ID:      uint(id),
-			UserID:  input.UserID,
-			EventID: input.EventID,
-			Review:  input.Review,
+			Review:  	input.Review, 
 		}
 		err = rc.n.UpdateReview(updatedReview.ID, updatedReview)
 		if err != nil {

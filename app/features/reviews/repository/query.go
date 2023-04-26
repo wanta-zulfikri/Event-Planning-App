@@ -19,9 +19,11 @@ func New(db *gorm.DB) *ReviewRepository {
 
 func (rr *ReviewRepository) WriteReview(newReview reviews.Core) (reviews.Core, error) {
 	input := Review{
-		UserID:  newReview.UserID,
-		EventID: newReview.EventID,
-		Review:  newReview.Review,
+		UserID:   newReview.UserID,
+		EventID:  newReview.EventID,
+		Review:   newReview.Review, 
+		Username: newReview.Username, 
+		Image:    newReview.Image,
 	}
 
 	err := rr.db.Table("review").Create(&input).Error
@@ -31,9 +33,11 @@ func (rr *ReviewRepository) WriteReview(newReview reviews.Core) (reviews.Core, e
 	}
 
 	createdReview := reviews.Core{
-		UserID:  input.UserID,
-		EventID: input.EventID,
-		Review:  input.Review,
+		UserID:  	input.UserID,
+		EventID: 	input.EventID,
+		Review:  	input.Review, 
+		Username: 	input.Username,
+		Image: 		input.Image,
 	}
 	return createdReview, nil
 }
@@ -50,7 +54,9 @@ func (rr *ReviewRepository) UpdateReview(id uint, updateReview reviews.Core) err
 
 	input.UserID = updateReview.UserID
 	input.EventID = updateReview.EventID
-	input.Review = updateReview.Review
+	input.Review = updateReview.Review 
+	input.Username = updateReview.Username 
+	input.Image = updateReview.Image
 
 	if err := rr.db.Save(&input).Error; err != nil {
 		return err
