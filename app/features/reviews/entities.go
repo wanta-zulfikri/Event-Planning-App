@@ -5,10 +5,12 @@ import (
 )
 
 type Core struct {
-	ID      uint
-	UserID  uint
-	EventID uint
-	Review  string
+	ID        uint
+	UserID    uint 
+	Username  string 
+	Image     string
+	EventID   uint
+	Review    string
 }
 
 type Repository interface {
