@@ -14,29 +14,39 @@ type Core struct {
 	Category    string
 	Location    string
 	Image       string
-	Hostedby    string //hostedby : username didapat dari jwt
+	Hostedby    string //hostedby : username didapat dari JWT Token
 	UserID      uint
+	Tickets     []TicketCore `gorm:"foreignKey:EventID"`
+}
+
+type TicketCore struct {
+	ID             uint
+	EventID        uint
+	TicketType     string
+	TicketCategory string
+	TicketPrice    uint
+	TicketQuantity uint
 }
 
 type Repository interface {
+	CreateEventWithTickets(event Core, userID uint) error
 	GetEvents() ([]Core, error)
-	CreateEvent(newEvent Core, id uint) (Core, error)
-	GetEvent(id uint) (Core, error)
+	GetEvent(eventid, userid uint) (Core, error)
 	UpdateEvent(id uint, updatedEvent Core) error
 	DeleteEvent(id uint) error
 }
 
 type Service interface {
+	CreateEventWithTickets(event Core, userID uint) error
 	GetEvents() ([]Core, error)
-	CreateEvent(newEvent Core, id uint) error
-	GetEvent(id uint) (Core, error)
+	GetEvent(eventid, userid uint) (Core, error)
 	UpdateEvent(id uint, updatedEvent Core) error
 	DeleteEvent(id uint) error
 }
 
 type Handler interface {
+	CreateEventWithTickets() echo.HandlerFunc
 	GetEvents() echo.HandlerFunc
-	CreateEvent() echo.HandlerFunc
 	GetEvent() echo.HandlerFunc
 	UpdateEvent() echo.HandlerFunc
 	DeleteEvent() echo.HandlerFunc

@@ -77,3 +77,59 @@ func ValidateJWTUsername(authHeader string) (string, error) {
 	}
 	return username, nil
 }
+
+// func ValidateJWT2(authHeader string) (uint, error) {
+// 	if authHeader == "" {
+// 		return 0, fmt.Errorf("missing Authorization header")
+// 	}
+// 	tokenString := strings.Replace(authHeader, "Bearer ", "", 1)
+
+// 	token, err := jwt.ParseWithClaims(tokenString, &jwt.MapClaims{}, func(token *jwt.Token) (interface{}, error) {
+// 		return []byte(common.JWTSecret), nil
+// 	})
+// 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+// 		id, ok := claims["id"].(float64)
+// 		if !ok {
+// 			return 0, fmt.Errorf("invalid or expired token")
+// 		}
+// 		return uint(id), nil
+// 	}
+// 	if err != nil {
+// 		return 0, fmt.Errorf("invalid or expired token")
+// 	}
+
+// 	return uint(id), nil
+// }
+
+type Claims struct {
+	ID       uint   `json:"id"`
+	Email    string `json:"email"`
+	Username string `json:"username"`
+}
+
+func (c *Claims) Valid() error {
+	if c.ID == 0 || c.Email == "" || c.Username == "" {
+		return fmt.Errorf("invalid claims")
+	}
+	return nil
+}
+
+func ValidateJWT2(authHeader string) (*Claims, error) {
+	if authHeader == "" {
+		return nil, fmt.Errorf("missing Authorization header")
+	}
+	tokenString := strings.Replace(authHeader, "Bearer ", "", 1)
+
+	token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (interface{}, error) {
+		return []byte(common.JWTSecret), nil
+	})
+	if err != nil {
+		return nil, fmt.Errorf("invalid or expired token")
+	}
+
+	if claims, ok := token.Claims.(*Claims); ok && token.Valid {
+		return claims, nil
+	} else {
+		return nil, fmt.Errorf("invalid or expired token")
+	}
+}

@@ -19,7 +19,7 @@ func New(db *gorm.DB) *TicketRepository {
 
 func (tr *TicketRepository) GetTickets() ([]tickets.Core, error) {
 	var cores []tickets.Core
-	if err := tr.db.Table("tickets").Find(&cores).Error; err != nil {
+	if err := tr.db.Table("tickets").Where("deleted_at IS NULL").Find(&cores).Error; err != nil {
 		return nil, err
 	}
 	return cores, nil

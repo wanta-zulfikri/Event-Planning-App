@@ -5,7 +5,6 @@ import (
 
 	"github.com/wanta-zulfikri/Event-Planning-App/app/features/tickets/repository"
 	"github.com/wanta-zulfikri/Event-Planning-App/app/features/transactions"
-	"github.com/wanta-zulfikri/Event-Planning-App/helper"
 	"gorm.io/gorm"
 )
 
@@ -75,7 +74,7 @@ func (tr *TransactionRepository) GetInvoice(Invoice string) (*Transaction, error
 
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, helper.ErrRecordNotFound
+			return nil, err
 		}
 		return nil, err
 	}

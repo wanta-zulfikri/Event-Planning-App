@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"math"
 	"net/http"
 	"strconv"
@@ -20,21 +19,94 @@ func New(h events.Service) events.Handler {
 	return &EventController{s: h}
 }
 
+func (ec *EventController) CreateEventWithTickets() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		var input RequestCreateEventWithTickets
+		tokenString := c.Request().Header.Get("Authorization")
+		claims, err := middlewares.ValidateJWT2(tokenString)
+		if err != nil {
+			return c.JSON(http.StatusUnauthorized, helper.ResponseFormat(http.StatusUnauthorized, "Missing or Malformed JWT"+err.Error(), nil))
+		}
+
+		id := claims.ID
+		username := claims.Username
+
+		if err := c.Bind(&input); err != nil {
+			c.Logger().Error("Failed to bind input: ", err)
+			return c.JSON(http.StatusBadRequest, helper.ResponseFormat(http.StatusBadRequest, "Bad Request", nil))
+		}
+
+		//masuk service
+		eventTickets := make([]events.TicketCore, len(input.Tickets))
+		for i, ticket := range input.Tickets {
+			eventTickets[i] = events.TicketCore{
+				TicketType:     ticket.TicketType,
+				TicketCategory: ticket.TicketCategory,
+				TicketPrice:    ticket.TicketPrice,
+				TicketQuantity: ticket.TicketQuantity,
+			}
+		}
+
+		newEvent := events.Core{
+			Title:       input.Title,
+			Description: input.Description,
+			EventDate:   input.EventDate,
+			EventTime:   input.EventTime,
+			Status:      input.Status,
+			Category:    input.Category,
+			Location:    input.Location,
+			Image:       input.Image,
+			Hostedby:    username,
+			Tickets:     eventTickets,
+		}
+
+		err = ec.s.CreateEventWithTickets(newEvent, id)
+		if err != nil {
+			c.Logger().Error("Failed to create event with tickets: ", err)
+			return c.JSON(http.StatusInternalServerError, helper.ResponseFormat(http.StatusInternalServerError, "Internal Server Error", nil))
+		}
+
+		response := EventResponse{
+			Code:    http.StatusCreated,
+			Message: "Success created an event",
+			Data: EventData{
+				Title:       newEvent.Title,
+				Description: newEvent.Description,
+				HostedBy:    newEvent.Hostedby,
+				Date:        newEvent.EventDate,
+				Time:        newEvent.EventTime,
+				Status:      newEvent.Status,
+				Category:    newEvent.Category,
+				Location:    newEvent.Location,
+				Picture:     newEvent.Image,
+				Ticket:      make([]TicketResponse, len(newEvent.Tickets)),
+			},
+		}
+
+		for i, ticket := range newEvent.Tickets {
+			response.Data.Ticket[i] = TicketResponse{
+				Type:     ticket.TicketType,
+				Category: ticket.TicketCategory,
+				Price:    ticket.TicketPrice,
+				Quantity: ticket.TicketQuantity,
+			}
+		}
+
+		return c.JSON(http.StatusCreated, response)
+	}
+}
+
 func (ec *EventController) GetEvents() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		tokenString := c.Request().Header.Get("Authorization")
-		if tokenString == "" {
-			return c.JSON(http.StatusUnauthorized, helper.ResponseFormat(http.StatusUnauthorized, "Unauthorized. Token is missing.", nil))
-		}
-
-		_, err := middlewares.ValidateJWT(tokenString)
+		_, err := middlewares.ValidateJWT2(tokenString)
 		if err != nil {
-			return c.JSON(http.StatusUnauthorized, helper.ResponseFormat(http.StatusUnauthorized, "Unauthorized. "+err.Error(), nil))
+			return c.JSON(http.StatusUnauthorized, helper.ResponseFormat(http.StatusUnauthorized, "Missing or Malformed JWT. "+err.Error(), nil))
 		}
 
 		events, err := ec.s.GetEvents()
 		if err != nil {
-			c.Logger().Error("Failed to get all books", err.Error())
+			c.Logger().Error("Failed to get events", err.Error())
 			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
 				"code":    http.StatusInternalServerError,
 				"message": "Internal Server Error",
@@ -42,7 +114,7 @@ func (ec *EventController) GetEvents() echo.HandlerFunc {
 		}
 
 		if len(events) == 0 {
-			c.Logger().Error("Failed to get all events", err.Error())
+			c.Logger().Error("Failed to get events", err.Error())
 			return c.JSON(http.StatusNotFound, map[string]interface{}{
 				"code":    http.StatusNotFound,
 				"message": "Events not found",
@@ -52,15 +124,16 @@ func (ec *EventController) GetEvents() echo.HandlerFunc {
 		formattedEvents := []ResponseGetEvents{}
 		for _, event := range events {
 			formattedEvent := ResponseGetEvents{
-				Title:       event.Title,
-				Description: event.Description,
-				EventDate:   event.EventDate,
-				EventTime:   event.EventTime,
-				Status:      event.Status,
-				Category:    event.Category,
-				Location:    event.Location,
-				Image:       event.Image,
-				Hostedby:    event.Hostedby,
+				ID:            event.ID,
+				Title:         event.Title,
+				Description:   event.Description,
+				Hosted_by:     event.Hostedby,
+				Date:          event.EventDate,
+				Time:          event.EventTime,
+				Status:        event.Status,
+				Category:      event.Category,
+				Location:      event.Location,
+				Event_picture: event.Image,
 			}
 			formattedEvents = append(formattedEvents, formattedEvent)
 		}
@@ -85,119 +158,63 @@ func (ec *EventController) GetEvents() echo.HandlerFunc {
 			endIndex = total
 		}
 
-		data := formattedEvents[startIndex:endIndex]
+		response := formattedEvents[startIndex:endIndex]
 
-		return c.JSON(http.StatusOK, map[string]interface{}{
-			"code":        http.StatusOK,
-			"message":     "Successful Operation",
-			"page":        pageInt,
-			"per_page":    perPageInt,
-			"total_pages": totalPages,
-			"total_items": total,
-			"data":        data,
+		pages := Pagination{
+			Page:       pageInt,
+			PerPage:    perPageInt,
+			TotalPages: totalPages,
+			TotalItems: total,
+		}
+
+		return c.JSON(http.StatusOK, EventsResponse{
+			Code:       http.StatusOK,
+			Message:    "Successful operation.",
+			Data:       response,
+			Pagination: pages,
 		})
-	}
-}
-
-func (ec *EventController) CreateEvent() echo.HandlerFunc {
-	return func(c echo.Context) error {
-		var input RequestCreateEvent
-		tokenString := c.Request().Header.Get("Authorization")
-		if tokenString == "" {
-			return c.JSON(http.StatusUnauthorized, helper.ResponseFormat(http.StatusUnauthorized, "Unauthorized. Token is missing.", nil))
-		}
-		idString, err := middlewares.ValidateJWT(tokenString)
-		if err != nil {
-			return c.JSON(http.StatusUnauthorized, helper.ResponseFormat(http.StatusUnauthorized, "Unauthorized. "+err.Error(), nil))
-		}
-
-		id, err := strconv.ParseUint(fmt.Sprint(idString), 10, 64)
-		if err != nil {
-			return c.JSON(http.StatusUnauthorized, helper.ResponseFormat(http.StatusUnauthorized, "Unauthorized. Invalid token.", nil))
-		}
-		username, err := middlewares.ValidateJWTUsername(tokenString)
-		if err != nil {
-			return c.JSON(http.StatusUnauthorized, helper.ResponseFormat(http.StatusUnauthorized, "Unauthorized. "+err.Error(), nil))
-		}
-
-		if username == "" {
-			return c.JSON(http.StatusUnauthorized, helper.ResponseFormat(http.StatusUnauthorized, "Unauthorized. Invalid token.", nil))
-		}
-
-		if err := c.Bind(&input); err != nil {
-			c.Logger().Error("Failed to bind input: ", err)
-			return c.JSON(http.StatusBadRequest, helper.ResponseFormat(http.StatusBadRequest, "Bad Request", nil))
-		}
-
-		file, err := c.FormFile("image")
-		if err != nil {
-			c.Logger().Error("Failed to get image: ", err)
-			return c.JSON(http.StatusBadRequest, helper.ResponseFormat(http.StatusBadRequest, "Bad Request", nil))
-		}
-
-		image, err := helper.UploadImage(c, file)
-		if err != nil {
-			c.Logger().Error("Failed to upload image: ", err)
-			return c.JSON(http.StatusInternalServerError, helper.ResponseFormat(http.StatusInternalServerError, "Internal Server Error", nil))
-		}
-		newEvent := events.Core{
-			Title:       input.Title,
-			Description: input.Description,
-			EventDate:   input.EventDate,
-			EventTime:   input.EventTime,
-			Status:      input.Status,
-			Category:    input.Category,
-			Location:    input.Location,
-			Image:       image,
-			Hostedby:    username,
-		}
-
-		err = ec.s.CreateEvent(newEvent, uint(id))
-		if err != nil {
-			c.Logger().Error("Failed to create event: ", err)
-			return c.JSON(http.StatusInternalServerError, helper.ResponseFormat(http.StatusInternalServerError, "Internal Server Error", nil))
-		}
-		return c.JSON(http.StatusCreated, helper.ResponseFormat(http.StatusCreated, "Event created successfully", nil))
 	}
 }
 
 func (ec *EventController) GetEvent() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		tokenString := c.Request().Header.Get("Authorization")
-		if tokenString == "" {
-			return c.JSON(http.StatusUnauthorized, helper.ResponseFormat(http.StatusUnauthorized, "Unauthorized. Token is missing.", nil))
+		claims, err := middlewares.ValidateJWT2(tokenString)
+		if err != nil {
+			return c.JSON(http.StatusUnauthorized, helper.ResponseFormat(http.StatusUnauthorized, "Missing or Malformed JWT. "+err.Error(), nil))
 		}
 
-		_, err := middlewares.ValidateJWT(tokenString)
-		if err != nil {
-			return c.JSON(http.StatusUnauthorized, helper.ResponseFormat(http.StatusUnauthorized, "Unauthorized. "+err.Error(), nil))
-		}
+		userid := claims.ID
 
-		id, err := strconv.ParseUint(c.Param("id"), 10, 32)
+		eventid, err := strconv.ParseUint(c.Param("id"), 10, 64)
 		if err != nil {
-			c.Logger().Error(err.Error())
+			c.Logger().Error("Failed to parse ID from URL param: ", err)
 			return c.JSON(http.StatusBadRequest, helper.ResponseFormat(http.StatusBadRequest, "Bad Request", nil))
 		}
 
-		event, err := ec.s.GetEvent(uint(id))
+		event, err := ec.s.GetEvent(uint(eventid), uint(userid))
 		if err != nil {
 			c.Logger().Error(err.Error())
 			return c.JSON(http.StatusInternalServerError, helper.ResponseFormat(http.StatusInternalServerError, "Internal Server Error", nil))
 		}
 
-		response := ResponseGetEvents{
-			Title:       event.Title,
-			Description: event.Description,
-			EventDate:   event.EventDate,
-			EventTime:   event.EventTime,
-			Status:      event.Status,
-			Category:    event.Category,
-			Location:    event.Location,
-			Image:       event.Image,
-			Hostedby:    event.Hostedby,
+		response := ResponseGetEvent{
+			Title:         event.Title,
+			Description:   event.Description,
+			Hosted_by:     event.Hostedby,
+			Date:          event.EventDate,
+			Time:          event.EventTime,
+			Status:        event.Status,
+			Category:      event.Category,
+			Location:      event.Location,
+			Event_picture: event.Image,
 		}
 
-		return c.JSON(http.StatusOK, helper.ResponseFormat(http.StatusOK, "Success get an event", response))
+		return c.JSON(http.StatusOK, helper.DataResponse{
+			Code:    http.StatusOK,
+			Message: "Successful operation.",
+			Data:    response,
+		})
 	}
 }
 
@@ -205,19 +222,12 @@ func (ec *EventController) UpdateEvent() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var input RequestUpdateEvent
 		tokenString := c.Request().Header.Get("Authorization")
-		if tokenString == "" {
-			return c.JSON(http.StatusUnauthorized, helper.ResponseFormat(http.StatusUnauthorized, "Unauthorized. Token is missing.", nil))
-		}
-
-		username, err := middlewares.ValidateJWTUsername(tokenString)
+		claims, err := middlewares.ValidateJWT2(tokenString)
 		if err != nil {
-			return c.JSON(http.StatusUnauthorized, helper.ResponseFormat(http.StatusUnauthorized, "Unauthorized. "+err.Error(), nil))
+			return c.JSON(http.StatusUnauthorized, helper.ResponseFormat(http.StatusUnauthorized, "Missing or Malformed JWT. "+err.Error(), nil))
 		}
 
-		if username == "" {
-			return c.JSON(http.StatusUnauthorized, helper.ResponseFormat(http.StatusUnauthorized, "Unauthorized. Invalid token.", nil))
-		}
-
+		username := claims.Username
 		id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 		if err != nil {
 			c.Logger().Error("Failed to parse ID from URL param: ", err)
@@ -268,13 +278,9 @@ func (ec *EventController) UpdateEvent() echo.HandlerFunc {
 func (ec *EventController) DeleteEvent() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		tokenString := c.Request().Header.Get("Authorization")
-		if tokenString == "" {
-			return c.JSON(http.StatusUnauthorized, helper.ResponseFormat(http.StatusUnauthorized, "Unauthorized. Token is missing.", nil))
-		}
-
-		_, err := middlewares.ValidateJWT(tokenString)
+		claims, err := middlewares.ValidateJWT2(tokenString)
 		if err != nil {
-			return c.JSON(http.StatusUnauthorized, helper.ResponseFormat(http.StatusUnauthorized, "Unauthorized. "+err.Error(), nil))
+			return c.JSON(http.StatusUnauthorized, helper.ResponseFormat(http.StatusUnauthorized, "Missing or Malformed JWT"+err.Error(), nil))
 		}
 
 		id, err := strconv.ParseUint(c.Param("id"), 10, 32)
@@ -283,11 +289,16 @@ func (ec *EventController) DeleteEvent() echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, helper.ResponseFormat(http.StatusBadRequest, "Bad Request", nil))
 		}
 
+		if claims.ID != uint(id) {
+			return c.JSON(http.StatusUnauthorized, helper.ResponseFormat(http.StatusUnauthorized, "Unauthorized. Token is not valid for this user.", nil))
+		}
+
 		err = ec.s.DeleteEvent(uint(id))
 		if err != nil {
 			c.Logger().Error("Error deleting profile", err.Error())
 			return c.JSON(http.StatusInternalServerError, helper.ResponseFormat(http.StatusInternalServerError, "Internal Server Error", nil))
 		}
-		return c.JSON(http.StatusOK, helper.ResponseFormat(http.StatusOK, "Success deleted an account", nil))
+
+		return c.JSON(http.StatusOK, helper.ResponseFormat(http.StatusOK, "Success deleted an event", nil))
 	}
 }
