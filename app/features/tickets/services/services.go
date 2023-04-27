@@ -15,33 +15,16 @@ func New(r tickets.Repository) tickets.Service {
 	return &TicketService{r: r}
 }
 
-func (ts *TicketService) GetTickets() ([]tickets.Core, error) {
-	tickets, err := ts.r.GetTickets()
+func (ts *TicketService) GetTickets(id uint) ([]tickets.Core, error) {
+	tickets, err := ts.r.GetTickets(id)
 	if err != nil {
 		return nil, err
 	}
 	return tickets, nil
 }
 
-func (ts *TicketService) CreateTicket(newTicket tickets.Core, eventid uint64) error {
-	_, err := ts.r.CreateTicket(newTicket, eventid)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (ts *TicketService) GetTicket(id uint) (tickets.Core, error) {
-	event, err := ts.r.GetTicket(id)
-	if err != nil {
-		return tickets.Core{}, err
-	}
-	return event, nil
-}
-
-func (ts *TicketService) UpdateTicket(id uint, updatedTicket tickets.Core) error {
-	updatedTicket.ID = id
-	if err := ts.r.UpdateTicket(id, updatedTicket); err != nil {
+func (ts *TicketService) UpdateTicket(eventid uint, updatedTicket []tickets.Core) error {
+	if err := ts.r.UpdateTicket(eventid, updatedTicket); err != nil {
 		return err
 	}
 	return nil
