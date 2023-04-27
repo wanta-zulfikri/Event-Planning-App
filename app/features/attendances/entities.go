@@ -15,12 +15,12 @@ type Core struct {
 
 type Repository interface {
 	CreateAttendance(newAttendance Core) (Core, error)
-	GetAttendance(id uint) (Core, error)
+	GetAttendance() ([]Core, error)
 }
 
 type Service interface {
 	CreateAttendance(newAttendance Core) error
-	GetAttendance(id uint) (Core, error)
+	GetAttendance() ([]Core, error)
 }
 
 type Handler interface {

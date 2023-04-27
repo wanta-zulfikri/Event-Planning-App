@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"math"
 	"strconv"
 
 	"github.com/labstack/echo/v4"
@@ -37,10 +38,11 @@ func (ac *AttendancesController) CreateAttendance() echo.HandlerFunc {
 		} 
 
 		newAttendances := attendances.Core {
-			ID: input.ID, 
-			UserID: input.UserID,
-			EventID: input.EventID,
-			EventCategory: input.EventCategory,
+			UserID:         input.UserID,
+			EventID:        input.EventID,
+			EventCategory:  input.EventCategory, 
+			TicketType:     input.TicketType, 
+			Quantity:       input.Quantity,
 		} 
 
 		err = ac.x.CreateAttendance(newAttendances) 
@@ -64,23 +66,72 @@ func (ac *AttendancesController) GetAttendance() echo.HandlerFunc {
 			return c.JSON(http.StatusUnauthorized, helper.ResponseFormat(http.StatusUnauthorized, "Unauthorized. "+err.Error(), nil))
 		} 
 
-		inputID := c.Param("id") 
-		if inputID == "" {
-			c.Logger().Error(err.Error()) 
-			return c.JSON(http.StatusBadRequest, helper.ResponseFormat(http.StatusBadRequest, "Bad Request", nil))
-		} 
-
-		id , err := strconv.ParseUint(inputID, 10, 32) 
+		
+		attendance, err := ac.x.GetAttendance()
 		if err != nil {
-			c.Logger().Error(err.Error()) 
-			return c.JSON(http.StatusBadRequest, helper.ResponseFormat(http.StatusBadRequest, "Bad Request", nil))
-		} 
+			c.Logger().Error("Failed to get attendances", err.Error())
+			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+				"code":    http.StatusInternalServerError,
+				"message": "Internal Server Error",
+			})
+		}
 
-		attendances, err := ac.x.GetAttendance(uint(id)) 
-		if err != nil {
-			c.Logger().Error(err.Error()) 
-			return c.JSON(http.StatusInternalServerError, helper.ResponseFormat(http.StatusInternalServerError, "Internal Server Error", nil))
-		} 
-		return c.JSON(http.StatusOK, helper.ResponseFormat(http.StatusOK, "Success get a attendence", attendances))
+		if len(attendance) == 0 {
+			c.Logger().Error("Failed to get attendances", err.Error())
+			return c.JSON(http.StatusNotFound, map[string]interface{}{
+				"code":    http.StatusNotFound,
+				"message": "Get attendances not found",
+			})
+		}
+
+		formattedAttendances := []RequestGetAttendances{}
+		for _, attendance := range attendance {
+			formattedAttendance := RequestGetAttendances{
+				ID:             attendance.ID, 
+			UserID:             attendance.UserID,
+			EventID:            attendance.EventID,
+			EventCategory:      attendance.EventCategory, 
+			TicketType:         attendance.TicketType, 
+			Quantity:           attendance.Quantity,
+			}
+			formattedAttendances = append(formattedAttendances, formattedAttendance)
+		}
+
+		page := c.QueryParam("page")
+		perPage := c.QueryParam("per_page")
+		if page != "" || perPage == "" {
+			perPage = "3"
+		}
+		pageInt := 1
+		if page != "" {
+			pageInt, _ = strconv.Atoi(page)
+		}
+		perPageInt, _ := strconv.Atoi(perPage)
+
+		total := len(formattedAttendances)
+		totalPages := int(math.Ceil(float64(total) / float64(perPageInt)))
+
+		startIndex := (pageInt - 1) * perPageInt
+		endIndex := startIndex + perPageInt
+		if endIndex > total {
+			endIndex = total
+		}
+
+		response := formattedAttendances[startIndex:endIndex]
+
+		pages := Pagination{
+			Page:       pageInt,
+			PerPage:    perPageInt,
+			TotalPages: totalPages,
+			TotalItems: total,
+		}
+
+		return c.JSON(http.StatusOK, attendancesResponse{
+			Code:       http.StatusOK,
+			Message:    "Successful operation.",
+			Data:       response,
+			Pagination: pages,
+		})
+	
 	}
 }

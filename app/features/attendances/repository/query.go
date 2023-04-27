@@ -42,22 +42,10 @@ func (ar *AttendancesRepository) CreateAttendance(newAttendance attendances.Core
 	return createdAttendances, nil
 }
 
-func (ar *AttendancesRepository) GetAttendance(id uint) (attendances.Core, error) {
-	var input Attendance
-	result := ar.db.Where("id = ?", id).Find(&input)
-	if result.Error != nil {
-		return attendances.Core{}, result.Error
-	}
-	if result.RowsAffected == 0 {
-		return attendances.Core{}, result.Error
-	}
-	return attendances.Core{
-		ID:            input.ID,
-		UserID:        input.UserID,
-		EventID:       input.EventID,
-		EventCategory: input.EventCategory,
-		TicketType:    input.TicketType,
-		Quantity:      input.Quantity,
-	}, nil
-
+func (ar *AttendancesRepository) GetAttendance() ([]attendances.Core, error){
+	var cores []attendances.Core
+	if err := ar.db.Table("reviews").Where("deleted_at IS NULL").Find(&cores).Error; err != nil {
+	  return nil, err 
+	} 
+	return cores, nil 
 }
