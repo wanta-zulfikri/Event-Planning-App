@@ -18,10 +18,10 @@ func (as *AttendancesService) CreateAttendance(newAttendance attendances.Core) e
 	return nil 
 } 
 
-func (as *AttendancesService)GetAttendance(id uint) (attendances.Core, error) {
-	attendance, err := as.a.GetAttendance(id) 
+func (as *AttendancesService)GetAttendance() ([]attendances.Core, error) {
+	attendance, err := as.a.GetAttendance() 
 	if err != nil { 
-		return attendances.Core{}, err 
+		return nil, err 
 	} 
 	return attendance, nil		
 }

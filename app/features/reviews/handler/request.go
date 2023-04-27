@@ -6,7 +6,5 @@ type RequestWriteReview struct {
 }
 
 type RequestUpdateReview struct {
-	
 	Review   string `from:"review"` 
-	
 }
