@@ -40,7 +40,6 @@ func (ec *EventController) CreateEventWithTickets() echo.HandlerFunc {
 		eventTickets := make([]events.TicketCore, len(input.Tickets))
 		for i, ticket := range input.Tickets {
 			eventTickets[i] = events.TicketCore{
-				TicketType:     ticket.TicketType,
 				TicketCategory: ticket.TicketCategory,
 				TicketPrice:    ticket.TicketPrice,
 				TicketQuantity: ticket.TicketQuantity,
@@ -85,7 +84,6 @@ func (ec *EventController) CreateEventWithTickets() echo.HandlerFunc {
 
 		for i, ticket := range newEvent.Tickets {
 			response.Data.Ticket[i] = TicketResponse{
-				Type:     ticket.TicketType,
 				Category: ticket.TicketCategory,
 				Price:    ticket.TicketPrice,
 				Quantity: ticket.TicketQuantity,
@@ -185,7 +183,6 @@ func (ec *EventController) GetEvent() echo.HandlerFunc {
 		}
 
 		userid := claims.ID
-
 		eventid, err := strconv.ParseUint(c.Param("id"), 10, 64)
 		if err != nil {
 			c.Logger().Error("Failed to parse ID from URL param: ", err)
@@ -199,6 +196,7 @@ func (ec *EventController) GetEvent() echo.HandlerFunc {
 		}
 
 		response := ResponseGetEvent{
+			ID:            event.ID,
 			Title:         event.Title,
 			Description:   event.Description,
 			Hosted_by:     event.Hostedby,
@@ -228,26 +226,21 @@ func (ec *EventController) UpdateEvent() echo.HandlerFunc {
 		}
 
 		username := claims.Username
-		id, err := strconv.ParseUint(c.Param("id"), 10, 32)
-		if err != nil {
-			c.Logger().Error("Failed to parse ID from URL param: ", err)
-			return c.JSON(http.StatusBadRequest, helper.ResponseFormat(http.StatusBadRequest, "Bad Request", nil))
-		}
-
+		id := claims.ID
 		if err := c.Bind(&input); err != nil {
 			c.Logger().Error("Failed to bind input from request body: ", err)
 			return c.JSON(http.StatusBadRequest, helper.ResponseFormat(http.StatusBadRequest, "Bad Request", nil))
 		}
 
-		file, err := c.FormFile("image")
-		var image string
+		file, err := c.FormFile("event_picture")
+		var event_picture string
 		if err != nil && err != http.ErrMissingFile {
-			c.Logger().Error("Failed to get image from form file: ", err)
+			c.Logger().Error("Failed to get event_picture from form file: ", err)
 			return c.JSON(http.StatusBadRequest, helper.ResponseFormat(http.StatusBadRequest, "Bad Request", nil))
 		} else if file != nil {
-			image, err = helper.UploadImage(c, file)
+			event_picture, err = helper.UploadImage(c, file)
 			if err != nil {
-				c.Logger().Error("Failed to upload image: ", err)
+				c.Logger().Error("Failed to upload event_picture: ", err)
 				return c.JSON(http.StatusInternalServerError, helper.ResponseFormat(http.StatusInternalServerError, "Internal Server Error", nil))
 			}
 		}
@@ -261,7 +254,7 @@ func (ec *EventController) UpdateEvent() echo.HandlerFunc {
 			Status:      input.Status,
 			Category:    input.Category,
 			Location:    input.Location,
-			Image:       image,
+			Image:       event_picture,
 			Hostedby:    username,
 		}
 
@@ -271,7 +264,23 @@ func (ec *EventController) UpdateEvent() echo.HandlerFunc {
 			return c.JSON(http.StatusInternalServerError, helper.ResponseFormat(http.StatusInternalServerError, "Internal Server Error", nil))
 		}
 
-		return c.JSON(http.StatusOK, helper.ResponseFormat(http.StatusOK, "Event updated successfully", nil))
+		response := ResponseUpdateEvent{
+			Title:         updatedEvent.Title,
+			Description:   updatedEvent.Description,
+			Hosted_by:     updatedEvent.Hostedby,
+			Date:          updatedEvent.EventDate,
+			Time:          updatedEvent.EventTime,
+			Status:        updatedEvent.Status,
+			Category:      updatedEvent.Category,
+			Location:      updatedEvent.Location,
+			Event_picture: updatedEvent.Image,
+		}
+
+		return c.JSON(http.StatusOK, helper.DataResponse{
+			Code:    http.StatusOK,
+			Message: "Success updated an event.",
+			Data:    response,
+		})
 	}
 }
 

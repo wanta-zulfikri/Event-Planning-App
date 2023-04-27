@@ -6,7 +6,6 @@ import (
 
 type Core struct {
 	ID             uint
-	TicketType     string
 	TicketCategory string
 	TicketPrice    uint
 	TicketQuantity uint
@@ -14,26 +13,35 @@ type Core struct {
 	TransactionID  uint
 }
 
+type EventCore struct {
+	ID          uint
+	Title       string
+	Description string
+	EventDate   string
+	EventTime   string
+	Status      string
+	Category    string
+	Location    string
+	Image       string
+	Hostedby    string //hostedby : username didapat dari JWT Token
+	UserID      uint
+	Tickets     []Core `gorm:"foreignKey:EventID"`
+}
+
 type Repository interface {
-	GetTickets() ([]Core, error)
-	CreateTicket(newTicket Core, eventid uint64) (Core, error)
-	GetTicket(id uint) (Core, error)
-	UpdateTicket(id uint, updatedTicket Core) error
+	GetTickets(id uint) ([]Core, error)
+	UpdateTicket(eventid uint, updatedTickets []Core) error
 	DeleteTicket(id uint) error
 }
 
 type Service interface {
-	GetTickets() ([]Core, error)
-	CreateTicket(newTicket Core, eventid uint64) error
-	GetTicket(id uint) (Core, error)
-	UpdateTicket(id uint, updatedTicket Core) error
+	GetTickets(id uint) ([]Core, error)
+	UpdateTicket(eventid uint, updatedTicket []Core) error
 	DeleteTicket(id uint) error
 }
 
 type Handler interface {
 	GetTickets() echo.HandlerFunc
-	CreateTicket() echo.HandlerFunc
-	GetTicket() echo.HandlerFunc
 	UpdateTicket() echo.HandlerFunc
 	DeleteTicket() echo.HandlerFunc
 }

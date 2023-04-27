@@ -19,9 +19,7 @@ type Event struct {
 
 type Ticket struct {
 	gorm.Model
-	EventID        uint `gorm:"references:EventID"`
-	Title          string
-	TicketType     string `gorm:"type:varchar(20)"`
+	EventID        uint   `gorm:"references:EventID"`
 	TicketCategory string `gorm:"type:varchar(20)"`
 	TicketPrice    uint
 	TicketQuantity uint
