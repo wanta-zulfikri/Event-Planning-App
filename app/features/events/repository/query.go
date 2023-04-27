@@ -48,7 +48,6 @@ func (er *EventRepository) CreateEventWithTickets(event events.Core, userID uint
 	tickets := make([]repository.Ticket, len(event.Tickets))
 	for i, ticket := range event.Tickets {
 		tickets[i] = repository.Ticket{
-			TicketType:     ticket.TicketType,
 			TicketCategory: ticket.TicketCategory,
 			TicketPrice:    ticket.TicketPrice,
 			TicketQuantity: ticket.TicketQuantity,
@@ -74,7 +73,7 @@ func (er *EventRepository) GetEvents() ([]events.Core, error) {
 
 func (er *EventRepository) GetEvent(eventid, userid uint) (events.Core, error) {
 	var input Event
-	result := er.db.Where("id = ? AND user_id = ?", eventid, userid).Find(&input)
+	result := er.db.Table("events").Where("id = ? AND user_id = ?", eventid, userid).Find(&input)
 	if result.Error != nil {
 		return events.Core{}, result.Error
 	}
@@ -82,6 +81,7 @@ func (er *EventRepository) GetEvent(eventid, userid uint) (events.Core, error) {
 		return events.Core{}, result.Error
 	}
 	return events.Core{
+		ID:          input.ID,
 		Title:       input.Title,
 		Description: input.Description,
 		EventDate:   input.EventDate,
@@ -95,33 +95,21 @@ func (er *EventRepository) GetEvent(eventid, userid uint) (events.Core, error) {
 }
 
 func (er *EventRepository) UpdateEvent(id uint, updatedEvent events.Core) error {
-	input := Event{}
-	if err := er.db.Where("id = ?", id).First(&input).Error; err != nil {
+	// Code jadi lebih simple, namun proses query update lebih lama, 2.03s diawal fetch data
+	input := make(map[string]interface{})
+	if err := er.db.Table("events").Where("id = ?", id).Updates(input).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return err
 		}
 		return err
 	}
-	input.Title = updatedEvent.Title
-	input.Description = updatedEvent.Description
-	input.EventDate = updatedEvent.EventDate
-	input.EventTime = updatedEvent.EventTime
-	input.Status = updatedEvent.Status
-	input.Category = updatedEvent.Category
-	input.Location = updatedEvent.Location
-	input.Image = updatedEvent.Image
-	input.Hostedby = updatedEvent.Hostedby
-	input.UpdatedAt = time.Now()
 
-	if err := er.db.Save(&input).Error; err != nil {
-		return err
-	}
 	return nil
 }
 
 func (er *EventRepository) DeleteEvent(id uint) error {
 	input := Event{}
-	if err := er.db.Where("id = ?", id).Find(&input).Error; err != nil {
+	if err := er.db.Table("events").Where("id = ?", id).Find(&input).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return err
 		}

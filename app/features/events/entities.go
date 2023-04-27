@@ -22,7 +22,6 @@ type Core struct {
 type TicketCore struct {
 	ID             uint
 	EventID        uint
-	TicketType     string
 	TicketCategory string
 	TicketPrice    uint
 	TicketQuantity uint

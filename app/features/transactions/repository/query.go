@@ -38,7 +38,6 @@ func (tr *TransactionRepository) CreateTransaction(newTransaction transactions.C
 
 	for _, ticket := range newTransaction.Tickets {
 		ticketInput := repository.Ticket{
-			TicketType:     ticket.TicketType,
 			TicketCategory: ticket.TicketCategory,
 			TicketPrice:    ticket.TicketPrice,
 			TicketQuantity: ticket.TicketQuantity,
