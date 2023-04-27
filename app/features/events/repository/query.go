@@ -73,7 +73,7 @@ func (er *EventRepository) GetEvents() ([]events.Core, error) {
 
 func (er *EventRepository) GetEvent(eventid, userid uint) (events.Core, error) {
 	var input Event
-	result := er.db.Table("events").Where("id = ? AND user_id = ?", eventid, userid).Find(&input)
+	result := er.db.Where("id = ? AND user_id = ?", eventid, userid).Find(&input)
 	if result.Error != nil {
 		return events.Core{}, result.Error
 	}
@@ -95,9 +95,18 @@ func (er *EventRepository) GetEvent(eventid, userid uint) (events.Core, error) {
 }
 
 func (er *EventRepository) UpdateEvent(id uint, updatedEvent events.Core) error {
-	// Code jadi lebih simple, namun proses query update lebih lama, 2.03s diawal fetch data
-	input := make(map[string]interface{})
-	if err := er.db.Table("events").Where("id = ?", id).Updates(input).Error; err != nil {
+	if err := er.db.Model(&Event{}).Where("id = ?", id).Updates(map[string]interface{}{
+		"title":       updatedEvent.Title,
+		"description": updatedEvent.Description,
+		"event_date":  updatedEvent.EventDate,
+		"event_time":  updatedEvent.EventTime,
+		"status":      updatedEvent.Status,
+		"category":    updatedEvent.Category,
+		"location":    updatedEvent.Location,
+		"image":       updatedEvent.Image,
+		"hostedby":    updatedEvent.Hostedby,
+		"updated_at":  time.Now(),
+	}).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return err
 		}
@@ -109,7 +118,7 @@ func (er *EventRepository) UpdateEvent(id uint, updatedEvent events.Core) error 
 
 func (er *EventRepository) DeleteEvent(id uint) error {
 	input := Event{}
-	if err := er.db.Table("events").Where("id = ?", id).Find(&input).Error; err != nil {
+	if err := er.db.Where("id = ?", id).Find(&input).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return err
 		}

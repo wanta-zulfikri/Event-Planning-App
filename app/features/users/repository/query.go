@@ -70,8 +70,13 @@ func (ar *UserRepository) GetProfile(id uint) (users.Core, error) {
 }
 
 func (ar *UserRepository) UpdateProfile(id uint, updatedUser users.Core) error {
-	input := make(map[string]interface{})
-	result := ar.db.Table("users").Where("id = ?", id).Updates(input)
+	result := ar.db.Table("users").Where("id = ?", id).Updates(map[string]interface{}{
+		"username":   updatedUser.Username,
+		"email":      updatedUser.Email,
+		"password":   updatedUser.Password,
+		"image":      updatedUser.Image,
+		"updated_at": time.Now(),
+	})
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			return fmt.Errorf("user with id %v not found", id)

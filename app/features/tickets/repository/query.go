@@ -34,6 +34,7 @@ func (tr *TicketRepository) UpdateTicket(eventID uint, updatedTickets []tickets.
 			"ticket_category": updatedTicket.TicketCategory,
 			"ticket_price":    updatedTicket.TicketPrice,
 			"ticket_quantity": updatedTicket.TicketQuantity,
+			"updated_at":      time.Now(),
 		}).Error; err != nil {
 			return err
 		}
