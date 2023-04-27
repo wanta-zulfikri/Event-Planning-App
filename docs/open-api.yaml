@@ -17,7 +17,7 @@ servers:
   - description: SwaggerHub API Auto Mocking
     url: https://virtserver.swaggerhub.com/dimasyudhana/EventappRESTfulAPI/1.0.1
   - description: Production
-    url: https://
+    url: https://peterzalai.biz.id
   - description: Demo
     url: http://public_ip
   - description: Testing
