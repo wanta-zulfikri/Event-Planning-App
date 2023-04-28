@@ -5,6 +5,7 @@ import (
 	"github.com/wanta-zulfikri/Event-Planning-App/app/features/events"
 	"github.com/wanta-zulfikri/Event-Planning-App/app/features/reviews"
 	"github.com/wanta-zulfikri/Event-Planning-App/app/features/tickets"
+	"github.com/wanta-zulfikri/Event-Planning-App/app/features/transactions"
 	"github.com/wanta-zulfikri/Event-Planning-App/app/features/users"
 	"github.com/wanta-zulfikri/Event-Planning-App/config/common"
 
@@ -12,7 +13,7 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 )
 
-func Route(e *echo.Echo, uc users.Handler, ec events.Handler, tc tickets.Handler, as attendances.Handler, rc reviews.Handler) {
+func Route(e *echo.Echo, uc users.Handler, ec events.Handler, tc tickets.Handler, tr transactions.Handler, as attendances.Handler, rc reviews.Handler) {
 	e.Pre(middleware.RemoveTrailingSlash())
 	e.Use(middleware.CORS())
 	e.Use(middleware.Logger())
@@ -24,7 +25,7 @@ func Route(e *echo.Echo, uc users.Handler, ec events.Handler, tc tickets.Handler
 	e.PUT("/users", uc.UpdateProfile(), middleware.JWT([]byte(common.JWTSecret)))
 	e.DELETE("/users", uc.DeleteProfile(), middleware.JWT([]byte(common.JWTSecret)))
 	//events
-	e.GET("/events", ec.GetEvents(), middleware.JWT([]byte(common.JWTSecret)))
+	e.GET("/events", ec.GetEvents())
 	e.POST("/events", ec.CreateEventWithTickets(), middleware.JWT([]byte(common.JWTSecret)))
 	e.GET("/events/:id", ec.GetEvent(), middleware.JWT([]byte(common.JWTSecret)))
 	e.PUT("/events/:id", ec.UpdateEvent(), middleware.JWT([]byte(common.JWTSecret)))
@@ -37,7 +38,7 @@ func Route(e *echo.Echo, uc users.Handler, ec events.Handler, tc tickets.Handler
 	e.POST("/attendances", as.CreateAttendance(), middleware.JWT([]byte(common.JWTSecret)))
 	e.GET("/attendances", as.GetAttendance(), middleware.JWT([]byte(common.JWTSecret)))
 	//transactions
-
+	e.POST("/transactions/:id", tr.CreateTransaction(), middleware.JWT([]byte(common.JWTSecret)))
 	//reviews
 	e.POST("/reviews", rc.WriteReview(), middleware.JWT([]byte(common.JWTSecret)))
 	e.PUT("/reviews", rc.UpdateReview(), middleware.JWT([]byte(common.JWTSecret)))

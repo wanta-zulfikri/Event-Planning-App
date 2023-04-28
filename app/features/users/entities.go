@@ -9,6 +9,7 @@ type Core struct {
 	ID       uint
 	Username string
 	Email    string
+	Phone    string
 	Password string
 	Image    string
 	Events   []events.Core
@@ -26,7 +27,7 @@ type Service interface {
 	Register(newUser Core) error
 	Login(email string, password string) (Core, error)
 	GetProfile(id uint) (Core, error)
-	UpdateProfile(id uint, username, newEmail, password, image string) error
+	UpdateProfile(id uint, updatedUser Core) error
 	DeleteProfile(id uint) error
 }
 

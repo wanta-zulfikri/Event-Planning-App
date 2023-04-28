@@ -155,8 +155,6 @@ paths:
           $ref: '#/components/responses/Response404'
         '500':
           $ref: '#/components/responses/Response500'
-      security:
-        - bearerAuth : []
 
     post:
       tags:
@@ -720,6 +718,7 @@ components:
                     data:
                       username: "peterzalai"
                       email: "peterzalai@gmail.com"
+                      phone: "+6281235288543"
                       password: "@Secret123"
                       image: "peterzalai.png"
                 example 2:
@@ -730,6 +729,7 @@ components:
                     data:
                       username: "satriowibowo"
                       email: "satriowibowo@gmail.com"
+                      phone: "+6281235288543"
                       password: "@Secret123"
                       image: "satriowibowo.png"
                 example 3:
@@ -740,6 +740,7 @@ components:
                     data:
                       username: "wantazulfikri"
                       email: "wantazulfikri@gmail.com"
+                      phone: "+6281235288543"
                       password: "@Secret123"
                       image: "wantazulfikri.png"
     
@@ -1214,6 +1215,9 @@ components:
         email:
           type: string
           format: email
+        phone:
+          type: string
+          format: phone
         password:
           type: string
           format: password
@@ -1223,6 +1227,7 @@ components:
       example:
         username: "peterzalai"
         email: "peterzalai@gmail.com"
+        phone: "+6281235288543"
         password: "@Secret123"
         image: "https://peterzalai.jpg"
     
@@ -1275,6 +1280,9 @@ components:
         email:
           type: string
           format: email
+        phone:
+          type: string
+          format: phone
         password:
           type: string
           format: password
@@ -1284,6 +1292,7 @@ components:
       example:
         username: "peterzalai"
         email: "peterzalai@gmail.com"
+        phone: "+6281235288543"
         paswword: "@Secret123"
         image: "peterzalai.png"
 
@@ -1296,7 +1305,7 @@ components:
         title: 
           type: string  
           description: Title of the event 
-        details: 
+        description: 
           type: string 
           description: Details of the event 
         hosted_by: 
@@ -1337,7 +1346,7 @@ components:
         data: 
           event_id: 1
           title: "Soundrenaline 2023"
-          details: "Simply dummy text."
+          description: "Simply dummy text."
           hosted_by: "Ravel Entertainment"
           date: "2023-08-05"
           time: "10:10:00"
@@ -1456,7 +1465,7 @@ components:
           category: "Music"
           location: "Jakarta"
           event_picture: "default_image_gcp.png"
-          ticket:
+          tickets:
           - ticket_category: "VIP"
             ticket_price: 500000
             ticket_quantity: 100
@@ -1510,7 +1519,7 @@ components:
           category: "Music"
           location: "Jakarta"
           event_picture: "default_image_gcp.png"
-          ticket:
+          tickets:
           - ticket_category: "VIP"
             ticket_price: 500000
             ticket_quantity: 100

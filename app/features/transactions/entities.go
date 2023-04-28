@@ -4,8 +4,6 @@ import (
 	"time"
 
 	"github.com/labstack/echo/v4"
-	"github.com/wanta-zulfikri/Event-Planning-App/app/features/tickets"
-	"github.com/wanta-zulfikri/Event-Planning-App/app/features/transactions/payment"
 )
 
 type Core struct {
@@ -15,25 +13,34 @@ type Core struct {
 	PurchaseEndDate   time.Time
 	Status            string
 	StatusDate        time.Time
-	Tickets           []tickets.Core
+	Tickets           []TicketCore
 	Subtotal          uint
 	GrandTotal        uint
 	UserID            uint
 	EventID           uint
 }
 
-type PaymentGatewayInterface interface {
-	InitializeClientMidtrans()
-	CreateTransaction(snap payment.PaymentGateway) string
-	CreateUrlTransactionWithGateway(snap payment.PaymentGateway) string
+type TransactionTicketCore struct {
+	TransactionID uint
+	TicketID      uint
+	Quantity      uint
+}
+
+type TicketCore struct {
+	ID                 uint
+	EventID            uint
+	TicketCategory     string
+	TicketPrice        uint
+	TicketQuantity     uint
+	TransactionTickets []TransactionTicketCore
 }
 
 type Repository interface {
-	CreateTransaction(newTransaction Core) (Core, error)
+	CreateTransaction(userid uint, input Core) error
 }
 
 type Service interface {
-	CreateTransaction(userID uint, inputs []Core) error
+	CreateTransaction(userid uint, input Core) error
 }
 
 type Handler interface {
