@@ -78,12 +78,12 @@ func (ec *EventController) CreateEventWithTickets() echo.HandlerFunc {
 				Category:    newEvent.Category,
 				Location:    newEvent.Location,
 				Picture:     newEvent.Image,
-				Ticket:      make([]TicketResponse, len(newEvent.Tickets)),
+				Tickets:     make([]TicketResponse, len(newEvent.Tickets)),
 			},
 		}
 
 		for i, ticket := range newEvent.Tickets {
-			response.Data.Ticket[i] = TicketResponse{
+			response.Data.Tickets[i] = TicketResponse{
 				Category: ticket.TicketCategory,
 				Price:    ticket.TicketPrice,
 				Quantity: ticket.TicketQuantity,
@@ -96,27 +96,17 @@ func (ec *EventController) CreateEventWithTickets() echo.HandlerFunc {
 
 func (ec *EventController) GetEvents() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		tokenString := c.Request().Header.Get("Authorization")
-		_, err := middlewares.ValidateJWT2(tokenString)
-		if err != nil {
-			return c.JSON(http.StatusUnauthorized, helper.ResponseFormat(http.StatusUnauthorized, "Missing or Malformed JWT. "+err.Error(), nil))
-		}
-
 		events, err := ec.s.GetEvents()
 		if err != nil {
-			c.Logger().Error("Failed to get events", err.Error())
-			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-				"code":    http.StatusInternalServerError,
-				"message": "Internal Server Error",
-			})
+			c.Logger().Error(err.Error())
+			return c.JSON(http.StatusBadRequest, helper.ResponseFormat(http.StatusNotFound, "The requested resource was not found.", nil))
 		}
 
 		if len(events) == 0 {
-			c.Logger().Error("Failed to get events", err.Error())
-			return c.JSON(http.StatusNotFound, map[string]interface{}{
-				"code":    http.StatusNotFound,
-				"message": "Events not found",
-			})
+			if err != nil {
+				c.Logger().Error(err.Error())
+				return c.JSON(http.StatusBadRequest, helper.ResponseFormat(http.StatusNotFound, "The requested resource was not found.", nil))
+			}
 		}
 
 		formattedEvents := []ResponseGetEvents{}
@@ -192,7 +182,7 @@ func (ec *EventController) GetEvent() echo.HandlerFunc {
 		event, err := ec.s.GetEvent(uint(eventid), uint(userid))
 		if err != nil {
 			c.Logger().Error(err.Error())
-			return c.JSON(http.StatusInternalServerError, helper.ResponseFormat(http.StatusInternalServerError, "Internal Server Error", nil))
+			return c.JSON(http.StatusBadRequest, helper.ResponseFormat(http.StatusNotFound, "The requested resource was not found.", nil))
 		}
 
 		response := ResponseGetEvent{

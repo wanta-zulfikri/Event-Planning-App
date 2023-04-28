@@ -43,16 +43,17 @@ func (us *UserService) GetProfile(id uint) (users.Core, error) {
 	return user, nil
 }
 
-func (us *UserService) UpdateProfile(id uint, username, newEmail, password, image string) error {
-	hashedPassword, err := helper.HashedPassword(password)
+func (us *UserService) UpdateProfile(id uint, updateUser users.Core) error {
+	hashedPassword, err := helper.HashedPassword(updateUser.Password)
 	if err != nil {
 		return fmt.Errorf("failed to hash password: %v", err)
 	}
 	updatedUser := users.Core{
-		Username: username,
-		Email:    newEmail,
+		Username: updateUser.Username,
+		Email:    updateUser.Email,
+		Phone:    updateUser.Phone,
 		Password: string(hashedPassword),
-		Image:    image,
+		Image:    updateUser.Image,
 	}
 	if err := us.m.UpdateProfile(id, updatedUser); err != nil {
 		return fmt.Errorf("Error while updating %d: %v", id, err)
