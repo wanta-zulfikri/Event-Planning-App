@@ -42,7 +42,7 @@ type EventData struct {
 	Category    string           `json:"category"`
 	Location    string           `json:"location"`
 	Picture     string           `json:"event_picture"`
-	Ticket      []TicketResponse `json:"ticket"`
+	Tickets     []TicketResponse `json:"tickets"`
 }
 
 type TicketResponse struct {

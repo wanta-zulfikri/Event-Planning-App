@@ -26,7 +26,7 @@ func (uc *UserController) Register() echo.HandlerFunc {
 			c.Logger().Error(err.Error())
 			return c.JSON(http.StatusBadRequest, helper.ResponseFormat(http.StatusBadRequest, "Bad Request", nil))
 		}
-		err := uc.s.Register(users.Core{Username: input.Username, Email: input.Email, Password: input.Password})
+		err := uc.s.Register(users.Core{Username: input.Username, Email: input.Email, Phone: input.Phone, Password: input.Password})
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, helper.ResponseFormat(http.StatusInternalServerError, "Internal Server Error", nil))
 		}
@@ -115,7 +115,16 @@ func (uc *UserController) UpdateProfile() echo.HandlerFunc {
 			return c.JSON(http.StatusInternalServerError, helper.ResponseFormat(http.StatusInternalServerError, "Internal Server Error", nil))
 		}
 
-		err = uc.s.UpdateProfile(uint(id), input.Username, input.Email, input.Password, image)
+		updatedUser := users.Core{
+			ID:       uint(id),
+			Username: input.Username,
+			Email:    input.Email,
+			Phone:    input.Phone,
+			Password: input.Password,
+			Image:    image,
+		}
+
+		err = uc.s.UpdateProfile(uint(id), updatedUser)
 		if err != nil {
 			c.Logger().Error(err.Error())
 			return c.JSON(http.StatusInternalServerError, helper.ResponseFormat(http.StatusInternalServerError, "Internal Server Error", nil))

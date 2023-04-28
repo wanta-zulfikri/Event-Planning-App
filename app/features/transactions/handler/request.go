@@ -1,8 +1,11 @@
 package handler
 
-// type TransactionInput struct {
-// 	event_name      string // receive this event id from unique valu of event name
-// 	ticket_category string
-// 	ticket_quantity uint
-// 	payment_method  string
-// }
+type RequestCreateTransaction struct {
+	ItemDescription []Tickets `json:"item_description"`
+}
+
+type Tickets struct {
+	TicketCategory string `json:"ticket_category"`
+	TicketPrice    uint   `json:"ticket_price"`
+	TicketQuantity uint   `json:"ticket_quantity"`
+}

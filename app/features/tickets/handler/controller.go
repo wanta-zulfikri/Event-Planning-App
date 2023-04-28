@@ -45,7 +45,7 @@ func (tc *TicketController) GetTickets() echo.HandlerFunc {
 		tickets, err := tc.s.GetTickets(uint(id))
 		if err != nil {
 			c.Logger().Error(err.Error())
-			return c.JSON(http.StatusInternalServerError, helper.ResponseFormat(http.StatusInternalServerError, "Internal Server Error", nil))
+			return c.JSON(http.StatusBadRequest, helper.ResponseFormat(http.StatusNotFound, "The requested resource was not found.", nil))
 		}
 
 		var response []ResponseGetTickets

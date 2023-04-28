@@ -15,6 +15,9 @@ import (
 	ticketHandler "github.com/wanta-zulfikri/Event-Planning-App/app/features/tickets/handler"
 	ticketRepo "github.com/wanta-zulfikri/Event-Planning-App/app/features/tickets/repository"
 	ticketLogic "github.com/wanta-zulfikri/Event-Planning-App/app/features/tickets/services"
+	transactionHandler "github.com/wanta-zulfikri/Event-Planning-App/app/features/transactions/handler"
+	transactionRepo "github.com/wanta-zulfikri/Event-Planning-App/app/features/transactions/repository"
+	transactionLogic "github.com/wanta-zulfikri/Event-Planning-App/app/features/transactions/services"
 	userHandler "github.com/wanta-zulfikri/Event-Planning-App/app/features/users/handler"
 	userRepo "github.com/wanta-zulfikri/Event-Planning-App/app/features/users/repository"
 	userLogic "github.com/wanta-zulfikri/Event-Planning-App/app/features/users/service"
@@ -39,6 +42,9 @@ func main() {
 	ticketModel := ticketRepo.New(db)
 	ticketService := ticketLogic.New(ticketModel)
 	ticketController := ticketHandler.New(ticketService)
+	transactionModel := transactionRepo.New(db)
+	transactionService := transactionLogic.New(transactionModel)
+	transactionController := transactionHandler.New(transactionService)
 	reviewModel := reviewRepo.New(db)
 	reviewService := reviewLogic.New(reviewModel)
 	reviewController := reviewHandler.New(reviewService)
@@ -46,7 +52,7 @@ func main() {
 	attendancesService := attendancesLogic.New(attendancesModel)
 	attendancesController := attendancesHandler.New(attendancesService)
 
-	routes.Route(e, userController, eventController, ticketController, attendancesController, reviewController)
+	routes.Route(e, userController, eventController, ticketController, transactionController, attendancesController, reviewController)
 
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%s", cfg.Port)))
 }

@@ -30,6 +30,7 @@ func (ar *UserRepository) Register(newUser users.Core) (users.Core, error) {
 
 	input.Username = newUser.Username
 	input.Email = newUser.Email
+	input.Phone = newUser.Phone
 	input.Password = hashedPassword
 
 	if err := ar.db.Table("users").Create(&input).Error; err != nil {
@@ -64,6 +65,7 @@ func (ar *UserRepository) GetProfile(id uint) (users.Core, error) {
 	return users.Core{
 		Username: input.Username,
 		Email:    input.Email,
+		Phone:    input.Phone,
 		Password: input.Password,
 		Image:    input.Image,
 	}, nil
@@ -73,6 +75,7 @@ func (ar *UserRepository) UpdateProfile(id uint, updatedUser users.Core) error {
 	result := ar.db.Table("users").Where("id = ?", id).Updates(map[string]interface{}{
 		"username":   updatedUser.Username,
 		"email":      updatedUser.Email,
+		"phone":      updatedUser.Phone,
 		"password":   updatedUser.Password,
 		"image":      updatedUser.Image,
 		"updated_at": time.Now(),
