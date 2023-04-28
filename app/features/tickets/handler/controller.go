@@ -21,13 +21,10 @@ func New(h tickets.Service) tickets.Handler {
 func (tc *TicketController) GetTickets() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		tokenString := c.Request().Header.Get("Authorization")
-		if tokenString == "" {
-			return c.JSON(http.StatusUnauthorized, helper.ResponseFormat(http.StatusUnauthorized, "Unauthorized. Token is missing.", nil))
-		}
-
-		_, err := middlewares.ValidateJWT(tokenString)
+		_, err := middlewares.ValidateJWT2(tokenString)
 		if err != nil {
-			return c.JSON(http.StatusUnauthorized, helper.ResponseFormat(http.StatusUnauthorized, "Unauthorized. "+err.Error(), nil))
+			c.Logger().Error(err.Error())
+			return c.JSON(http.StatusUnauthorized, helper.ResponseFormat(http.StatusUnauthorized, "Missing or Malformed JWT. "+err.Error(), nil))
 		}
 
 		inputID := c.Param("id")
@@ -72,6 +69,7 @@ func (tc *TicketController) UpdateTicket() echo.HandlerFunc {
 		tokenString := c.Request().Header.Get("Authorization")
 		_, err := middlewares.ValidateJWT2(tokenString)
 		if err != nil {
+			c.Logger().Error(err.Error())
 			return c.JSON(http.StatusUnauthorized, helper.ResponseFormat(http.StatusUnauthorized, "Missing or Malformed JWT. "+err.Error(), nil))
 		}
 
@@ -111,6 +109,7 @@ func (tc *TicketController) DeleteTicket() echo.HandlerFunc {
 		tokenString := c.Request().Header.Get("Authorization")
 		_, err := middlewares.ValidateJWT2(tokenString)
 		if err != nil {
+			c.Logger().Error(err.Error())
 			return c.JSON(http.StatusUnauthorized, helper.ResponseFormat(http.StatusUnauthorized, "Missing or Malformed JWT. "+err.Error(), nil))
 		}
 
@@ -131,6 +130,6 @@ func (tc *TicketController) DeleteTicket() echo.HandlerFunc {
 			c.Logger().Error("Error deleting profile", err.Error())
 			return c.JSON(http.StatusInternalServerError, helper.ResponseFormat(http.StatusInternalServerError, "Internal Server Error", nil))
 		}
-		return c.JSON(http.StatusOK, helper.ResponseFormat(http.StatusOK, "Success deleted an account", nil))
+		return c.JSON(http.StatusOK, helper.ResponseFormat(http.StatusOK, "Success Deleted a Tickets", nil))
 	}
 }
