@@ -30,7 +30,7 @@ type TicketCore struct {
 type Repository interface {
 	CreateEventWithTickets(event Core, userID uint) error
 	GetEvents() ([]Core, error)
-	GetEvent(eventid, userid uint) (Core, error)
+	GetEvent(eventid uint) (Core, error)
 	UpdateEvent(id uint, updatedEvent Core) error
 	DeleteEvent(id uint) error
 }
@@ -38,7 +38,7 @@ type Repository interface {
 type Service interface {
 	CreateEventWithTickets(event Core, userID uint) error
 	GetEvents() ([]Core, error)
-	GetEvent(eventid, userid uint) (Core, error)
+	GetEvent(eventid uint) (Core, error)
 	UpdateEvent(id uint, updatedEvent Core) error
 	DeleteEvent(id uint) error
 }

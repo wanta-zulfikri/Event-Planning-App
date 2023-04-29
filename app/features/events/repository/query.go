@@ -71,9 +71,9 @@ func (er *EventRepository) GetEvents() ([]events.Core, error) {
 	return cores, nil
 }
 
-func (er *EventRepository) GetEvent(eventid, userid uint) (events.Core, error) {
+func (er *EventRepository) GetEvent(eventid uint) (events.Core, error) {
 	var input Event
-	result := er.db.Where("id = ? AND user_id = ?", eventid, userid).Find(&input)
+	result := er.db.Where("id = ? AND deleted_at IS NULL", eventid).Find(&input)
 	if result.Error != nil {
 		return events.Core{}, result.Error
 	}
