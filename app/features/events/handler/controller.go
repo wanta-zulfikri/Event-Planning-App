@@ -96,10 +96,22 @@ func (ec *EventController) CreateEventWithTickets() echo.HandlerFunc {
 
 func (ec *EventController) GetEvents() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		events, err := ec.s.GetEvents()
-		if err != nil {
-			c.Logger().Error(err.Error())
-			return c.JSON(http.StatusBadRequest, helper.ResponseFormat(http.StatusNotFound, "The requested resource was not found.", nil))
+		category := c.QueryParam("category")
+		var events []events.Core
+		var err error
+
+		if category != "" {
+			events, err = ec.s.GetEventsByCategory(category)
+			if err != nil {
+				c.Logger().Error(err.Error())
+				return c.JSON(http.StatusBadRequest, helper.ResponseFormat(http.StatusNotFound, "The requested resource was not found.", nil))
+			}
+		} else {
+			events, err = ec.s.GetEvents()
+			if err != nil {
+				c.Logger().Error(err.Error())
+				return c.JSON(http.StatusBadRequest, helper.ResponseFormat(http.StatusNotFound, "The requested resource was not found.", nil))
+			}
 		}
 
 		if len(events) == 0 {
