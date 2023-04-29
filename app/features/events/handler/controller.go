@@ -164,6 +164,83 @@ func (ec *EventController) GetEvents() echo.HandlerFunc {
 	}
 }
 
+func (ec *EventController) GetEventsByUserID() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		tokenString := c.Request().Header.Get("Authorization")
+		claims, err := middlewares.ValidateJWT2(tokenString)
+		if err != nil {
+			return c.JSON(http.StatusUnauthorized, helper.ResponseFormat(http.StatusUnauthorized, "Missing or Malformed JWT. "+err.Error(), nil))
+		}
+
+		userid := claims.ID
+		events, err := ec.s.GetEventsByUserID(userid)
+		if err != nil {
+			c.Logger().Error(err.Error())
+			return c.JSON(http.StatusBadRequest, helper.ResponseFormat(http.StatusNotFound, "The requested resource was not found.", nil))
+		}
+
+		if len(events) == 0 {
+			if err != nil {
+				c.Logger().Error(err.Error())
+				return c.JSON(http.StatusBadRequest, helper.ResponseFormat(http.StatusNotFound, "The requested resource was not found.", nil))
+			}
+		}
+
+		formattedEvents := []ResponseGetEvents{}
+		for _, event := range events {
+			formattedEvent := ResponseGetEvents{
+				ID:            event.ID,
+				Title:         event.Title,
+				Description:   event.Description,
+				Hosted_by:     event.Hostedby,
+				Date:          event.EventDate,
+				Time:          event.EventTime,
+				Status:        event.Status,
+				Category:      event.Category,
+				Location:      event.Location,
+				Event_picture: event.Image,
+			}
+			formattedEvents = append(formattedEvents, formattedEvent)
+		}
+
+		page := c.QueryParam("page")
+		perPage := c.QueryParam("per_page")
+		if page != "" || perPage == "" {
+			perPage = "3"
+		}
+		pageInt := 1
+		if page != "" {
+			pageInt, _ = strconv.Atoi(page)
+		}
+		perPageInt, _ := strconv.Atoi(perPage)
+
+		total := len(formattedEvents)
+		totalPages := int(math.Ceil(float64(total) / float64(perPageInt)))
+
+		startIndex := (pageInt - 1) * perPageInt
+		endIndex := startIndex + perPageInt
+		if endIndex > total {
+			endIndex = total
+		}
+
+		response := formattedEvents[startIndex:endIndex]
+
+		pages := Pagination{
+			Page:       pageInt,
+			PerPage:    perPageInt,
+			TotalPages: totalPages,
+			TotalItems: total,
+		}
+
+		return c.JSON(http.StatusOK, EventsResponse{
+			Code:       http.StatusOK,
+			Message:    "Successful operation.",
+			Data:       response,
+			Pagination: pages,
+		})
+	}
+}
+
 func (ec *EventController) GetEvent() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		eventid, err := strconv.ParseUint(c.Param("id"), 10, 64)

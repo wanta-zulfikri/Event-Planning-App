@@ -179,14 +179,47 @@ paths:
       security:
         - bearerAuth: []
 
-  /events/{id}:
+  /events/{userid}:
+    get:
+        tags:
+          - Events
+        summary: Get list of events by user ID
+        description: Get list of event with pagination on the database
+        parameters:
+          - name: userid
+            in: path
+            description: User ID
+            required: true
+            schema:
+              type: integer
+          - in: query
+            name: page
+            schema:
+              type: integer
+            description: The page number to retrieve
+            required: false
+        responses:
+          '200':
+            $ref: '#/components/responses/Response200EventListGet'
+          '400':
+            $ref: '#/components/responses/Response400'
+          '401':
+            $ref: '#/components/responses/Response401'
+          '404':
+            $ref: '#/components/responses/Response404'
+          '500':
+            $ref: '#/components/responses/Response500'
+        security: 
+          - bearerAuth: []
+    
+  /events/{eventid}:
     get:
       tags:
         - Events
       summary: Get an event by ID include its reviews
       description: Get an event by their ID include its reviews on the database
       parameters:
-        - name: id
+        - name: eventid
           in: path
           description: Event ID
           required: true
@@ -211,7 +244,7 @@ paths:
       security: 
         - bearerAuth: [] 
       parameters:
-        - name: id
+        - name: eventid
           in: path
           description: Event ID
           required: true
@@ -251,7 +284,7 @@ paths:
       summary: Delete an event by ID
       description: Delete event information by event ID
       parameters:
-        - name: id
+        - name: eventid
           in: path
           description: Event ID
           required: true
@@ -434,14 +467,14 @@ paths:
       security:
         - bearerAuth : []
 
-  /events/{id}/attendees:
+  /events/{eventid}/attendees:
     post:
       tags:
         - Event Attendees
       summary: Create attendees for an event
       description: Endpoint to create attendees for an event on an event profile
       parameters:
-      - name: id
+      - name: eventid
         in: path
         description: Event ID
         required: true
@@ -462,14 +495,14 @@ paths:
           $ref: '#/components/responses/Response500'
       security:
         - bearerAuth: []
-  
+
     get:
       tags:
         - Event Attendees
       summary: Get list of attendees for an event
       description: Get list of attendees for an event on an event profile
       parameters:
-        - name: id
+        - name: eventid
           in: path
           description: ID of The Event Attendees
           required: true
@@ -478,6 +511,33 @@ paths:
       responses:
         '200': 
           $ref: '#/components/responses/Response200EventAttendees'
+        '400':
+          $ref: '#/components/responses/Response400' 
+        '401':
+          $ref: '#/components/responses/Response401'
+        '404':
+          $ref: '#/components/responses/Response404' 
+        '500': 
+          $ref: '#/components/responses/Response500'
+      security:
+        - bearerAuth : []
+
+  /events/{userid}/attendees:
+    get:
+      tags:
+        - Event Attendees
+      summary: Get list of events by userid
+      description: Get list of events by userid on an user profile
+      parameters:
+        - name: userid
+          in: path
+          description: user ID that attend events
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200': 
+          $ref: '#/components/responses/Response200EventListGet'
         '400':
           $ref: '#/components/responses/Response400' 
         '401':

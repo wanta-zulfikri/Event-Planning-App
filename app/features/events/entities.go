@@ -30,6 +30,7 @@ type TicketCore struct {
 type Repository interface {
 	CreateEventWithTickets(event Core, userID uint) error
 	GetEvents() ([]Core, error)
+	GetEventsByUserID(userid uint) ([]Core, error)
 	GetEvent(eventid uint) (Core, error)
 	UpdateEvent(id uint, updatedEvent Core) error
 	DeleteEvent(id uint) error
@@ -38,6 +39,7 @@ type Repository interface {
 type Service interface {
 	CreateEventWithTickets(event Core, userID uint) error
 	GetEvents() ([]Core, error)
+	GetEventsByUserID(userid uint) ([]Core, error)
 	GetEvent(eventid uint) (Core, error)
 	UpdateEvent(id uint, updatedEvent Core) error
 	DeleteEvent(id uint) error
@@ -46,6 +48,7 @@ type Service interface {
 type Handler interface {
 	CreateEventWithTickets() echo.HandlerFunc
 	GetEvents() echo.HandlerFunc
+	GetEventsByUserID() echo.HandlerFunc
 	GetEvent() echo.HandlerFunc
 	UpdateEvent() echo.HandlerFunc
 	DeleteEvent() echo.HandlerFunc
