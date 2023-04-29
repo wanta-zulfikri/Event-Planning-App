@@ -3,19 +3,19 @@ package repository
 import (
 	"time"
 
+	"github.com/wanta-zulfikri/Event-Planning-App/app/features/tickets/repository"
 	"gorm.io/gorm"
 )
 
 // untuk membuat many to many, dibuat relasi antara Transaction dan Ticket : wajib jamak dalam penamaan.
+// Ticket - Ticket // >>> detail transaction to get ticketprice, preload ke ticket
 
 type Transaction struct {
-	gorm.Model
-	Invoice            string
+	ID                 string `gorm:"primaryKey"`
 	PurchaseStartDate  time.Time
 	PurchaseEndDate    time.Time
 	Status             string
 	StatusDate         time.Time
-	Subtotal           uint
 	GrandTotal         uint
 	UserID             uint
 	EventID            uint
@@ -24,16 +24,18 @@ type Transaction struct {
 
 type TransactionTickets struct {
 	TransactionID  uint
-	TicketID       uint
+	TicketID       repository.Ticket
 	TicketCategory string
-	TicketPrice    string
-	Quantity       uint
+	TicketPrice    uint
+	TicketQuantity uint
 	Subtotal       uint
-	// Ticket         Ticket // >>> detail transaction to get ticketprice, preload ke ticket
 }
 
 type Ticket struct {
-	gorm.Model
+	ID                 uint `gorm:"primaryKey"`
+	CreatedAt          time.Time
+	UpdatedAt          time.Time
+	DeletedAt          gorm.DeletedAt `gorm:"index"`
 	EventID            uint
 	TicketCategory     string
 	TicketPrice        uint

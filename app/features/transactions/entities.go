@@ -7,40 +7,45 @@ import (
 )
 
 type Core struct {
-	ID                uint
-	Invoice           string
-	PurchaseStartDate time.Time
-	PurchaseEndDate   time.Time
-	Status            string
-	StatusDate        time.Time
-	Tickets           []TicketCore
-	Subtotal          uint
-	GrandTotal        uint
-	UserID            uint
-	EventID           uint
+	ID                 string
+	PurchaseStartDate  time.Time
+	PurchaseEndDate    time.Time
+	Status             string
+	StatusDate         time.Time
+	GrandTotal         uint
+	UserID             uint
+	EventID            uint
+	TransactionTickets []TransactionTickets
 }
 
-type TransactionTicketCore struct {
-	TransactionID uint
-	TicketID      uint
-	Quantity      uint
+type TransactionTickets struct {
+	TransactionID  string
+	TicketID       uint // masih null ???
+	TicketCategory string
+	TicketPrice    uint
+	TicketQuantity uint
+	Subtotal       uint
 }
 
-type TicketCore struct {
-	ID                 uint
+type Carts struct {
+	ItemDescription []Ticket
+}
+
+type Ticket struct {
+	TicketID           uint
 	EventID            uint
 	TicketCategory     string
 	TicketPrice        uint
 	TicketQuantity     uint
-	TransactionTickets []TransactionTicketCore
+	TransactionTickets []TransactionTickets
 }
 
 type Repository interface {
-	CreateTransaction(userid uint, input Core) error
+	CreateTransaction(Core) error
 }
 
 type Service interface {
-	CreateTransaction(userid uint, input Core) error
+	CreateTransaction(userid uint, eventid uint, request Carts) error
 }
 
 type Handler interface {
