@@ -166,20 +166,13 @@ func (ec *EventController) GetEvents() echo.HandlerFunc {
 
 func (ec *EventController) GetEvent() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		tokenString := c.Request().Header.Get("Authorization")
-		claims, err := middlewares.ValidateJWT2(tokenString)
-		if err != nil {
-			return c.JSON(http.StatusUnauthorized, helper.ResponseFormat(http.StatusUnauthorized, "Missing or Malformed JWT. "+err.Error(), nil))
-		}
-
-		userid := claims.ID
 		eventid, err := strconv.ParseUint(c.Param("id"), 10, 64)
 		if err != nil {
 			c.Logger().Error("Failed to parse ID from URL param: ", err)
 			return c.JSON(http.StatusBadRequest, helper.ResponseFormat(http.StatusBadRequest, "Bad Request", nil))
 		}
 
-		event, err := ec.s.GetEvent(uint(eventid), uint(userid))
+		event, err := ec.s.GetEvent(uint(eventid))
 		if err != nil {
 			c.Logger().Error(err.Error())
 			return c.JSON(http.StatusBadRequest, helper.ResponseFormat(http.StatusNotFound, "The requested resource was not found.", nil))
