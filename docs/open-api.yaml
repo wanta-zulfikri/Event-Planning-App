@@ -131,6 +131,60 @@ paths:
       security:
         - bearerAuth: []
 
+  /users/events:
+    get:
+        tags:
+          - Users
+        summary: Get list of events owned by user ID
+        description: Get list of events owned by userid on an user profile with pagination
+        parameters:
+          - in: query
+            name: page
+            schema:
+              type: integer
+            description: The page number to retrieve
+            required: false
+        responses:
+          '200':
+            $ref: '#/components/responses/Response200EventListGet'
+          '400':
+            $ref: '#/components/responses/Response400'
+          '401':
+            $ref: '#/components/responses/Response401'
+          '404':
+            $ref: '#/components/responses/Response404'
+          '500':
+            $ref: '#/components/responses/Response500'
+        security: 
+          - bearerAuth: []
+
+  /users/attendances:
+    get:
+        tags:
+          - Users
+        summary: Get list of events attended by user ID
+        description: Get list of events attended by userid on an user profile with pagination
+        parameters:
+          - in: query
+            name: page
+            schema:
+              type: integer
+            description: The page number to retrieve
+            required: false
+        responses:
+          '200':
+            $ref: '#/components/responses/Response200EventListGet'
+          '400':
+            $ref: '#/components/responses/Response400'
+          '401':
+            $ref: '#/components/responses/Response401'
+          '404':
+            $ref: '#/components/responses/Response404'
+          '500':
+            $ref: '#/components/responses/Response500'
+        security: 
+          - bearerAuth: []
+
   /events:
     get:
       tags:
@@ -138,6 +192,12 @@ paths:
       summary: Get list of events with pagination
       description: Get list of event on the database
       parameters:
+        - in: query
+          name: category
+          schema:
+            type: string
+          description: The string value of category to retrieve spesific list of category event
+          required: false
         - in: query
           name: page
           schema:
@@ -178,48 +238,15 @@ paths:
           $ref: '#/components/responses/Response500'
       security:
         - bearerAuth: []
-
-  /events/{userid}:
-    get:
-        tags:
-          - Events
-        summary: Get list of events by user ID
-        description: Get list of event with pagination on the database
-        parameters:
-          - name: userid
-            in: path
-            description: User ID
-            required: true
-            schema:
-              type: integer
-          - in: query
-            name: page
-            schema:
-              type: integer
-            description: The page number to retrieve
-            required: false
-        responses:
-          '200':
-            $ref: '#/components/responses/Response200EventListGet'
-          '400':
-            $ref: '#/components/responses/Response400'
-          '401':
-            $ref: '#/components/responses/Response401'
-          '404':
-            $ref: '#/components/responses/Response404'
-          '500':
-            $ref: '#/components/responses/Response500'
-        security: 
-          - bearerAuth: []
     
-  /events/{eventid}:
+  /events/{id}:
     get:
       tags:
         - Events
-      summary: Get an event by ID include its reviews
-      description: Get an event by their ID include its reviews on the database
+      summary: Get an event by ID include its attendances & reviews
+      description: Get an event by their ID include its attendances & reviews on the database
       parameters:
-        - name: eventid
+        - name: id
           in: path
           description: Event ID
           required: true
@@ -244,7 +271,7 @@ paths:
       security: 
         - bearerAuth: [] 
       parameters:
-        - name: eventid
+        - name: id
           in: path
           description: Event ID
           required: true
@@ -284,7 +311,7 @@ paths:
       summary: Delete an event by ID
       description: Delete event information by event ID
       parameters:
-        - name: eventid
+        - name: id
           in: path
           description: Event ID
           required: true
@@ -467,88 +494,6 @@ paths:
       security:
         - bearerAuth : []
 
-  /events/{eventid}/attendees:
-    post:
-      tags:
-        - Event Attendees
-      summary: Create attendees for an event
-      description: Endpoint to create attendees for an event on an event profile
-      parameters:
-      - name: eventid
-        in: path
-        description: Event ID
-        required: true
-        schema:
-          type: integer
-      requestBody:
-          $ref: '#/components/requestBodies/RequestAttendeesCreate'
-      responses:
-        '201':
-          $ref: '#/components/responses/Response201'
-        '400':
-          $ref: '#/components/responses/Response400'
-        '401':
-          $ref: '#/components/responses/Response401'
-        '404':
-          $ref: '#/components/responses/Response404'
-        '500':
-          $ref: '#/components/responses/Response500'
-      security:
-        - bearerAuth: []
-
-    get:
-      tags:
-        - Event Attendees
-      summary: Get list of attendees for an event
-      description: Get list of attendees for an event on an event profile
-      parameters:
-        - name: eventid
-          in: path
-          description: ID of The Event Attendees
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200': 
-          $ref: '#/components/responses/Response200EventAttendees'
-        '400':
-          $ref: '#/components/responses/Response400' 
-        '401':
-          $ref: '#/components/responses/Response401'
-        '404':
-          $ref: '#/components/responses/Response404' 
-        '500': 
-          $ref: '#/components/responses/Response500'
-      security:
-        - bearerAuth : []
-
-  /events/{userid}/attendees:
-    get:
-      tags:
-        - Event Attendees
-      summary: Get list of events by userid
-      description: Get list of events by userid on an user profile
-      parameters:
-        - name: userid
-          in: path
-          description: user ID that attend events
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200': 
-          $ref: '#/components/responses/Response200EventListGet'
-        '400':
-          $ref: '#/components/responses/Response400' 
-        '401':
-          $ref: '#/components/responses/Response401'
-        '404':
-          $ref: '#/components/responses/Response404' 
-        '500': 
-          $ref: '#/components/responses/Response500'
-      security:
-        - bearerAuth : []
-
   /reviews:
     post:
       tags:
@@ -663,14 +608,6 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/RequestTransactionCreate'
-
-    RequestAttendeesCreate:
-      description: Request body containing attendee information
-      required: true
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/RequestAttendeesCreate'
 
     RequestReviewCreate:
       required: true
@@ -864,7 +801,7 @@ components:
               code: 200
               message: "Successful Operation"
               data:
-                - id: 1
+                - event_id: 1
                   title: "udemy: golang goroutines"
                   description: "Lorem Ipsum"
                   hosted_by: "Udemy Indonesia"
@@ -874,7 +811,7 @@ components:
                   category: "Course"
                   location: "Jakarta"
                   event_picture: "https://thumbor.forbes.com/thumbor/fit-in/900x510/https://www.forbes.com/home-improvement/wp-content/uploads/2022/07/download-23.jpg"
-                - id: 2
+                - event_id: 2
                   title: "udemy: golang goroutines"
                   description: "Lorem Ipsum"
                   hosted_by: "Udemy Indonesia"
@@ -884,7 +821,7 @@ components:
                   category: "Course"
                   location: "Jakarta"
                   event_picture: "https://thumbor.forbes.com/thumbor/fit-in/900x510/https://www.forbes.com/home-improvement/wp-content/uploads/2022/07/download-23.jpg"
-                - id: 3
+                - event_id: 3
                   title: "udemy: golang goroutines"
                   description: "Lorem Ipsum"
                   hosted_by: "Udemy Indonesia"
@@ -1074,62 +1011,6 @@ components:
                   grand_total: 2000000
                   payment_type: "paid"
                   payment_method: "credit_card"
-
-    Response200EventAttendees:
-      description: Get list of attendees information
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ResponseEventAttendees'
-          examples:
-            paid_tickets:
-              summary: Example paid_tickets
-              value:
-                code: 200
-                message: Success retrieved event data
-                data:
-                  - id: 1
-                    user_id: 1
-                    event_id: 3
-                    event_category: Music
-                    ticket_type: paid
-                    quantity: 2
-                  - id: 2
-                    user_id: 2
-                    event_id: 3
-                    event_category: Music
-                    ticket_type: paid
-                    quantity: 4
-                  - id: 3
-                    user_id: 3
-                    event_id: 3
-                    event_category: Music
-                    ticket_type: paid
-                    quantity: 2
-            free_tickets:
-              summary: Example free_tickets
-              value:
-                code: 200
-                message: Success retrieved event data
-                data:
-                  - id: 1
-                    user_id: 1
-                    event_id: 5
-                    event_category: Sport
-                    ticket_type: free
-                    quantity: 2
-                  - id: 2
-                    user_id: 2
-                    event_id: 5
-                    event_category: Sport
-                    ticket_type: free
-                    quantity: 4
-                  - id: 3
-                    user_id: 3
-                    event_id: 5
-                    event_category: Sport
-                    ticket_type: free
-                    quantity: 2
 
     Response201ReviewCreate:
         description: Create a review successfully
@@ -1412,6 +1293,13 @@ components:
           category: "Music"
           location: "Jakarta"
           event_picture: "image.png"
+          attendances:
+          - username: "peterzalai"
+            user_picture: "peterzalai.png"
+          - username: "ropel"
+            user_picture: "ropel.png"
+          - username: "wanta"
+            user_picture: "wanta.png"
           reviews:
           - username: "peterzalai"
             user_picture: "peterzalai.png"
@@ -1850,95 +1738,6 @@ components:
               type: string
               enum: [credit_card, debit_card, bank_transfer, e-wallet]
               example: "credit_card"
-
-    RequestAttendeesCreate:
-      type: object
-      properties:
-        user_id:
-          type: integer
-          description: User ID who attends the event
-          example: 2
-        event_id:
-          type: integer
-          description: Event ID that the attendee is registered for
-          example: 3
-        event_category:
-          type: string
-          description: Category of the event
-          example: Music
-        ticket_type:
-          type: string
-          enum: [free, paid]
-          description: Type of ticket
-          example: paid
-        quantity:
-          type: integer
-          minimum: 1
-          description: Number of tickets to be purchased
-          example: 4
-      required:
-        - user_id
-        - event_id
-        - event_category
-        - ticket_type
-        - quantity
-
-    ResponseEventAttendees:
-      type: object
-      properties:
-        code:
-          type: integer
-          example: 201
-        message:
-          type: string
-          example: "Success created a transaction"
-        data:
-          type: array
-          items:
-            type: object
-            properties:
-              id:
-                type: integer
-                description: ID of the event attendee
-              user_id:
-                type: integer
-                description: User ID who attends the event
-              event_id:
-                type: integer
-                description: Event ID that the attendee is registered for
-              event_category:
-                type: string
-                description: Category of the event
-              ticket_type:
-                type: string
-                enum: [free, paid]
-                description: Type of ticket
-              quantity:
-                type: integer
-                minimum: 1
-                description: Number of tickets purchased
-      example:
-        code: 201
-        message: "Success created a transaction"
-        data:
-          - id: 1
-            user_id: 1
-            event_id: 3
-            event_category: Music
-            ticket_type: paid
-            quantity: 2
-          - id: 2
-            user_id: 2
-            event_id: 3
-            event_category: Music
-            ticket_type: paid
-            quantity: 4
-          - id: 3
-            user_id: 3
-            event_id: 3
-            event_category: Music
-            ticket_type: paid
-            quantity: 2
           
     RequestReviewCreate:
       type: object

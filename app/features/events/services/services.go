@@ -32,6 +32,14 @@ func (es *EventService) GetEvents() ([]events.Core, error) {
 	return events, nil
 }
 
+func (es *EventService) GetEventsByCategory(category string) ([]events.Core, error) {
+	events, err := es.r.GetEventsByCategory(category)
+	if err != nil {
+		return nil, err
+	}
+	return events, nil
+}
+
 func (es *EventService) GetEventsByUserID(userid uint) ([]events.Core, error) {
 	events, err := es.r.GetEventsByUserID(userid)
 	if err != nil {

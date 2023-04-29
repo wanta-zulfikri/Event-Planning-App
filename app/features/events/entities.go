@@ -30,6 +30,7 @@ type TicketCore struct {
 type Repository interface {
 	CreateEventWithTickets(event Core, userID uint) error
 	GetEvents() ([]Core, error)
+	GetEventsByCategory(category string) ([]Core, error)
 	GetEventsByUserID(userid uint) ([]Core, error)
 	GetEvent(eventid uint) (Core, error)
 	UpdateEvent(id uint, updatedEvent Core) error
@@ -39,6 +40,7 @@ type Repository interface {
 type Service interface {
 	CreateEventWithTickets(event Core, userID uint) error
 	GetEvents() ([]Core, error)
+	GetEventsByCategory(category string) ([]Core, error)
 	GetEventsByUserID(userid uint) ([]Core, error)
 	GetEvent(eventid uint) (Core, error)
 	UpdateEvent(id uint, updatedEvent Core) error
