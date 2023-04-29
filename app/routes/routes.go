@@ -24,6 +24,7 @@ func Route(e *echo.Echo, uc users.Handler, ec events.Handler, tc tickets.Handler
 	e.GET("/users", uc.GetProfile(), middleware.JWT([]byte(common.JWTSecret)))
 	e.PUT("/users", uc.UpdateProfile(), middleware.JWT([]byte(common.JWTSecret)))
 	e.DELETE("/users", uc.DeleteProfile(), middleware.JWT([]byte(common.JWTSecret)))
+	e.GET("/users/events", ec.GetEventsByUserID(), middleware.JWT([]byte(common.JWTSecret)))
 	//events
 	e.GET("/events", ec.GetEvents())
 	e.POST("/events", ec.CreateEventWithTickets(), middleware.JWT([]byte(common.JWTSecret)))
