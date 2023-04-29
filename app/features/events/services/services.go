@@ -32,8 +32,8 @@ func (es *EventService) GetEvents() ([]events.Core, error) {
 	return events, nil
 }
 
-func (es *EventService) GetEvent(eventid, userid uint) (events.Core, error) {
-	event, err := es.r.GetEvent(eventid, userid)
+func (es *EventService) GetEvent(eventid uint) (events.Core, error) {
+	event, err := es.r.GetEvent(eventid)
 	if err != nil {
 		return events.Core{}, err
 	}
