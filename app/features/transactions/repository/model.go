@@ -15,7 +15,6 @@ type Transaction struct {
 	PurchaseEndDate    time.Time
 	Status             string
 	StatusDate         time.Time
-	Subtotal           uint
 	GrandTotal         uint
 	UserID             uint
 	EventID            uint
@@ -23,11 +22,12 @@ type Transaction struct {
 }
 
 type TransactionTickets struct {
+	gorm.Model
 	TransactionID  uint
 	TicketID       uint
 	TicketCategory string
-	TicketPrice    string
-	Quantity       uint
+	TicketPrice    uint
+	TicketQuantity uint
 	Subtotal       uint
 	// Ticket         Ticket // >>> detail transaction to get ticketprice, preload ke ticket
 }
