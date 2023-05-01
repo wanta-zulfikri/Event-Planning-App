@@ -1,7 +1,9 @@
 package repository
 
 import (
-	_ "github.com/lib/pq"
+	"errors"
+	"fmt"
+
 	"github.com/wanta-zulfikri/Event-Planning-App/app/features/transactions"
 	"gorm.io/gorm"
 )
@@ -14,26 +16,21 @@ func New(db *gorm.DB) *TransactionRepository {
 	return &TransactionRepository{db: db}
 }
 
-func (tr *TransactionRepository) CreateTransaction(input transactions.Transaction) error {
-	err := tr.db.Create(&input).Error
-	if err != nil {
-		return err
-	}
-
-	// Insert transaction_tickets into transaction_tickets table
-	var tickets []transactions.Transaction_Tickets
-	for _, t := range input.Transaction_Tickets {
-		ticket := transactions.Transaction_Tickets{
-			TransactionID: input.ID,
-			TicketID:      t.TicketID,
+func (tr *TransactionRepository) GetTransaction(transactionid uint) (transactions.Transaction, error) {
+	var transaction transactions.Transaction
+	if err := tr.db.Where("id = ?", transactionid).Preload("Transaction_Tickets").First(&transaction).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return transactions.Transaction{}, errors.New("Transaction not found")
 		}
-		tickets = append(tickets, ticket)
+		return transactions.Transaction{}, fmt.Errorf("Failed to retrieve transaction from database: %w", err)
 	}
+	return transaction, nil
+}
 
-	err = tr.db.Model(&input).Association("Transaction_Tickets").Append(tickets)
+func (tr *TransactionRepository) CreateTransaction(request transactions.Transaction) error {
+	err := tr.db.Create(&request).Error
 	if err != nil {
 		return err
 	}
-
 	return nil
 }
