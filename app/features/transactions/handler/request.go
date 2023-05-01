@@ -5,7 +5,5 @@ type RequestCreateTransaction struct {
 }
 
 type Tickets struct {
-	TicketCategory string `json:"ticket_category"`
-	TicketPrice    uint   `json:"ticket_price"`
-	TicketQuantity uint   `json:"ticket_quantity"`
+	TicketID uint `json:"ticket_id"`
 }

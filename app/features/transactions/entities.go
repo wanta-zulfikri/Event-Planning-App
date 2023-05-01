@@ -1,53 +1,37 @@
 package transactions
 
 import (
-	"time"
-
 	"github.com/labstack/echo/v4"
 )
 
-type Core struct {
-	ID                 string
-	PurchaseStartDate  time.Time
-	PurchaseEndDate    time.Time
-	Status             string
-	StatusDate         time.Time
-	GrandTotal         uint
-	UserID             uint
-	EventID            uint
-	TransactionTickets []TransactionTickets
+type Transaction struct {
+	ID                  uint
+	UserID              uint
+	EventID             uint
+	Transaction_Tickets []Transaction_Tickets
 }
 
-type TransactionTickets struct {
-	TransactionID  uint
-	TicketID       uint
-	TicketCategory string
-	TicketPrice    uint
-	TicketQuantity uint
-	Subtotal       uint
-}
-
-type Carts struct {
-	ItemDescription []Ticket
-}
-
-type Ticket struct {
-	TicketID           uint
-	EventID            uint
-	TicketCategory     string
-	TicketPrice        uint
-	TicketQuantity     uint
-	TransactionTickets []TransactionTickets
+type Transaction_Tickets struct {
+	TransactionID uint
+	TicketID      uint
 }
 
 type Repository interface {
-	CreateTransaction(Core) error
+	CreateTransaction(Transaction) error
 }
 
 type Service interface {
-	CreateTransaction(userid uint, eventid uint, request Carts) error
+	CreateTransaction(userid uint, eventid uint, request Transaction) error
 }
 
 type Handler interface {
 	CreateTransaction() echo.HandlerFunc
+}
+
+type RequestCreateTransaction struct {
+	ItemDescription []Tickets `json:"item_description"`
+}
+
+type Tickets struct {
+	TicketID uint `json:"ticket_id"`
 }

@@ -9,24 +9,36 @@ import (
 	"gorm.io/gorm"
 )
 
-func Migrate(db *gorm.DB) error {
-	migrator := db.Migrator()
-	if err := migrator.DropTable(
-		&u.User{},
-		&e.Event{},
-		&tr.Transaction{},
-		&t.Ticket{},
-		&r.Review{}); err != nil {
-		return err
-	}
+// func Migrate(db *gorm.DB) error {
+// 	migrator := db.Migrator()
+// 	if err := migrator.DropTable(
+// 		&u.User{},
+// 		&e.Event{},
+// 		&tr.Transaction{},
+// 		&t.Ticket{},
+// 		&r.Review{}); err != nil {
+// 		return err
+// 	}
 
-	if err := migrator.CreateTable(
+// 	if err := migrator.CreateTable(
+// 		&u.User{},
+// 		&e.Event{},
+// 		&tr.Transaction{},
+// 		&t.Ticket{},
+// 		&r.Review{}); err != nil {
+// 		return err
+// 	}
+// 	return nil
+// }
+
+func Migrate(db *gorm.DB) error {
+	err := db.AutoMigrate(
 		&u.User{},
 		&e.Event{},
 		&tr.Transaction{},
+		// &tr.Transaction_Tickets{},
 		&t.Ticket{},
-		&r.Review{}); err != nil {
-		return err
-	}
-	return nil
+		&r.Review{},
+	)
+	return err
 }

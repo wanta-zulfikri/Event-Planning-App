@@ -1,6 +1,7 @@
 package repository
 
 import (
+	_ "github.com/lib/pq"
 	"github.com/wanta-zulfikri/Event-Planning-App/app/features/transactions"
 	"gorm.io/gorm"
 )
@@ -13,48 +14,26 @@ func New(db *gorm.DB) *TransactionRepository {
 	return &TransactionRepository{db: db}
 }
 
-func (tr *TransactionRepository) CreateTransaction(input transactions.Core) error {
-	tx := tr.db.Begin()
-	defer func() {
-		if r := recover(); r != nil {
-			tx.Rollback()
-		}
-	}()
-
-	// invoice := helper.GenerateInvoice()
-
-	newTransaction := Transaction{
-		// Invoice:           invoice,
-		PurchaseStartDate: input.PurchaseStartDate,
-		PurchaseEndDate:   input.PurchaseEndDate,
-		Status:            input.Status,
-		StatusDate:        input.StatusDate,
-		GrandTotal:        input.GrandTotal,
-		UserID:            input.UserID,
-		EventID:           input.EventID,
-	}
-	err := tx.Table("transactions").Create(&newTransaction).Error
+func (tr *TransactionRepository) CreateTransaction(input transactions.Transaction) error {
+	err := tr.db.Create(&input).Error
 	if err != nil {
-		tx.Rollback()
 		return err
 	}
 
-	tickets := make([]transactions.TransactionTickets, len(input.TransactionTickets))
-	for i, ticket := range input.TransactionTickets {
-		tickets[i] = transactions.TransactionTickets{
-			TransactionID:  ticket.TransactionID,
-			TicketID:       ticket.TicketID,
-			TicketCategory: ticket.TicketCategory,
-			TicketPrice:    ticket.TicketPrice,
-			TicketQuantity: ticket.TicketQuantity,
-			Subtotal:       ticket.TicketPrice * ticket.TicketQuantity,
+	// Insert transaction_tickets into transaction_tickets table
+	var tickets []transactions.Transaction_Tickets
+	for _, t := range input.Transaction_Tickets {
+		ticket := transactions.Transaction_Tickets{
+			TransactionID: input.ID,
+			TicketID:      t.TicketID,
 		}
+		tickets = append(tickets, ticket)
 	}
-	err = tx.Table("transaction_tickets").CreateInBatches(tickets, len(tickets)).Error
+
+	err = tr.db.Model(&input).Association("Transaction_Tickets").Append(tickets)
 	if err != nil {
-		tx.Rollback()
 		return err
 	}
 
-	return tx.Commit().Error
+	return nil
 }
