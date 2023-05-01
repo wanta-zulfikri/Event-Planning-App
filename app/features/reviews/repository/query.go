@@ -23,7 +23,6 @@ func (rr *ReviewRepository) WriteReview(request reviews.Core) (reviews.Core, err
 		Username: request.Username,
 		EventID:  request.EventID,
 		Review:   request.Review,
-
 	}
 
 	err := rr.db.Table("reviews").Create(&input).Error
@@ -36,20 +35,16 @@ func (rr *ReviewRepository) WriteReview(request reviews.Core) (reviews.Core, err
 		Username: request.Username,
 		EventID:  input.EventID,
 		Review:   input.Review,
-		Username: request.Username,
-		EventID:  input.EventID,
-		Review:   input.Review,
 	}
 	return createdReview, nil
 }
 
-
 func (rr *ReviewRepository) UpdateReview(request reviews.Core) (reviews.Core, error) {
 	input := Review{
-		UserID:   request.UserID,
-		Username: request.Username,
-		EventID:  request.EventID,
-		Review:   request.Review, 
+		UserID:    request.UserID,
+		Username:  request.Username,
+		EventID:   request.EventID,
+		Review:    request.Review,
 		UpdatedAt: time.Now(),
 	}
 
@@ -58,21 +53,23 @@ func (rr *ReviewRepository) UpdateReview(request reviews.Core) (reviews.Core, er
 	input.Review = request.Review
 
 	if err := rr.db.Save(&input).Error; err != nil {
-		return err
+		return reviews.Core{}, err
+	}
 
 	if err := rr.db.Model(&Review{}).Where("id = ? AND deleted_at IS NULL", request.EventID).Updates(Review{Review: input.Review, UpdatedAt: time.Now()}).Error; err != nil {
 		log.Println("Error updating review: ", err.Error())
 		return reviews.Core{}, err
 	}
+
 	updateReview := reviews.Core{
 		UserID:   request.UserID,
 		Username: request.Username,
 		EventID:  request.EventID,
 		Review:   input.Review,
 	}
+
 	return updateReview, nil
 }
-
 
 func (rr *ReviewRepository) DeleteReview(id uint) error {
 	input := Review{}
