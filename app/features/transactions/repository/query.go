@@ -1,9 +1,6 @@
 package repository
 
 import (
-	"errors"
-
-	"github.com/wanta-zulfikri/Event-Planning-App/app/features/tickets/repository"
 	"github.com/wanta-zulfikri/Event-Planning-App/app/features/transactions"
 	"gorm.io/gorm"
 )
@@ -12,71 +9,52 @@ type TransactionRepository struct {
 	db *gorm.DB
 }
 
-func NewTransactionRepository(db *gorm.DB) *TransactionRepository {
+func New(db *gorm.DB) *TransactionRepository {
 	return &TransactionRepository{db: db}
 }
 
-func (tr *TransactionRepository) CreateTransaction(newTransaction transactions.Core) (transactions.Core, error) {
-	input := Transaction{
-		Model:             gorm.Model{},
-		Invoice:           newTransaction.Invoice,
-		PurchaseStartDate: newTransaction.PurchaseStartDate,
-		PurchaseEndDate:   newTransaction.PurchaseEndDate,
-		Status:            newTransaction.Status,
-		StatusDate:        newTransaction.StatusDate,
-		// Tickets:           []*repository.Ticket{},
-		Subtotal:   newTransaction.Subtotal,
-		GrandTotal: newTransaction.GrandTotal,
-		UserID:     newTransaction.UserID,
-		EventID:    newTransaction.EventID,
-	}
-
-	err := tr.db.Create(&input).Error
-	if err != nil {
-		return transactions.Core{}, err
-	}
-
-	for _, ticket := range newTransaction.Tickets {
-		ticketInput := repository.Ticket{
-			TicketType:     ticket.TicketType,
-			TicketCategory: ticket.TicketCategory,
-			TicketPrice:    ticket.TicketPrice,
-			TicketQuantity: ticket.TicketQuantity,
-			EventID:        ticket.EventID,
+func (tr *TransactionRepository) CreateTransaction(input transactions.Core) error {
+	tx := tr.db.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
 		}
+	}()
 
-		err = tr.db.Create(&ticketInput).Error
-		if err != nil {
-			return transactions.Core{}, err
-		}
-	}
+	// invoice := helper.GenerateInvoice()
 
-	createdTransaction := transactions.Core{
-		ID:                input.ID,
-		Invoice:           input.Invoice,
+	newTransaction := Transaction{
+		// Invoice:           invoice,
 		PurchaseStartDate: input.PurchaseStartDate,
 		PurchaseEndDate:   input.PurchaseEndDate,
 		Status:            input.Status,
 		StatusDate:        input.StatusDate,
-		Subtotal:          input.Subtotal,
 		GrandTotal:        input.GrandTotal,
 		UserID:            input.UserID,
 		EventID:           input.EventID,
-		Tickets:           newTransaction.Tickets,
 	}
-	return createdTransaction, nil
-}
-
-func (tr *TransactionRepository) GetInvoice(Invoice string) (*Transaction, error) {
-	transaction := &Transaction{}
-
-	err := tr.db.Model(&Transaction{}).Where("invoice = ?", transaction).Take(&transaction).Error
-
+	err := tx.Table("transactions").Create(&newTransaction).Error
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, err
-		}
-		return nil, err
+		tx.Rollback()
+		return err
 	}
-	return transaction, nil
+
+	tickets := make([]transactions.TransactionTickets, len(input.TransactionTickets))
+	for i, ticket := range input.TransactionTickets {
+		tickets[i] = transactions.TransactionTickets{
+			TransactionID:  ticket.TransactionID,
+			TicketID:       ticket.TicketID,
+			TicketCategory: ticket.TicketCategory,
+			TicketPrice:    ticket.TicketPrice,
+			TicketQuantity: ticket.TicketQuantity,
+			Subtotal:       ticket.TicketPrice * ticket.TicketQuantity,
+		}
+	}
+	err = tx.Table("transaction_tickets").CreateInBatches(tickets, len(tickets)).Error
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	return tx.Commit().Error
 }

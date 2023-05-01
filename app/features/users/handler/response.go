@@ -7,6 +7,7 @@ type LoginResponse struct {
 type UserResponse struct {
 	Username string `json:"username"`
 	Email    string `json:"email"`
+	Phone    string `json:"phone"`
 	Password string `json:"password"`
 	Image    string `json:"image"`
 }

@@ -3,9 +3,6 @@ package main
 import (
 	"fmt"
 
-	attendancesHandler "github.com/wanta-zulfikri/Event-Planning-App/app/features/attendances/handler"
-	attendancesRepo "github.com/wanta-zulfikri/Event-Planning-App/app/features/attendances/repository"
-	attendancesLogic "github.com/wanta-zulfikri/Event-Planning-App/app/features/attendances/services"
 	eventHandler "github.com/wanta-zulfikri/Event-Planning-App/app/features/events/handler"
 	eventRepo "github.com/wanta-zulfikri/Event-Planning-App/app/features/events/repository"
 	eventLogic "github.com/wanta-zulfikri/Event-Planning-App/app/features/events/services"
@@ -15,6 +12,9 @@ import (
 	ticketHandler "github.com/wanta-zulfikri/Event-Planning-App/app/features/tickets/handler"
 	ticketRepo "github.com/wanta-zulfikri/Event-Planning-App/app/features/tickets/repository"
 	ticketLogic "github.com/wanta-zulfikri/Event-Planning-App/app/features/tickets/services"
+	transactionHandler "github.com/wanta-zulfikri/Event-Planning-App/app/features/transactions/handler"
+	transactionRepo "github.com/wanta-zulfikri/Event-Planning-App/app/features/transactions/repository"
+	transactionLogic "github.com/wanta-zulfikri/Event-Planning-App/app/features/transactions/services"
 	userHandler "github.com/wanta-zulfikri/Event-Planning-App/app/features/users/handler"
 	userRepo "github.com/wanta-zulfikri/Event-Planning-App/app/features/users/repository"
 	userLogic "github.com/wanta-zulfikri/Event-Planning-App/app/features/users/service"
@@ -39,14 +39,14 @@ func main() {
 	ticketModel := ticketRepo.New(db)
 	ticketService := ticketLogic.New(ticketModel)
 	ticketController := ticketHandler.New(ticketService)
+	transactionModel := transactionRepo.New(db)
+	transactionService := transactionLogic.New(transactionModel)
+	transactionController := transactionHandler.New(transactionService)
 	reviewModel := reviewRepo.New(db)
 	reviewService := reviewLogic.New(reviewModel)
 	reviewController := reviewHandler.New(reviewService)
-	attendancesModel := attendancesRepo.New(db)
-	attendancesService := attendancesLogic.New(attendancesModel)
-	attendancesController := attendancesHandler.New(attendancesService)
 
-	routes.Route(e, userController, eventController, ticketController, attendancesController, reviewController)
+	routes.Route(e, userController, eventController, ticketController, transactionController, reviewController)
 
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%s", cfg.Port)))
 }

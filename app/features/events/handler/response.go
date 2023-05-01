@@ -1,7 +1,7 @@
 package handler
 
 type ResponseGetEvents struct {
-	ID            uint   `json:"id"`
+	ID            uint   `json:"event_id"`
 	Title         string `json:"title"`
 	Description   string `json:"description"`
 	Hosted_by     string `json:"hosted_by"`
@@ -14,6 +14,7 @@ type ResponseGetEvents struct {
 }
 
 type ResponseGetEvent struct {
+	ID            uint   `json:"event_id"`
 	Title         string `json:"title"`
 	Description   string `json:"description"`
 	Hosted_by     string `json:"hosted_by"`
@@ -40,12 +41,11 @@ type EventData struct {
 	Status      string           `json:"status"`
 	Category    string           `json:"category"`
 	Location    string           `json:"location"`
-	Picture     string           `json:"picture"`
-	Ticket      []TicketResponse `json:"ticket"`
+	Picture     string           `json:"event_picture"`
+	Tickets     []TicketResponse `json:"tickets"`
 }
 
 type TicketResponse struct {
-	Type     string `json:"ticket_type"`
 	Category string `json:"ticket_category"`
 	Price    uint   `json:"ticket_price"`
 	Quantity uint   `json:"ticket_quantity"`
@@ -63,4 +63,16 @@ type Pagination struct {
 	PerPage    int `json:"per_page"`
 	TotalPages int `json:"total_pages"`
 	TotalItems int `json:"total_items"`
+}
+
+type ResponseUpdateEvent struct {
+	Title         string `json:"title"`
+	Description   string `json:"description"`
+	Hosted_by     string `json:"hosted_by"`
+	Date          string `json:"date"`
+	Time          string `json:"time"`
+	Status        string `json:"status"`
+	Category      string `json:"category"`
+	Location      string `json:"location"`
+	Event_picture string `json:"event_picture"`
 }

@@ -30,6 +30,7 @@ func (ar *UserRepository) Register(newUser users.Core) (users.Core, error) {
 
 	input.Username = newUser.Username
 	input.Email = newUser.Email
+	input.Phone = newUser.Phone
 	input.Password = hashedPassword
 
 	if err := ar.db.Table("users").Create(&input).Error; err != nil {
@@ -64,30 +65,27 @@ func (ar *UserRepository) GetProfile(id uint) (users.Core, error) {
 	return users.Core{
 		Username: input.Username,
 		Email:    input.Email,
+		Phone:    input.Phone,
 		Password: input.Password,
 		Image:    input.Image,
 	}, nil
 }
 
 func (ar *UserRepository) UpdateProfile(id uint, updatedUser users.Core) error {
-	input := User{}
-	if err := ar.db.Where("id = ?", id).First(&input).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
+	result := ar.db.Table("users").Where("id = ?", id).Updates(map[string]interface{}{
+		"username":   updatedUser.Username,
+		"email":      updatedUser.Email,
+		"phone":      updatedUser.Phone,
+		"password":   updatedUser.Password,
+		"image":      updatedUser.Image,
+		"updated_at": time.Now(),
+	})
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			return fmt.Errorf("user with id %v not found", id)
 		}
-		log.Print("Failed to query user by id", err)
-		return err
-	}
-
-	input.Username = updatedUser.Username
-	input.Email = updatedUser.Email
-	input.Password = updatedUser.Password
-	input.Image = updatedUser.Image
-	input.UpdatedAt = time.Now()
-
-	if err := ar.db.Save(&input).Error; err != nil {
-		log.Print("Failed to update user", err)
-		return err
+		log.Print("Failed to update user", result.Error)
+		return result.Error
 	}
 	return nil
 }
