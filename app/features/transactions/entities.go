@@ -19,8 +19,8 @@ type Core struct {
 }
 
 type TransactionTickets struct {
-	TransactionID  string
-	TicketID       uint // masih null ???
+	TransactionID  uint
+	TicketID       uint
 	TicketCategory string
 	TicketPrice    uint
 	TicketQuantity uint

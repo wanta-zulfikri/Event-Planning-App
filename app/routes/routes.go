@@ -1,7 +1,6 @@
 package routes
 
 import (
-	"github.com/wanta-zulfikri/Event-Planning-App/app/features/attendances"
 	"github.com/wanta-zulfikri/Event-Planning-App/app/features/events"
 	"github.com/wanta-zulfikri/Event-Planning-App/app/features/reviews"
 	"github.com/wanta-zulfikri/Event-Planning-App/app/features/tickets"
@@ -13,7 +12,7 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 )
 
-func Route(e *echo.Echo, uc users.Handler, ec events.Handler, tc tickets.Handler, tr transactions.Handler, as attendances.Handler, rc reviews.Handler) {
+func Route(e *echo.Echo, uc users.Handler, ec events.Handler, tc tickets.Handler, tr transactions.Handler, rc reviews.Handler) {
 	e.Pre(middleware.RemoveTrailingSlash())
 	e.Use(middleware.CORS())
 	e.Use(middleware.Logger())
@@ -24,6 +23,7 @@ func Route(e *echo.Echo, uc users.Handler, ec events.Handler, tc tickets.Handler
 	e.GET("/users", uc.GetProfile(), middleware.JWT([]byte(common.JWTSecret)))
 	e.PUT("/users", uc.UpdateProfile(), middleware.JWT([]byte(common.JWTSecret)))
 	e.DELETE("/users", uc.DeleteProfile(), middleware.JWT([]byte(common.JWTSecret)))
+	e.GET("/users/events", ec.GetEventsByUserID(), middleware.JWT([]byte(common.JWTSecret)))
 	//events
 	e.GET("/events", ec.GetEvents())
 	e.POST("/events", ec.CreateEventWithTickets(), middleware.JWT([]byte(common.JWTSecret)))
@@ -34,13 +34,10 @@ func Route(e *echo.Echo, uc users.Handler, ec events.Handler, tc tickets.Handler
 	e.GET("/tickets/:id", tc.GetTickets(), middleware.JWT([]byte(common.JWTSecret)))
 	e.PUT("/tickets/:id", tc.UpdateTicket(), middleware.JWT([]byte(common.JWTSecret)))
 	e.DELETE("/tickets/:id", tc.DeleteTicket(), middleware.JWT([]byte(common.JWTSecret)))
-	//attendancees
-	e.POST("/attendances", as.CreateAttendance(), middleware.JWT([]byte(common.JWTSecret)))
-	e.GET("/attendances", as.GetAttendance(), middleware.JWT([]byte(common.JWTSecret)))
 	//transactions
 	e.POST("/transactions/:id", tr.CreateTransaction(), middleware.JWT([]byte(common.JWTSecret)))
 	//reviews
-	e.POST("/reviews", rc.WriteReview(), middleware.JWT([]byte(common.JWTSecret)))
-	e.PUT("/reviews", rc.UpdateReview(), middleware.JWT([]byte(common.JWTSecret)))
-	e.DELETE("/reviews", rc.DeleteReview(), middleware.JWT([]byte(common.JWTSecret)))
+	e.POST("/reviews/:id", rc.WriteReview(), middleware.JWT([]byte(common.JWTSecret)))
+	e.PUT("/reviews/:id", rc.UpdateReview(), middleware.JWT([]byte(common.JWTSecret)))
+	e.DELETE("/reviews/:id", rc.DeleteReview(), middleware.JWT([]byte(common.JWTSecret)))
 }

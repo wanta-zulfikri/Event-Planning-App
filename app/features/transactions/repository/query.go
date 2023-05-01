@@ -2,7 +2,6 @@ package repository
 
 import (
 	"github.com/wanta-zulfikri/Event-Planning-App/app/features/transactions"
-	"github.com/wanta-zulfikri/Event-Planning-App/helper"
 	"gorm.io/gorm"
 )
 
@@ -22,10 +21,10 @@ func (tr *TransactionRepository) CreateTransaction(input transactions.Core) erro
 		}
 	}()
 
-	invoice := helper.GenerateInvoice()
+	// invoice := helper.GenerateInvoice()
 
 	newTransaction := Transaction{
-		ID:                invoice,
+		// Invoice:           invoice,
 		PurchaseStartDate: input.PurchaseStartDate,
 		PurchaseEndDate:   input.PurchaseEndDate,
 		Status:            input.Status,
@@ -43,7 +42,7 @@ func (tr *TransactionRepository) CreateTransaction(input transactions.Core) erro
 	tickets := make([]transactions.TransactionTickets, len(input.TransactionTickets))
 	for i, ticket := range input.TransactionTickets {
 		tickets[i] = transactions.TransactionTickets{
-			TransactionID:  invoice,
+			TransactionID:  ticket.TransactionID,
 			TicketID:       ticket.TicketID,
 			TicketCategory: ticket.TicketCategory,
 			TicketPrice:    ticket.TicketPrice,

@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/wanta-zulfikri/Event-Planning-App/app/features/transactions"
-	"github.com/wanta-zulfikri/Event-Planning-App/helper"
 )
 
 type TransactionService struct {
@@ -31,7 +30,6 @@ func (ts *TransactionService) CreateTransaction(userid uint, eventid uint, reque
 	}
 
 	Transaction := transactions.Core{
-		ID:                 helper.GenerateInvoice(),
 		PurchaseStartDate:  time.Now(),
 		PurchaseEndDate:    time.Now().Add(24 * time.Hour),
 		Status:             "pending",

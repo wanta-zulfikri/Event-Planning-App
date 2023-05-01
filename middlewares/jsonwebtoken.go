@@ -105,6 +105,7 @@ type Claims struct {
 	ID       uint   `json:"id"`
 	Email    string `json:"email"`
 	Username string `json:"username"`
+	Image    string `json:"image"`
 }
 
 func (c *Claims) Valid() error {
