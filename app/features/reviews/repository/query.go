@@ -39,25 +39,28 @@ func (rr *ReviewRepository) WriteReview(request reviews.Core) (reviews.Core, err
 	return createdReview, nil
 }
 
+
 func (rr *ReviewRepository) UpdateReview(request reviews.Core) (reviews.Core, error) {
-	input := Review{}
-	if err := rr.db.Where("id = ?", request.UserID).First(&input).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return request, errors.New(err.Error())
-		}
-		return request, nil
-
+	input := Review{
+		UserID:   request.UserID,
+		Username: request.Username,
+		EventID:  request.EventID,
+		Review:   request.Review, 
+		UpdatedAt: time.Now(),
 	}
-
-	input.Username = request.Username
-	input.EventID = request.EventID
-	input.Review = request.Review
-
-	if err := rr.db.Save(&input).Error; err != nil {
-		return request, errors.New(err.Error())
+	if err := rr.db.Model(&Review{}).Where("id = ? AND deleted_at IS NULL", request.EventID).Updates(Review{Review: input.Review, UpdatedAt: time.Now()}).Error; err != nil {
+		log.Println("Error updating review: ", err.Error())
+		return reviews.Core{}, err
 	}
-	return request, nil
+	updateReview := reviews.Core{
+		UserID:   request.UserID,
+		Username: request.Username,
+		EventID:  request.EventID,
+		Review:   input.Review,
+	}
+	return updateReview, nil
 }
+
 
 func (rr *ReviewRepository) DeleteReview(id uint) error {
 	input := Review{}

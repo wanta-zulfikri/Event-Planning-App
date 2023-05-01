@@ -56,6 +56,7 @@ func (rc *ReviewController) WriteReview() echo.HandlerFunc {
 	}
 }
 
+
 func (rc *ReviewController) UpdateReview() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var input RequestUpdateReview
@@ -91,42 +92,36 @@ func (rc *ReviewController) UpdateReview() echo.HandlerFunc {
 			return c.JSON(http.StatusInternalServerError, helper.ResponseFormat(http.StatusInternalServerError, "Internal Server Error", nil))
 
 		}
-		return c.JSON(http.StatusOK, helper.ResponseFormat(http.StatusCreated, "Success Updated a Review", nil))
+		return c.JSON(http.StatusOK, helper.ResponseFormat(http.StatusOK, "Success Updated a Review", nil))
 	}
 }
 
+
 func (rc *ReviewController) DeleteReview() echo.HandlerFunc {
-	return func(c echo.Context) error {
-		tokenString := c.Request().Header.Get("Authorization")
-		if tokenString == "" {
-			return c.JSON(http.StatusUnauthorized, helper.ResponseFormat(http.StatusUnauthorized, "Unauthorized. Token is missing.", nil))
-		}
-
-		_, err := middlewares.ValidateJWT(tokenString)
+    return func(c echo.Context) error {
+        tokenString := c.Request().Header.Get("Authorization")
+        claims, err := middlewares.ValidateJWT2(tokenString)
+        if err != nil {
+            return c.JSON(http.StatusUnauthorized, helper.ResponseFormat(http.StatusUnauthorized, "Missing or Malformed JWT"+err.Error(), nil))
+        }
+		
+		id, err := strconv.ParseUint(c.Param("id"),10, 32)
 		if err != nil {
-			return c.JSON(http.StatusUnauthorized, helper.ResponseFormat(http.StatusUnauthorized, "Unauthorized. "+err.Error(), nil))
-		}
-
-		inputID := c.Param("id")
-		if inputID == "" {
-			c.Logger().Error(err.Error())
+			c.Logger().Error("Failed to parse ID from URL param: ", err)
 			return c.JSON(http.StatusBadRequest, helper.ResponseFormat(http.StatusBadRequest, "Bad Request", nil))
+		} 
 
+		
+		if claims.ID != uint(id) {
+			return c.JSON(http.StatusUnauthorized, helper.ResponseFormat(http.StatusUnauthorized, "Unauthorized. Token is not valid for this user.", nil))
 		}
 
-		id, err := strconv.ParseUint(inputID, 10, 32)
-		if err != nil {
-			c.Logger().Error(err.Error())
-			return c.JSON(http.StatusBadRequest, helper.ResponseFormat(http.StatusBadRequest, "Bad Request", nil))
+        err = rc.n.DeleteReview(uint(id))
+        if err != nil {
+            c.Logger().Error("Failed to delete review: ", err)
+            return c.JSON(http.StatusInternalServerError, helper.ResponseFormat(http.StatusInternalServerError, "Internal Server Error", nil))
+        }
 
-		}
-
-		err = rc.n.DeleteReview(uint(id))
-		if err != nil {
-			c.Logger().Error("Error delleting review", err.Error())
-			return c.JSON(http.StatusInternalServerError, helper.ResponseFormat(http.StatusInternalServerError, "Internal Server Error", nil))
-		}
-
-		return c.JSON(http.StatusOK, helper.ResponseFormat(http.StatusOK, "Success Deleted a Review", nil))
-	}
+        return c.JSON(http.StatusOK, helper.ResponseFormat(http.StatusOK, "Success Deleted a Review", nil))
+    }
 }
