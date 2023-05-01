@@ -3,40 +3,33 @@ package repository
 import (
 	"time"
 
-	"gorm.io/gorm"
+	"github.com/wanta-zulfikri/Event-Planning-App/app/features/tickets/repository"
 )
 
-// untuk membuat many to many, dibuat relasi antara Transaction dan Ticket : wajib jamak dalam penamaan.
-
+// https://gorm.io/docs/many_to_many.html#Customize-JoinTable
+// many2many:transaction_tickets check config migrate, wajib menggunakan automigrate.
 type Transaction struct {
-	gorm.Model
+	ID                 uint `gorm:"primaryKey; autoIncrement"`
+	UserID             uint
+	EventID            uint
 	Invoice            string
 	PurchaseStartDate  time.Time
 	PurchaseEndDate    time.Time
 	Status             string
 	StatusDate         time.Time
-	Subtotal           uint
 	GrandTotal         uint
-	UserID             uint
-	EventID            uint
-	TransactionTickets []TransactionTickets
+	PaymentMethod      string
+	TransactionTickets []Transaction_Tickets `gorm:"many2many:transaction_tickets;"`
 }
 
-type TransactionTickets struct {
-	TransactionID  uint
-	TicketID       uint
+type Transaction_Tickets struct {
+	ID             uint
+	TransactionID  uint              //**
+	Transaction    Transaction       //**
+	TicketID       uint              //**
+	Ticket         repository.Ticket //**
 	TicketCategory string
-	TicketPrice    string
-	Quantity       uint
+	TicketPrice    uint
+	TicketQuantity uint
 	Subtotal       uint
-	// Ticket         Ticket // >>> detail transaction to get ticketprice, preload ke ticket
-}
-
-type Ticket struct {
-	gorm.Model
-	EventID            uint
-	TicketCategory     string
-	TicketPrice        uint
-	TicketQuantity     uint
-	TransactionTickets []TransactionTickets
 }

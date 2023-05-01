@@ -2,7 +2,7 @@ openapi: 3.0.3
 
 info:
   title: Event Planning App RESTful API Project
-  version: "1.0"
+  version: 1.0.1
   description: The Event Planning App RESTful API Project is an application used for creating and managing events.
   contact:
     name: Developer 
@@ -516,12 +516,11 @@ paths:
       security:
         - bearerAuth : []
 
-  /reviews/{id}:
     put:
       tags:
         - Reviews
-      summary: Edit a review
-      description: Edit an existing review on a single event's page
+      summary: Update a review
+      description: Update an existing review on a single event's page
       parameters:
         - name: id
           in: path
@@ -877,107 +876,8 @@ components:
               summary: Example transaction pending
               value:
                 code: 201
-                message: Success created a transaction
-                data:
-                  invoice: "MT00002570"
-                  user_id: 1
-                  event_id: 1
-                  event_date: "2023-04-25 10:15:00"
-                  purchase_startdate: "2023-04-14 20:15:00"
-                  purchase_enddate: "2023-04-17 10:15:00"
-                  status: "pending"
-                  status_date: "2023-04-17 10:15:00"
-                  items_description:
-                    - ticket_category: "VIP"
-                      ticket_quantity: 2
-                      ticket_price: 500000
-                      subtotal: 1000000
-                    - ticket_category: "Reguler"
-                      ticket_quantity: 4
-                      ticket_price: 250000
-                      subtotal: 1000000
-                  grand_total: 2000000
-                  payment_type: "paid"
-                  payment_method: "credit_card"
-            example_transaction_completed:
-              summary: Example transaction completed
-              value:
-                code: 201
-                message: Success created a transaction
-                data:
-                  invoice: "MT00002575"
-                  user_id: 2
-                  event_id: 1
-                  event_date: "2023-04-25 10:15:00"
-                  purchase_startdate: "2023-04-14 20:15:00"
-                  purchase_enddate: "2023-04-15 10:15:00"
-                  status: "completed"
-                  status_date: "2023-04-15 07:15:00"
-                  items_description:
-                    - ticket_category: "VIP"
-                      ticket_quantity: 2
-                      ticket_price: 500000
-                      subtotal: 1000000
-                    - ticket_category: "Reguler"
-                      ticket_quantity: 4
-                      ticket_price: 250000
-                      subtotal: 1000000
-                  grand_total: 2000000
-                  payment_type: "paid"
-                  payment_method: "alfamart"   
-            example_transaction_failed:
-              summary: Example transaction failed
-              value:
-                code: 201
-                message: Success created a transaction
-                data:
-                  invoice: "MT00002575"
-                  user_id: 3
-                  event_id: 1
-                  event_date: "2023-04-25 10:15:00"
-                  purchase_startdate: "2023-04-14 10:15:00"
-                  purchase_enddate: "2023-04-15 10:15:00"
-                  status: "failed"
-                  status_date: "2023-04-15 05:15:00"
-                  items_description:
-                    - ticket_category: "VIP"
-                      ticket_quantity: 2
-                      ticket_price: 500000
-                      subtotal: 1000000
-                    - ticket_category: "Reguler"
-                      ticket_quantity: 4
-                      ticket_price: 250000
-                      subtotal: 1000000
-                  grand_total: 2000000
-                  payment_type: "paid"
-                  payment_method: "alfamart"
-            example_transaction_canceled:
-              summary: Example transaction canceled
-              value:
-                code: 201
-                message: Success created a transaction
-                data:
-                  invoice: "MT00002575"
-                  user_id: 3
-                  event_id: 1
-                  event_date: "2023-04-25 10:15:00"
-                  purchase_startdate: "2023-04-14 10:15:00"
-                  purchase_enddate: "2023-04-15 10:15:00"
-                  status: "canceled"
-                  status_date: "2023-04-15 05:15:00"
-                  items_description:
-                    - ticket_category: "VIP"
-                      ticket_quantity: 2
-                      ticket_price: 500000
-                      subtotal: 1000000
-                    - ticket_category: "Reguler"
-                      ticket_quantity: 4
-                      ticket_price: 250000
-                      subtotal: 1000000
-                  grand_total: 2000000
-                  payment_type: "paid"
-                  payment_method: "alfamart"      
-
+                message: Success Created a Transaction
+               
     Response200TransactionGet:
       description: Successful response for retrieving transactions
       content:
@@ -985,78 +885,92 @@ components:
           schema:
             $ref: '#/components/schemas/ResponseTransactionGet'
           examples:
-            example_transaction:
-              summary: Example transaction
+            example_transaction_1:
+              summary: Example transaction 1
               value:
                 code: 200
-                message: Success retrieved transaction data
+                message: Successful Operation
                 data:
                   invoice: "MT00002570"
-                  user_id: 1
-                  event_id: 1
-                  event_date: "2023-04-25 10:15:00"
+                  seller: peterzalai
+                  seller_email: peterzalai@gmail.com
+                  attendee: AzhariAziz
+                  attendee_email: azhariaziz@gmail.com
+                  title: "udemy: golang goroutines"
+                  event_date: "2023-04-25"
+                  event_time: "10:15:00"
                   purchase_startdate: "2023-04-14 20:15:00"
-                  purchase_enddate: "2023-04-17 10:15:00"
+                  purchase_enddate: "2023-04-15 20:15:00"
                   status: "pending"
-                  status_date: "2023-04-17 10:15:00"
+                  status_date: "2023-04-15 10:15:00"
                   items_description:
                     - ticket_category: "VIP"
-                      ticket_quantity: 2
                       ticket_price: 500000
+                      ticket_quantity: 2
                       subtotal: 1000000
                     - ticket_category: "Reguler"
-                      ticket_quantity: 4
                       ticket_price: 250000
+                      ticket_quantity: 4
                       subtotal: 1000000
                   grand_total: 2000000
-                  payment_type: "paid"
-                  payment_method: "credit_card"
+                  payment_method: "credit_card"   
+            example_transaction_2:  
+              summary: Example transaction 2
+              value:
+                code: 200
+                message: Successful Operation
+                data:
+                  invoice: "MT00002570"
+                  seller: peterzalai
+                  seller_email: peterzalai@gmail.com
+                  attendee: AzhariAziz
+                  attendee_email: azhariaziz@gmail.com
+                  title: "udemy: golang goroutines"
+                  event_date: "2023-04-25"
+                  event_time: "10:15:00"
+                  purchase_startdate: "2023-04-14 20:15:00"
+                  purchase_enddate: "2023-04-15 20:15:00"
+                  status: "completed"
+                  status_date: "2023-04-15 10:15:00"
+                  items_description:
+                    - ticket_category: "VIP"
+                      ticket_price: 500000
+                      ticket_quantity: 2
+                      subtotal: 1000000
+                    - ticket_category: "Reguler"
+                      ticket_price: 250000
+                      ticket_quantity: 4
+                      subtotal: 1000000
+                  grand_total: 2000000
+                  payment_method: "credit_card"     
 
     Response201ReviewCreate:
-        description: Create a review successfully
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ResponseReviewCreate'
-            examples:
-              example create review 1:
-                summary: Example update review id 1
-                value:
-                  username: "peterzalai"
-                  image: "peterzalai.png"
-                  review: "A review is a longer, more formal write-up concerning someones work over a set period of time."
-              example create review 2:
-                summary: Example update review id 2
-                value:
-                  username: "Carlo"
-                  image: "janedoe.png"
-                  review: "I really enjoyed this event! The performers were amazing and the venue was beautiful."
+      description: Create a review successfully
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                example: 201
+              message:
+                type: string
+                example: "Success Created a Review"
 
     Response200ReviewEdit:
-        description: Review edited successfully
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ResponseReviewEdit'
-            examples:
-              example edit review 1:
-                summary: Example edit review id 1
-                value:
-                  code: 200
-                  message: Success edited a review
-                  data:
-                    username: "peterzalai"
-                    image: "peterzalai.png"
-                    review: "A review is a longer, more formal write-up concerning someones work over a set period of time."
-              example edit review 2:
-                summary: Example edit review id 2
-                value:
-                  code: 200
-                  message: Success edited a review
-                  data:
-                    username: "Carlo"
-                    image: "carlo.png"
-                    review: "I really enjoyed this event! The performers were amazing and the venue was beautiful."
+      description: Update a review successfully
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                example: 200
+              message:
+                type: string
+                example: "Success Updated a Review"
 
     Response200ReviewDelete:
         description: Review deleted successfully
@@ -1293,13 +1207,6 @@ components:
           category: "Music"
           location: "Jakarta"
           event_picture: "image.png"
-          attendances:
-          - username: "peterzalai"
-            user_picture: "peterzalai.png"
-          - username: "ropel"
-            user_picture: "ropel.png"
-          - username: "wanta"
-            user_picture: "wanta.png"
           reviews:
           - username: "peterzalai"
             user_picture: "peterzalai.png"
@@ -1537,10 +1444,12 @@ components:
         message: "Successful Operation"
         data:
         - event_id: 1
+          ticket_id: 1
           ticket_category: "VIP"
           ticket_price: 500000
           ticket_quantity: 100
         - event_id: 1
+          ticket_id: 2
           ticket_category: "Reguler"
           ticket_price: 250000
           ticket_quantity: 350
@@ -1572,19 +1481,35 @@ components:
           items:
             type: object
             properties:
+              ticket_id:
+                type: integer
               ticket_category:
                 type: string
+              ticket_price:
+                type: integer
               ticket_quantity:
                 type: integer
+              subtotal:
+                type: integer
           example:
-            - ticket_category: "VIP"
+            - ticket_id: 1
+              ticket_category: "VIP"
+              ticket_price: 100000
               ticket_quantity: 2
-            - ticket_category: "Reguler"
+              subtotal: 200000
+            - ticket_id: 2
+              ticket_category: "Reguler"
+              ticket_price: 25000
               ticket_quantity: 4
+              subtotal: 100000
+        grandtotal: 
+          type: integer
+          example: 300000
         payment_method:
           type: string
           enum: [credit_card, debit_card, bank_transfer, e-wallet]
           example: "credit_card"
+
 
     ResponseTransactionCreate:
           type: object
@@ -1742,35 +1667,9 @@ components:
     RequestReviewCreate:
       type: object
       properties:
-        event_id:
-          type: number
-          example: 1
         review:
           type: string
           example: "Seems quite difficult to give an expression, overall good"
-    
-    ResponseReviewCreate:
-      type: object
-      properties:
-        code:
-          type: integer
-          example: 201
-        message:
-          type: string
-          example: "Success created a review"
-        data:
-          properties:
-            username:
-              type: string
-            image:
-              type: string
-              format: binary
-            review:
-              type: string
-          example:
-              username: "peterzalai"
-              image: "peterzalai.png"
-              review: "Seems quite difficult to give an expression, overall good"
 
     RequestReviewEdit:
       type: object
@@ -1778,27 +1677,3 @@ components:
         review:
           type: string
           example: "A review is a longer, more formal write-up concerning someones work over a set period of time."
-
-    ResponseReviewEdit:
-      type: object
-      properties:
-        code:
-          type: integer
-          example: 200
-        message:
-          type: string
-          example: "Success edited a transaction"
-        data:
-          properties:
-            username:
-              type: string
-            image:
-              type: string
-              format: binary
-            review:
-              type: string
-          example:
-            - username: "peterzalai"
-              image: "peterzalai.png"
-              review: "Seems quite difficult to give an expression, overall good"
-

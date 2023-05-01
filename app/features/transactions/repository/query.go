@@ -1,7 +1,9 @@
 package repository
 
 import (
-	"github.com/wanta-zulfikri/Event-Planning-App/app/features/events/repository"
+	"errors"
+	"fmt"
+
 	"github.com/wanta-zulfikri/Event-Planning-App/app/features/transactions"
 	"gorm.io/gorm"
 )
@@ -14,53 +16,58 @@ func New(db *gorm.DB) *TransactionRepository {
 	return &TransactionRepository{db: db}
 }
 
-func (tr *TransactionRepository) CreateTransaction(userID uint, input transactions.Core) error {
-	tx := tr.db.Begin()
-	defer func() {
-		if r := recover(); r != nil {
-			tx.Rollback()
+func (tr *TransactionRepository) GetTransaction(transactionid uint) (transactions.Transaction, error) {
+	var transaction transactions.Transaction
+	if err := tr.db.
+		Where("transactions.id = ?", transactionid).
+		Preload("Transaction_Tickets").
+		Joins("JOIN users ON users.id = transactions.user_id").
+		Joins("JOIN events ON events.id = transactions.event_id").
+		Select("transactions.*, users.username, users.email, events.title, events.event_date, events.event_time").
+		First(&transaction).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return transactions.Transaction{}, errors.New("Transaction not found")
 		}
-	}()
-
-	// create transaction
-	newTransaction := Transaction{
-		Invoice:           input.Invoice,
-		PurchaseStartDate: input.PurchaseStartDate,
-		PurchaseEndDate:   input.PurchaseEndDate,
-		Status:            input.Status,
-		StatusDate:        input.StatusDate,
-		Subtotal:          input.Subtotal,
-		GrandTotal:        input.GrandTotal,
-		UserID:            userID,
-		EventID:           input.EventID,
+		return transactions.Transaction{}, fmt.Errorf("Failed to retrieve transaction from database: %w", err)
 	}
-	err := tx.Table("transactions").Create(&newTransaction).Error
-	if err != nil {
-		tx.Rollback()
-		return err
-	}
-
-	// create transaction_has_tickets
-	tickets := make([]repository.Ticket, len(input.Tickets))
-	for i, ticket := range input.Tickets {
-		tickets[i] = repository.Ticket{
-			TicketCategory: ticket.TicketCategory,
-			TicketPrice:    ticket.TicketPrice,
-			TicketQuantity: ticket.TicketQuantity,
-		}
-	}
-	err = tx.Table("tickets").CreateInBatches(tickets, len(tickets)).Error
-	if err != nil {
-		tx.Rollback()
-		return err
-	}
-
-	return tx.Commit().Error
+	return transaction, nil
 }
 
-// gorm.db.Preload("Event", func(db gorm.DB)gorm.DB {
-// return Select("id,start_date,end_date,name,hosted_by,image,location")
-// }).Where("user_id = ? AND status='paid'", uid).Find(&res).Error; err != nil {
-// 	t.log.Errorf("error db : %v", err)
-// 	return nil, errorr.NewInternal("Internal server error")
-// }
+func (tr *TransactionRepository) CreateTransaction(request transactions.Transaction) error {
+	var err error
+	tx := tr.db.Begin()
+
+	if err := tx.Model(&request).
+		Create(map[string]interface{}{
+			"user_id":             request.UserID,
+			"event_id":            request.EventID,
+			"invoice":             request.Invoice,
+			"purchase_start_date": request.PurchaseStartDate,
+			"purchase_end_date":   request.PurchaseEndDate,
+			"status":              request.Status,
+			"status_date":         request.StatusDate,
+			"grand_total":         request.GrandTotal,
+			"payment_method":      request.PaymentMethod,
+		}).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	tx.Last(&request)
+
+	for i := range request.Transaction_Tickets {
+		request.Transaction_Tickets[i].TransactionID = request.ID
+		err = tx.Create(&request.Transaction_Tickets[i]).Error
+		if err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+
+	err = tx.Commit().Error
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
