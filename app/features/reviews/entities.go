@@ -5,23 +5,23 @@ import (
 )
 
 type Core struct {
-	ID        uint
-	UserID    uint 
-	Username  string 
-	Image     string
-	EventID   uint
-	Review    string
+	ID       uint
+	UserID   uint
+	Username string
+	Image    string
+	EventID  uint
+	Review   string
 }
 
 type Repository interface {
-	WriteReview(newReview Core) (Core, error)
-	UpdateReview(id uint, updateReview Core) error
+	WriteReview(Core) (Core, error)
+	UpdateReview(Core) (Core, error)
 	DeleteReview(id uint) error
 }
 
 type Service interface {
-	WriteReview(newReview Core) error
-	UpdateReview(id uint, updateReview Core) error
+	WriteReview(Core) (Core, error)
+	UpdateReview(Core) (Core, error)
 	DeleteReview(id uint) error
 }
 

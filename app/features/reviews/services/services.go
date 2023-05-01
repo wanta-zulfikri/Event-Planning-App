@@ -15,29 +15,29 @@ func New(o reviews.Repository) reviews.Service {
 	return &ReviewService{n: o}
 }
 
-func (rs *ReviewService) WriteReview(newReview reviews.Core) error {
-	_, err := rs.n.WriteReview(newReview)
+func (rs *ReviewService) WriteReview(request reviews.Core) (reviews.Core, error) {
+	result, err := rs.n.WriteReview(request)
 	if err != nil {
-		return err
+		return request, errors.New(err.Error())
 	}
-	return nil
-} 
+	return result, nil
+}
 
-func (rs *ReviewService)UpdateReview(id uint, updateReview reviews.Core) error {
-	updateReview.ID = id 
-	if err := rs.n.UpdateReview(id, updateReview); err != nil {
-		return err
-	} 
-	return nil 
-} 
+func (rs *ReviewService) UpdateReview(request reviews.Core) (reviews.Core, error) {
+	result, err := rs.n.UpdateReview(request)
+	if err != nil {
+		return request, errors.New(err.Error())
+	}
+	return result, nil
+}
 
 func (rs *ReviewService) DeleteReview(id uint) error {
-	err := rs.n.DeleteReview(id) 
+	err := rs.n.DeleteReview(id)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return err 
-		} 
-		return err 
-	} 
+			return err
+		}
+		return err
+	}
 	return nil
 }

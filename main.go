@@ -3,9 +3,6 @@ package main
 import (
 	"fmt"
 
-	attendancesHandler "github.com/wanta-zulfikri/Event-Planning-App/app/features/attendances/handler"
-	attendancesRepo "github.com/wanta-zulfikri/Event-Planning-App/app/features/attendances/repository"
-	attendancesLogic "github.com/wanta-zulfikri/Event-Planning-App/app/features/attendances/services"
 	eventHandler "github.com/wanta-zulfikri/Event-Planning-App/app/features/events/handler"
 	eventRepo "github.com/wanta-zulfikri/Event-Planning-App/app/features/events/repository"
 	eventLogic "github.com/wanta-zulfikri/Event-Planning-App/app/features/events/services"
@@ -48,11 +45,8 @@ func main() {
 	reviewModel := reviewRepo.New(db)
 	reviewService := reviewLogic.New(reviewModel)
 	reviewController := reviewHandler.New(reviewService)
-	attendancesModel := attendancesRepo.New(db)
-	attendancesService := attendancesLogic.New(attendancesModel)
-	attendancesController := attendancesHandler.New(attendancesService)
 
-	routes.Route(e, userController, eventController, ticketController, transactionController, attendancesController, reviewController)
+	routes.Route(e, userController, eventController, ticketController, transactionController, reviewController)
 
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%s", cfg.Port)))
 }

@@ -7,7 +7,6 @@ require (
 	github.com/golang/mock v1.6.0
 	github.com/joho/godotenv v1.5.1
 	google.golang.org/api v0.114.0
-	gorm.io/driver/mysql v1.5.0
 	gorm.io/gorm v1.25.0
 )
 
@@ -16,6 +15,7 @@ require (
 	cloud.google.com/go/compute v1.18.0 // indirect
 	cloud.google.com/go/compute/metadata v0.2.3 // indirect
 	cloud.google.com/go/iam v0.12.0 // indirect
+	github.com/go-sql-driver/mysql v1.7.0 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/go-cmp v0.5.9 // indirect
@@ -34,7 +34,6 @@ require (
 
 require (
 	cloud.google.com/go/storage v1.30.1
-	github.com/go-sql-driver/mysql v1.7.0 // indirect
 	github.com/jinzhu/copier v0.3.5
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
@@ -50,4 +49,5 @@ require (
 	golang.org/x/net v0.9.0 // indirect
 	golang.org/x/sys v0.7.0 // indirect
 	golang.org/x/text v0.9.0 // indirect
+	gorm.io/driver/mysql v1.5.0
 )
