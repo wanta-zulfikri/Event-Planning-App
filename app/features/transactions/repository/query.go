@@ -18,7 +18,13 @@ func New(db *gorm.DB) *TransactionRepository {
 
 func (tr *TransactionRepository) GetTransaction(transactionid uint) (transactions.Transaction, error) {
 	var transaction transactions.Transaction
-	if err := tr.db.Where("id = ?", transactionid).Preload("Transaction_Tickets").First(&transaction).Error; err != nil {
+	if err := tr.db.
+		Where("transactions.id = ?", transactionid).
+		Preload("Transaction_Tickets").
+		Joins("JOIN users ON users.id = transactions.user_id").
+		Joins("JOIN events ON events.id = transactions.event_id").
+		Select("transactions.*, users.username, users.email, events.title, events.event_date, events.event_time").
+		First(&transaction).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return transactions.Transaction{}, errors.New("Transaction not found")
 		}
@@ -28,9 +34,40 @@ func (tr *TransactionRepository) GetTransaction(transactionid uint) (transaction
 }
 
 func (tr *TransactionRepository) CreateTransaction(request transactions.Transaction) error {
-	err := tr.db.Create(&request).Error
+	var err error
+	tx := tr.db.Begin()
+
+	if err := tx.Model(&request).
+		Create(map[string]interface{}{
+			"user_id":             request.UserID,
+			"event_id":            request.EventID,
+			"invoice":             request.Invoice,
+			"purchase_start_date": request.PurchaseStartDate,
+			"purchase_end_date":   request.PurchaseEndDate,
+			"status":              request.Status,
+			"status_date":         request.StatusDate,
+			"grand_total":         request.GrandTotal,
+			"payment_method":      request.PaymentMethod,
+		}).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	tx.Last(&request)
+
+	for i := range request.Transaction_Tickets {
+		request.Transaction_Tickets[i].TransactionID = request.ID
+		err = tx.Create(&request.Transaction_Tickets[i]).Error
+		if err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+
+	err = tx.Commit().Error
 	if err != nil {
 		return err
 	}
+
 	return nil
 }

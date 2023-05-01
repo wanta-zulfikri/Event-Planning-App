@@ -21,12 +21,14 @@ func New(s transactions.Service) transactions.Handler {
 func (tc *TransactionController) GetTransaction() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		tokenString := c.Request().Header.Get("Authorization")
-		_, err := middlewares.ValidateJWT2(tokenString)
+		claims, err := middlewares.ValidateJWT2(tokenString)
 		if err != nil {
 			c.Logger().Error(err.Error())
 			return c.JSON(http.StatusUnauthorized, helper.ResponseFormat(http.StatusUnauthorized, "Missing or Malformed JWT"+err.Error(), nil))
 		}
 
+		attendee_email := claims.Email
+		attendee := claims.Username
 		transactionid, err := strconv.ParseUint(c.Param("id"), 10, 64)
 		if err != nil {
 			c.Logger().Error("Failed to parse ID from URL param: ", err)
@@ -39,7 +41,39 @@ func (tc *TransactionController) GetTransaction() echo.HandlerFunc {
 			return c.JSON(http.StatusInternalServerError, helper.ResponseFormat(http.StatusInternalServerError, "Internal Server Error", nil))
 		}
 
-		return c.JSON(http.StatusOK, transaction)
+		response := TransactionResponse{
+			Code:    http.StatusOK,
+			Message: "Successful Operation",
+			Data: ResponseGetTransaction{
+				Invoice:           transaction.Invoice,
+				Seller:            transaction.Username,
+				SEmail:            transaction.Email,
+				Attendee:          attendee,
+				AEmail:            attendee_email,
+				Title:             transaction.Title,
+				EventDate:         transaction.EventDate,
+				EventTime:         transaction.EventTime,
+				PurchaseStartDate: transaction.PurchaseStartDate.Format("2006-01-02 15:04:05"),
+				PurchaseEndDate:   transaction.PurchaseEndDate.Format("2006-01-02 15:04:05"),
+				Status:            transaction.Status,
+				StatusDate:        transaction.StatusDate.Format("2006-01-02 15:04:05"),
+				ItemDescription:   make([]ResponseTickets, 0),
+				GrandTotal:        transaction.GrandTotal,
+				PaymentMethod:     transaction.PaymentMethod,
+			},
+		}
+
+		for _, t := range transaction.Transaction_Tickets {
+			item := ResponseTickets{
+				TicketCategory: t.TicketCategory,
+				TicketPrice:    t.TicketPrice,
+				TicketQuantity: t.TicketQuantity,
+				Subtotal:       t.Subtotal,
+			}
+			response.Data.ItemDescription = append(response.Data.ItemDescription, item)
+		}
+
+		return c.JSON(http.StatusOK, response)
 	}
 }
 

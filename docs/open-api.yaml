@@ -896,18 +896,20 @@ components:
               summary: Example transaction 1
               value:
                 code: 200
-                message: Success retrieved transaction data
+                message: Successful Operation
                 data:
                   invoice: "MT00002570"
-                  username: peterzalai
-                  email: peterzalai@gmail.com
+                  seller: peterzalai
+                  seller_email: peterzalai@gmail.com
+                  attendee: AzhariAziz
+                  attendee_email: azhariaziz@gmail.com
                   title: "udemy: golang goroutines"
                   event_date: "2023-04-25"
                   event_time: "10:15:00"
                   purchase_startdate: "2023-04-14 20:15:00"
-                  purchase_enddate: "2023-04-17 10:15:00"
+                  purchase_enddate: "2023-04-15 20:15:00"
                   status: "pending"
-                  status_date: "2023-04-17 10:15:00"
+                  status_date: "2023-04-15 10:15:00"
                   items_description:
                     - ticket_category: "VIP"
                       ticket_price: 500000
@@ -918,23 +920,25 @@ components:
                       ticket_quantity: 4
                       subtotal: 1000000
                   grand_total: 2000000
-                  payment_method: "credit_card"
-            example_transaction_2:
+                  payment_method: "credit_card"   
+            example_transaction_2:  
               summary: Example transaction 2
               value:
                 code: 200
-                message: Success retrieved transaction data
+                message: Successful Operation
                 data:
                   invoice: "MT00002570"
-                  username: peterzalai
-                  email: peterzalai@gmail.com
+                  seller: peterzalai
+                  seller_email: peterzalai@gmail.com
+                  attendee: AzhariAziz
+                  attendee_email: azhariaziz@gmail.com
                   title: "udemy: golang goroutines"
                   event_date: "2023-04-25"
                   event_time: "10:15:00"
                   purchase_startdate: "2023-04-14 20:15:00"
-                  purchase_enddate: "2023-04-17 10:15:00"
+                  purchase_enddate: "2023-04-15 20:15:00"
                   status: "completed"
-                  status_date: "2023-04-17 10:15:00"
+                  status_date: "2023-04-15 10:15:00"
                   items_description:
                     - ticket_category: "VIP"
                       ticket_price: 500000
@@ -945,7 +949,7 @@ components:
                       ticket_quantity: 4
                       subtotal: 1000000
                   grand_total: 2000000
-                  payment_method: "credit_card"        
+                  payment_method: "credit_card"     
 
     Response201ReviewCreate:
       description: Create a review successfully

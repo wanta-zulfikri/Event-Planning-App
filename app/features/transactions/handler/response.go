@@ -8,8 +8,10 @@ type TransactionResponse struct {
 
 type ResponseGetTransaction struct {
 	Invoice           string            `json:"invoice"`
-	Username          string            `json:"username"`
-	Email             string            `json:"email"`
+	Seller            string            `json:"seller"`
+	SEmail            string            `json:"seller_email"`
+	Attendee          string            `json:"attendee"`
+	AEmail            string            `json:"attendee_email"`
 	Title             string            `json:"title"`
 	EventDate         string            `json:"event_date"`
 	EventTime         string            `json:"event_time"`

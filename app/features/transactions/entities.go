@@ -11,6 +11,13 @@ type Transaction struct {
 	UserID              uint
 	EventID             uint
 	Invoice             string
+	Username            string
+	Email               string
+	Attendee            string
+	AEmail              string
+	Title               string
+	EventDate           string
+	EventTime           string
 	PurchaseStartDate   time.Time
 	PurchaseEndDate     time.Time
 	Status              string
