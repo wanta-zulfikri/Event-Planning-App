@@ -73,7 +73,6 @@ func (rr *ReviewRepository) UpdateReview(request reviews.Core) (reviews.Core, er
 	return updateReview, nil
 }
 
-
 func (rr *ReviewRepository) DeleteReview(id uint) error {
 	input := Review{}
 	if err := rr.db.Where("id = ?", id).Find(&input).Error; err != nil {
