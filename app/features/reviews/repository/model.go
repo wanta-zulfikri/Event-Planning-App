@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"time"
+
 	"gorm.io/gorm"
 )
 
@@ -9,5 +11,6 @@ type Review struct {
 	UserID   uint
 	Username string
 	EventID  uint
-	Review   string `gorm:"type:varchar(255)"`
+	Review   string `gorm:"type:varchar(255)"` 
+	UpdatedAt time.Time
 }
