@@ -19,18 +19,11 @@ func New(db *gorm.DB) *ReviewRepository {
 
 func (rr *ReviewRepository) WriteReview(request reviews.Core) (reviews.Core, error) {
 	input := Review{
-<<<<<<< HEAD
-		UserID:   newReview.UserID,
-		EventID:  newReview.EventID,
-		Review:   newReview.Review, 
-		Username: newReview.Username, 
-		Image:    newReview.Image,
-=======
 		UserID:   request.UserID,
 		Username: request.Username,
 		EventID:  request.EventID,
 		Review:   request.Review,
->>>>>>> feature/revisedreviews
+
 	}
 
 	err := rr.db.Table("reviews").Create(&input).Error
@@ -40,17 +33,12 @@ func (rr *ReviewRepository) WriteReview(request reviews.Core) (reviews.Core, err
 	}
 
 	createdReview := reviews.Core{
-<<<<<<< HEAD
-		UserID:  	input.UserID,
-		EventID: 	input.EventID,
-		Review:  	input.Review, 
-		Username: 	input.Username,
-		Image: 		input.Image,
-=======
 		Username: request.Username,
 		EventID:  input.EventID,
 		Review:   input.Review,
->>>>>>> feature/revisedreviews
+		Username: request.Username,
+		EventID:  input.EventID,
+		Review:   input.Review,
 	}
 	return createdReview, nil
 }
@@ -64,21 +52,17 @@ func (rr *ReviewRepository) UpdateReview(request reviews.Core) (reviews.Core, er
 		Review:   request.Review, 
 		UpdatedAt: time.Now(),
 	}
-<<<<<<< HEAD
 
-	input.UserID = updateReview.UserID
-	input.EventID = updateReview.EventID
-	input.Review = updateReview.Review 
-	input.Username = updateReview.Username 
-	input.Image = updateReview.Image
+	input.Username = request.Username
+	input.EventID = request.EventID
+	input.Review = request.Review
 
 	if err := rr.db.Save(&input).Error; err != nil {
 		return err
-=======
+
 	if err := rr.db.Model(&Review{}).Where("id = ? AND deleted_at IS NULL", request.EventID).Updates(Review{Review: input.Review, UpdatedAt: time.Now()}).Error; err != nil {
 		log.Println("Error updating review: ", err.Error())
 		return reviews.Core{}, err
->>>>>>> feature/revisedreviews
 	}
 	updateReview := reviews.Core{
 		UserID:   request.UserID,

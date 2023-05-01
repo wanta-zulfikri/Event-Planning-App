@@ -1,13 +1,10 @@
 package config
 
 import (
-	// "log"
 	"os"
 	"sync"
 
 	"github.com/wanta-zulfikri/Event-Planning-App/config/common"
-
-	// "github.com/joho/godotenv"
 )
 
 type Configuration struct {

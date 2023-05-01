@@ -1,4 +1,3 @@
-
 package handler
 
 import (
@@ -78,7 +77,7 @@ func (rc *ReviewController) UpdateReview() echo.HandlerFunc {
 		if err := c.Bind(&input); err != nil {
 			c.Logger().Error("Failed to bind input:", err)
 			return c.JSON(http.StatusBadRequest, helper.ResponseFormat(http.StatusBadRequest, "Bad Request", nil))
-		} 
+		}
 
 		// file, err := c.FormFile("image")
 		// var image string

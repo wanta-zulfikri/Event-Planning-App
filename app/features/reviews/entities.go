@@ -5,8 +5,10 @@ import (
 )
 
 type Core struct {
+	ID       uint
 	UserID   uint
 	Username string
+	Image    string
 	EventID  uint
 	Review   string
 }

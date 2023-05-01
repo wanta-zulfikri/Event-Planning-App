@@ -10,6 +10,7 @@ import (
 
 type Event struct {
 	gorm.Model
+	ID           uint   `gorm:"primaryKey; autoIncrement"`
 	Title        string `gorm:"type:varchar(100)"`
 	Description  string `gorm:"type:varchar(225)"`
 	EventDate    string `gorm:"type:varchar(20)"`
