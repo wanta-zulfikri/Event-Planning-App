@@ -9,6 +9,8 @@ import (
 
 	"github.com/midtrans/midtrans-go"
 	"github.com/midtrans/midtrans-go/coreapi"
+	"github.com/wanta-zulfikri/Event-Planning-App/config"
+	"github.com/wanta-zulfikri/Event-Planning-App/config/common"
 )
 
 type PaymentMethod string
@@ -63,6 +65,23 @@ type Midtrans struct {
 	OrderTime      string
 	ExpiryDuration int
 	ExpiryUnit     string
+}
+
+func NewMidtrans(cfg config.Configuration) *Midtrans {
+	return &Midtrans{
+		Client: coreapi.Client{
+			ServerKey:  common.MIDTRANS_SERVER_KEY,
+			ClientKey:  common.MIDTRANS_CLIENT_KEY,
+			Env:        midtrans.EnvironmentType(common.Environment),
+			HttpClient: midtrans.GetHttpClient(midtrans.EnvironmentType(common.Environment)),
+			Options: &midtrans.ConfigOptions{
+				PaymentOverrideNotification: &common.URLHandler,
+				PaymentAppendNotification:   &common.URLHandler,
+			},
+		},
+		ExpiryDuration: common.ExpiryDuration,
+		ExpiryUnit:     common.Unit,
+	}
 }
 
 func (m *Midtrans) CreateCharge(r ChargeRequest) (*ChargeResponse, error) {
