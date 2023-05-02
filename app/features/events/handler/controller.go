@@ -19,6 +19,78 @@ func New(h events.Service) events.Handler {
 	return &EventController{s: h}
 }
 
+type ResponseGetEvent struct {
+	ID            uint                   `json:"event_id"`
+	Title         string                 `json:"title"`
+	Description   string                 `json:"description"`
+	Hosted_by     string                 `json:"hosted_by"`
+	Date          string                 `json:"date"`
+	Time          string                 `json:"time"`
+	Status        string                 `json:"status"`
+	Category      string                 `json:"category"`
+	Location      string                 `json:"location"`
+	Event_picture string                 `json:"event_picture"`
+	Transactions  []ResponseTransactions `json:"attendances"`
+	Reviews       []ResponseReviews      `json:"reviews"`
+}
+
+type ResponseTransactions struct {
+	UserID uint `json:"user_id"`
+}
+
+type ResponseReviews struct {
+	Username string `json:"username"`
+	Review   string `json:"review"`
+}
+
+func (ec *EventController) GetEvent() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		eventid, err := strconv.ParseUint(c.Param("id"), 10, 64)
+		if err != nil {
+			c.Logger().Error("Failed to parse ID from URL param: ", err)
+			return c.JSON(http.StatusBadRequest, helper.ResponseFormat(http.StatusBadRequest, "Bad Request", nil))
+		}
+
+		event, err := ec.s.GetEvent(uint(eventid))
+		if err != nil {
+			c.Logger().Error(err.Error())
+			return c.JSON(http.StatusNotFound, helper.ResponseFormat(http.StatusNotFound, "The requested resource was not found.", nil))
+		}
+
+		response := ResponseGetEvent{
+			ID:            event.ID,
+			Title:         event.Title,
+			Description:   event.Description,
+			Hosted_by:     event.Hostedby,
+			Date:          event.EventDate,
+			Time:          event.EventTime,
+			Status:        event.Status,
+			Category:      event.Category,
+			Location:      event.Location,
+			Event_picture: event.Image,
+			Transactions:  make([]ResponseTransactions, 0),
+			Reviews:       make([]ResponseReviews, 0),
+		}
+
+		for _, t := range event.Transactions {
+			transaction := ResponseTransactions{
+				UserID: t.UserID,
+			}
+			response.Transactions = append(response.Transactions, transaction)
+		}
+
+		for _, r := range event.Reviews {
+			review := ResponseReviews{
+				Username: r.Username,
+				Review:   r.Review,
+			}
+			response.Reviews = append(response.Reviews, review)
+		}
+
+		return c.JSON(http.StatusOK, helper.ResponseFormat(http.StatusOK, "Successful Operation", response))
+	}
+}
+
 func (ec *EventController) CreateEventWithTickets() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var input RequestCreateEventWithTickets
@@ -249,41 +321,6 @@ func (ec *EventController) GetEventsByUserID() echo.HandlerFunc {
 			Message:    "Successful operation.",
 			Data:       response,
 			Pagination: pages,
-		})
-	}
-}
-
-func (ec *EventController) GetEvent() echo.HandlerFunc {
-	return func(c echo.Context) error {
-		eventid, err := strconv.ParseUint(c.Param("id"), 10, 64)
-		if err != nil {
-			c.Logger().Error("Failed to parse ID from URL param: ", err)
-			return c.JSON(http.StatusBadRequest, helper.ResponseFormat(http.StatusBadRequest, "Bad Request", nil))
-		}
-
-		event, err := ec.s.GetEvent(uint(eventid))
-		if err != nil {
-			c.Logger().Error(err.Error())
-			return c.JSON(http.StatusBadRequest, helper.ResponseFormat(http.StatusNotFound, "The requested resource was not found.", nil))
-		}
-
-		response := ResponseGetEvent{
-			ID:            event.ID,
-			Title:         event.Title,
-			Description:   event.Description,
-			Hosted_by:     event.Hostedby,
-			Date:          event.EventDate,
-			Time:          event.EventTime,
-			Status:        event.Status,
-			Category:      event.Category,
-			Location:      event.Location,
-			Event_picture: event.Image,
-		}
-
-		return c.JSON(http.StatusOK, helper.DataResponse{
-			Code:    http.StatusOK,
-			Message: "Successful operation.",
-			Data:    response,
 		})
 	}
 }

@@ -89,25 +89,45 @@ func (er *EventRepository) GetEventsByUserID(userid uint) ([]events.Core, error)
 
 func (er *EventRepository) GetEvent(eventid uint) (events.Core, error) {
 	var input Event
-	result := er.db.Where("id = ? AND deleted_at IS NULL", eventid).Find(&input)
+	result := er.db.Preload("Transactions").Preload("Reviews").Where("id = ? AND deleted_at IS NULL", eventid).Find(&input)
 	if result.Error != nil {
 		return events.Core{}, result.Error
 	}
 	if result.RowsAffected == 0 {
 		return events.Core{}, result.Error
 	}
-	return events.Core{
-		ID:          input.ID,
-		Title:       input.Title,
-		Description: input.Description,
-		EventDate:   input.EventDate,
-		EventTime:   input.EventTime,
-		Status:      input.Status,
-		Category:    input.Category,
-		Location:    input.Location,
-		Image:       input.Image,
-		Hostedby:    input.Hostedby,
-	}, nil
+
+	response := events.Core{
+		ID:           input.ID,
+		Title:        input.Title,
+		Description:  input.Description,
+		EventDate:    input.EventDate,
+		EventTime:    input.EventTime,
+		Status:       input.Status,
+		Category:     input.Category,
+		Location:     input.Location,
+		Image:        input.Image,
+		Hostedby:     input.Hostedby,
+		Transactions: make([]events.Transaction, 0),
+		Reviews:      make([]events.Reviews, 0),
+	}
+
+	for _, t := range input.Transactions {
+		transaction := events.Transaction{
+			UserID: t.UserID,
+		}
+		response.Transactions = append(response.Transactions, transaction)
+	}
+
+	for _, r := range input.Reviews {
+		review := events.Reviews{
+			Username: r.Username,
+			Review:   r.Review,
+		}
+		response.Reviews = append(response.Reviews, review)
+	}
+
+	return response, nil
 }
 
 func (er *EventRepository) UpdateEvent(id uint, updatedEvent events.Core) error {

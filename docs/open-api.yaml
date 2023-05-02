@@ -494,12 +494,19 @@ paths:
       security:
         - bearerAuth : []
 
-  /reviews:
+  /reviews/{id}:
     post:
       tags:
         - Reviews   
       summary: Write a review
       description: Write a review on a single event's page
+      parameters:
+      - name: id
+        in: path
+        description: Event ID
+        required: true
+        schema:
+          type: integer
       requestBody:
           $ref: '#/components/requestBodies/RequestReviewCreate'
       responses:
@@ -1207,6 +1214,15 @@ components:
           category: "Music"
           location: "Jakarta"
           event_picture: "image.png"
+          attendances:
+          - username: "peterzalai"
+            user_picture: "peterzalai.png"
+          - username: "AzhariAziz"
+            user_picture: "AzhariAziz.png"
+          - username: "ropel"
+            user_picture: "ropel.png"
+          - username: "wanta"
+            user_picture: "wanta.png"
           reviews:
           - username: "peterzalai"
             user_picture: "peterzalai.png"

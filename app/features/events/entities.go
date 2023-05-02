@@ -5,18 +5,21 @@ import (
 )
 
 type Core struct {
-	ID          uint
-	Title       string
-	Description string
-	EventDate   string
-	EventTime   string
-	Status      string
-	Category    string
-	Location    string
-	Image       string
-	Hostedby    string //hostedby : username didapat dari JWT Token
-	UserID      uint
-	Tickets     []TicketCore `gorm:"foreignKey:EventID"`
+	ID           uint
+	Title        string
+	Description  string
+	EventDate    string
+	EventTime    string
+	Status       string
+	Category     string
+	Location     string
+	Image        string
+	Hostedby     string //hostedby : username didapat dari JWT Token
+	UserID       uint
+	Transactions []Transaction
+	Attendances  []Attendances
+	Reviews      []Reviews
+	Tickets      []TicketCore
 }
 
 type TicketCore struct {
@@ -25,6 +28,23 @@ type TicketCore struct {
 	TicketCategory string
 	TicketPrice    uint
 	TicketQuantity uint
+}
+
+type Attendances struct {
+	Username     string
+	User_picture string
+}
+
+type Reviews struct {
+	Username     string
+	User_picture string
+	Review       string
+}
+
+type Transaction struct {
+	ID      uint
+	UserID  uint
+	EventID uint
 }
 
 type Repository interface {
