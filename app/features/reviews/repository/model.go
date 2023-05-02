@@ -12,5 +12,5 @@ type Review struct {
 	Username string
 	EventID  uint
 	Review   string `gorm:"type:varchar(255)"` 
-    UpdatedAt time.Time
+	UpdatedAt time.Time
 }
