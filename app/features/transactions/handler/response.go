@@ -26,7 +26,7 @@ type ResponseGetTransaction struct {
 
 type ResponseTickets struct {
 	TicketCategory string `json:"ticket_category"`
-	TicketPrice    uint   `json:"ticket_price"`
+	TicketPrice    int64  `json:"ticket_price"`
 	TicketQuantity uint   `json:"ticket_quantity"`
 	Subtotal       uint   `json:"subtotal"`
 }

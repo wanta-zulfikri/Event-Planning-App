@@ -8,9 +8,9 @@ type RequestCreateTransaction struct {
 }
 
 type Tickets struct {
-	TicketID       uint   `json:"ticket_id"`
+	TicketID       string `json:"ticket_id"`
 	TicketCategory string `json:"ticket_category"`
-	TicketPrice    uint   `json:"ticket_price"`
+	TicketPrice    int64  `json:"ticket_price"`
 	TicketQuantity uint   `json:"ticket_quantity"`
 	Subtotal       uint   `json:"subtotal"`
 }
