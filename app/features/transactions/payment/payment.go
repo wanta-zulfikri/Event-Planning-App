@@ -65,23 +65,6 @@ type Midtrans struct {
 	ExpiryUnit     string
 }
 
-// func NewMidtrans(cfg Config) *Midtrans {
-// 	return &Midtrans{
-// 		Midtrans: coreapi.Client{
-// 			ServerKey:  cfg.Midtrans.ServerKey,
-// 			ClientKey:  cfg.Midtrans.ClientKey,
-// 			Env:        midtrans.EnvironmentType(cfg.Midtrans.Env),
-// 			HttpClient: midtrans.GetHttpClient(midtrans.EnvironmentType(cfg.Midtrans.Env)),
-// 			Options: &midtrans.ConfigOptions{
-// 				PaymentOverrideNotification: &cfg.Midtrans.URLHandler,
-// 				PaymentAppendNotification:   &cfg.Midtrans.URLHandler,
-// 			},
-// 		},
-// 		ExpDuration: cfg.Midtrans.ExpiryDuration,
-// 		ExpUnit:     cfg.Midtrans.Unit,
-// 	}
-// }
-
 func (m *Midtrans) CreateCharge(r ChargeRequest) (*ChargeResponse, error) {
 	request := &coreapi.ChargeReq{
 		TransactionDetails: midtrans.TransactionDetails{
