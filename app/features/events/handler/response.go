@@ -13,31 +13,32 @@ type ResponseGetEvents struct {
 	Event_picture string `json:"event_picture"`
 }
 
-// type ResponseGetEvent struct {
-// 	ID            uint          `json:"event_id"`
-// 	Title         string        `json:"title"`
-// 	Description   string        `json:"description"`
-// 	Hosted_by     string        `json:"hosted_by"`
-// 	Date          string        `json:"date"`
-// 	Time          string        `json:"time"`
-// 	Status        string        `json:"status"`
-// 	Category      string        `json:"category"`
-// 	Location      string        `json:"location"`
-// 	Event_picture string        `json:"event_picture"`
-// 	Attendances   []Attendances `json:"attendances"`
-// 	Reviews       []Reviews     `json:"reviews"`
-// }
+type ResponseGetEvent struct {
+	ID            uint                   `json:"event_id"`
+	Title         string                 `json:"title"`
+	Description   string                 `json:"description"`
+	Hosted_by     string                 `json:"hosted_by"`
+	Date          string                 `json:"date"`
+	Time          string                 `json:"time"`
+	Status        string                 `json:"status"`
+	Category      string                 `json:"category"`
+	Location      string                 `json:"location"`
+	Event_picture string                 `json:"event_picture"`
+	Transactions  []ResponseTransactions `json:"attendances"`
+	Reviews       []ResponseReviews      `json:"reviews"`
+}
 
-// type Attendances struct {
-// 	Username     string `json:"username"`
-// 	User_picture string `json:"user_picture"`
-// }
+type ResponseTransactions struct {
+	UserID   uint   `json:"user_id"`
+	Username string `json:"username"`
+	// UserPicture string `json:"user_picture"`
+}
 
-// type Reviews struct {
-// 	Username     string `json:"username"`
-// 	User_picture string `json:"user_picture"`
-// 	Review       string `json:"review"`
-// }
+type ResponseReviews struct {
+	UserID   uint   `json:"user_id"`
+	Username string `json:"username"`
+	Review   string `json:"review"`
+}
 
 type EventResponse struct {
 	Code    int       `json:"code"`

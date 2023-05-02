@@ -112,15 +112,17 @@ func (er *EventRepository) GetEvent(eventid uint) (events.Core, error) {
 		Reviews:      make([]events.Reviews, 0),
 	}
 
-	for _, t := range input.Transactions {
-		transaction := events.Transaction{
-			UserID: t.UserID,
-		}
-		response.Transactions = append(response.Transactions, transaction)
+	err := er.db.Table("transactions").Joins("JOIN users ON transactions.user_id = users.id").
+		Select("transactions.user_id, users.username, users.image").
+		Where("transactions.event_id = ?", eventid).
+		Scan(&response.Transactions).Error
+	if err != nil {
+		return events.Core{}, err
 	}
 
 	for _, r := range input.Reviews {
 		review := events.Reviews{
+			UserID:   r.UserID,
 			Username: r.Username,
 			Review:   r.Review,
 		}

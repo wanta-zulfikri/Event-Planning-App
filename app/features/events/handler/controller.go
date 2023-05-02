@@ -19,30 +19,6 @@ func New(h events.Service) events.Handler {
 	return &EventController{s: h}
 }
 
-type ResponseGetEvent struct {
-	ID            uint                   `json:"event_id"`
-	Title         string                 `json:"title"`
-	Description   string                 `json:"description"`
-	Hosted_by     string                 `json:"hosted_by"`
-	Date          string                 `json:"date"`
-	Time          string                 `json:"time"`
-	Status        string                 `json:"status"`
-	Category      string                 `json:"category"`
-	Location      string                 `json:"location"`
-	Event_picture string                 `json:"event_picture"`
-	Transactions  []ResponseTransactions `json:"attendances"`
-	Reviews       []ResponseReviews      `json:"reviews"`
-}
-
-type ResponseTransactions struct {
-	UserID uint `json:"user_id"`
-}
-
-type ResponseReviews struct {
-	Username string `json:"username"`
-	Review   string `json:"review"`
-}
-
 func (ec *EventController) GetEvent() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		eventid, err := strconv.ParseUint(c.Param("id"), 10, 64)
@@ -74,13 +50,16 @@ func (ec *EventController) GetEvent() echo.HandlerFunc {
 
 		for _, t := range event.Transactions {
 			transaction := ResponseTransactions{
-				UserID: t.UserID,
+				UserID:   t.UserID,
+				Username: t.Username,
+				// UserPicture: t.User_picture,
 			}
 			response.Transactions = append(response.Transactions, transaction)
 		}
 
 		for _, r := range event.Reviews {
 			review := ResponseReviews{
+				UserID:   r.UserID,
 				Username: r.Username,
 				Review:   r.Review,
 			}

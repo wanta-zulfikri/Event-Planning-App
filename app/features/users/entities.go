@@ -3,16 +3,18 @@ package users
 import (
 	"github.com/labstack/echo/v4"
 	"github.com/wanta-zulfikri/Event-Planning-App/app/features/events"
+	"github.com/wanta-zulfikri/Event-Planning-App/app/features/transactions"
 )
 
 type Core struct {
-	ID       uint
-	Username string
-	Email    string
-	Phone    string
-	Password string
-	Image    string
-	Events   []events.Core
+	ID           uint
+	Username     string
+	Email        string
+	Phone        string
+	Password     string
+	Image        string
+	Events       []events.Core
+	Transactions []transactions.Transaction `gorm:"foreignKey:UserID"`
 }
 
 type Repository interface {

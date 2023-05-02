@@ -36,15 +36,18 @@ type Attendances struct {
 }
 
 type Reviews struct {
+	UserID       uint
 	Username     string
 	User_picture string
 	Review       string
 }
 
 type Transaction struct {
-	ID      uint
-	UserID  uint
-	EventID uint
+	ID           uint
+	UserID       uint
+	EventID      uint
+	Username     string
+	User_picture string
 }
 
 type Repository interface {
