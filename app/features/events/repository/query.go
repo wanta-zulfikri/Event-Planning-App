@@ -167,8 +167,11 @@ func (er *EventRepository) DeleteEvent(id uint) error {
 
 	input.DeletedAt = gorm.DeletedAt{Time: time.Now(), Valid: true}
 
-	if err := er.db.Save(&input).Error; err != nil {
+	if err := er.db.Model(&Event{}).Where("id = ?", id).Updates(map[string]interface{}{
+		"DeletedAt": input.DeletedAt,
+	}).Error; err != nil {
 		return err
 	}
+
 	return nil
 }

@@ -378,19 +378,16 @@ func (ec *EventController) UpdateEvent() echo.HandlerFunc {
 func (ec *EventController) DeleteEvent() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		tokenString := c.Request().Header.Get("Authorization")
-		claims, err := middlewares.ValidateJWT2(tokenString)
+		_, err := middlewares.ValidateJWT2(tokenString)
 		if err != nil {
-			return c.JSON(http.StatusUnauthorized, helper.ResponseFormat(http.StatusUnauthorized, "Missing or Malformed JWT"+err.Error(), nil))
+			c.Logger().Error(err.Error())
+			return c.JSON(http.StatusUnauthorized, helper.ResponseFormat(http.StatusUnauthorized, "Missing or Malformed JWT. "+err.Error(), nil))
 		}
 
-		id, err := strconv.ParseUint(c.Param("id"), 10, 32)
+		id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 		if err != nil {
 			c.Logger().Error(err.Error())
 			return c.JSON(http.StatusBadRequest, helper.ResponseFormat(http.StatusBadRequest, "Bad Request", nil))
-		}
-
-		if claims.ID != uint(id) {
-			return c.JSON(http.StatusUnauthorized, helper.ResponseFormat(http.StatusUnauthorized, "Unauthorized. Token is not valid for this user.", nil))
 		}
 
 		err = ec.s.DeleteEvent(uint(id))
