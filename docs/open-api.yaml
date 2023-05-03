@@ -308,8 +308,8 @@ paths:
     delete:
       tags:
         - Events
-      summary: Delete an event by ID
-      description: Delete event information by event ID
+      summary: Delete an event by ID include with its tickets
+      description: Delete event information by event ID include with its tickets
       parameters:
         - name: id
           in: path
