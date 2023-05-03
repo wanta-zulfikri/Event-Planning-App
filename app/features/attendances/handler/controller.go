@@ -2,7 +2,6 @@ package handler
 
 import (
 	"net/http"
-	"math"
 	"strconv"
 
 	"github.com/labstack/echo/v4"
@@ -42,7 +41,7 @@ func (ac *AttendancesController) CreateAttendance() echo.HandlerFunc {
 		file, err := c.FormFile("event_picture")
 		var event_picture string
 		if err != nil && err != http.ErrMissingFile {
-			c.Logger().Error("Failed to get event_picture from form file: ", err)
+			c.Logger().Error("Failed to get event_picture form file: ", err)
 			return c.JSON(http.StatusBadRequest, helper.ResponseFormat(http.StatusBadRequest, "Bad Request", nil))
 		} else if file != nil {
 			event_picture, err = helper.UploadImage(c, file)
@@ -51,8 +50,8 @@ func (ac *AttendancesController) CreateAttendance() echo.HandlerFunc {
 				return c.JSON(http.StatusInternalServerError, helper.ResponseFormat(http.StatusInternalServerError, "Internal Server Error", nil))
 			}
 		}  
-		newAttendances := attendances.Core{ 
-            UserID:          userid,
+		newAttendances := attendances.Core{  
+			ID:              userid,
 			EventID:         uint(eventid),	
 			Description:     input.Description, 
 			HostedBy:        username, 
@@ -61,99 +60,83 @@ func (ac *AttendancesController) CreateAttendance() echo.HandlerFunc {
 			Status:          input.Status, 
 			Category:        input.Category, 
 			Location:        input.Location, 
-			EventPicture:    input.EventPicture,
+			EventPicture:    event_picture,
 		} 
 			
-		_, err := ac.x.CreateAttendance(newAttendances,id) 
+		err = ac.x.CreateAttendance(newAttendances) 
 		if err != nil {
-			c.Logger().Error("Failed to write a review:", err)
+			c.Logger().Error("Failed to create attendances:", err)
 			return c.JSON(http.StatusInternalServerError, helper.ResponseFormat(http.StatusInternalServerError, "Internal Server Error", nil))
 		}
-		return c.JSON(http.StatusCreated, helper.ResponseFormat(http.StatusCreated, "Success Created a Review", nil))
+		return c.JSON(http.StatusCreated, helper.ResponseFormat(http.StatusCreated, "Success Created attendances", nil))
 	}
 }
 
 
+func (ac *AttendancesController) GetAttendance() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		tokenString := c.Request().Header.Get("Authorization")
+		_, err := middlewares.ValidateJWT2(tokenString)
+		if err != nil {
+			c.Logger().Error(err.Error())
+			return c.JSON(http.StatusUnauthorized, helper.ResponseFormat(http.StatusUnauthorized, "Missing or Malformed JWT. "+err.Error(), nil))
+		}
 
+		inputID := c.Param("id")
+		if inputID == "" {
+			c.Logger().Error(err.Error())
+			return c.JSON(http.StatusBadRequest, helper.ResponseFormat(http.StatusBadRequest, "Bad Request", nil))
+		}
 
-// func (ac *AttendancesController) GetAttendance() echo.HandlerFunc {
-// 	return func(c echo.Context) error {
-// 		tokenString := c.Request().Header.Get("Authorization")
-// 		if tokenString == "" {
-// 			return c.JSON(http.StatusUnauthorized, helper.ResponseFormat(http.StatusUnauthorized, "Unauthorized. Token is missing.", nil)) 
-// 		} 
-
-// 		_, err := middlewares.ValidateJWT(tokenString) 
-// 		if err != nil {
-// 			return c.JSON(http.StatusUnauthorized, helper.ResponseFormat(http.StatusUnauthorized, "Unauthorized. "+err.Error(), nil))
-// 		} 
+		id, err := strconv.ParseUint(inputID, 10, 32)
+		if err != nil {
+			c.Logger().Error(err.Error())
+			return c.JSON(http.StatusBadRequest, helper.ResponseFormat(http.StatusBadRequest, "Bad Request", nil))
+		}
 
 		
-// 		attendance, err := ac.x.GetAttendance()
-// 		if err != nil {
-// 			c.Logger().Error("Failed to get attendances", err.Error())
-// 			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-// 				"code":    http.StatusInternalServerError,
-// 				"message": "Internal Server Error",
-// 			})
-// 		}
+		file, err := c.FormFile("event_picture")
+		var event_picture string
+		if err != nil && err != http.ErrMissingFile {
+			c.Logger().Error("Failed to get event_picture from file: ", err)
+			return c.JSON(http.StatusBadRequest, helper.ResponseFormat(http.StatusBadRequest, "Bad Request", nil))
+		} else if file != nil {
+			event_picture, err = helper.UploadImage(c, file)
+			if err != nil {
+				c.Logger().Error("Failed to upload event_picture: ", err)
+				return c.JSON(http.StatusInternalServerError, helper.ResponseFormat(http.StatusInternalServerError, "Internal Server Error", nil))
+			}
+		}
+        
+		attendances, err := ac.x.GetAttendance(id)
+		if err != nil {
+			c.Logger().Error(err.Error())
+			return c.JSON(http.StatusBadRequest, helper.ResponseFormat(http.StatusNotFound, "The requested resource was not found.", nil))
+		} 
 
-// 		if len(attendance) == 0 {
-// 			c.Logger().Error("Failed to get attendances", err.Error())
-// 			return c.JSON(http.StatusNotFound, map[string]interface{}{
-// 				"code":    http.StatusNotFound,
-// 				"message": "Get attendances not found",
-// 			})
-// 		}
 
-// 		formattedAttendances := []RequestGetAttendances{}
-// 		for _, attendance := range attendance {
-// 			formattedAttendance := RequestGetAttendances{
-// 				ID:             attendance.ID, 
-// 			UserID:             attendance.UserID,
-// 			EventID:            attendance.EventID,
-// 			EventCategory:      attendance.EventCategory, 
-// 			TicketType:         attendance.TicketType, 
-// 			Quantity:           attendance.Quantity,
-// 			}
-// 			formattedAttendances = append(formattedAttendances, formattedAttendance)
-// 		}
+		var response []ResponseGetAttendances
+		for _, Attendance := range attendances {
+			response = append(response, ResponseGetAttendances{
+				ID             :   Attendance.ID,          
+				EventID        :   Attendance.EventID,
+				Title          :   Attendance.Title,
+				Description    :   Attendance.Description, 
+				HostedBy       :   Attendance.HostedBy,
+				Date           :   Attendance.Date,
+				Time           :   Attendance.Time,
+				Status         :   Attendance.Status,
+				Location       :   Attendance.Location,
+				EventPicture   :   event_picture,
+				Category       :   Attendance.Category,
+			})
+		}
 
-// 		page := c.QueryParam("page")
-// 		perPage := c.QueryParam("per_page")
-// 		if page != "" || perPage == "" {
-// 			perPage = "3"
-// 		}
-// 		pageInt := 1
-// 		if page != "" {
-// 			pageInt, _ = strconv.Atoi(page)
-// 		}
-// 		perPageInt, _ := strconv.Atoi(perPage)
-
-// 		total := len(formattedAttendances)
-// 		totalPages := int(math.Ceil(float64(total) / float64(perPageInt)))
-
-// 		startIndex := (pageInt - 1) * perPageInt
-// 		endIndex := startIndex + perPageInt
-// 		if endIndex > total {
-// 			endIndex = total
-// 		}
-
-// 		response := formattedAttendances[startIndex:endIndex]
-
-// 		pages := Pagination{
-// 			Page:       pageInt,
-// 			PerPage:    perPageInt,
-// 			TotalPages: totalPages,
-// 			TotalItems: total,
-// 		}
-
-// 		return c.JSON(http.StatusOK, attendancesResponse{
-// 			Code:       http.StatusOK,
-// 			Message:    "Successful operation.",
-// 			Data:       response,
-// 			Pagination: pages,
-// 		})
-	
-// 	}
-// }
+		return c.JSON(http.StatusOK, helper.DataResponse{
+			Code:    http.StatusOK,
+			Message: "Successful operation.",
+			Data:    response,
+		})
+		return c.JSON(http.StatusCreated, helper.ResponseFormat(http.StatusCreated, "success Get attendances", nil))
+	}
+}

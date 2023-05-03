@@ -36,8 +36,6 @@ func (ar *AttendancesRepository) CreateAttendance(newAttendance attendances.Core
 	}
 
 	createdAttendances := attendances.Core{ 
-
-		EventID: 
 		Description:   input.Description,
 		HostedBy:      input.HostedBy,
 		Date:          input.Date,

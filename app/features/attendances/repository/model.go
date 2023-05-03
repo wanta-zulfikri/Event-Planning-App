@@ -4,6 +4,7 @@ import "gorm.io/gorm"
 
 type Attendance struct {
 	gorm.Model 
+	ID              uint
 	EventID         uint 
 	Title          string 
 	Description    string  

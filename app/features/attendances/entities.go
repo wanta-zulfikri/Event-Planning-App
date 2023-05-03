@@ -5,7 +5,8 @@ import (
 )
 
 type Core struct { 
-	EventID        uint 
+    ID               uint
+	EventID          uint 
 	Title 			string  
 	Description 	string 
 	HostedBy  		string 
