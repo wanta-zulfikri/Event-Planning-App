@@ -40,7 +40,7 @@ func (es *EventService) GetEventsByCategory(category string) ([]events.Event, er
 	return events, nil
 }
 
-func (es *EventService) GetEventsByUserID(userid uint) ([]events.Core, error) {
+func (es *EventService) GetEventsByUserID(userid uint) ([]events.Event, error) {
 	events, err := es.r.GetEventsByUserID(userid)
 	if err != nil {
 		return nil, err

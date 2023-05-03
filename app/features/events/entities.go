@@ -66,7 +66,7 @@ type Repository interface {
 	CreateEventWithTickets(event Core, userID uint) error
 	GetEvents() ([]Event, error)
 	GetEventsByCategory(category string) ([]Event, error)
-	GetEventsByUserID(userid uint) ([]Core, error)
+	GetEventsByUserID(userid uint) ([]Event, error)
 	GetEvent(eventid uint) (Core, error)
 	UpdateEvent(id uint, updatedEvent Core) error
 	DeleteEvent(id uint) error
@@ -76,7 +76,7 @@ type Service interface {
 	CreateEventWithTickets(event Core, userID uint) error
 	GetEvents() ([]Event, error)
 	GetEventsByCategory(category string) ([]Event, error)
-	GetEventsByUserID(userid uint) ([]Core, error)
+	GetEventsByUserID(userid uint) ([]Event, error)
 	GetEvent(eventid uint) (Core, error)
 	UpdateEvent(id uint, updatedEvent Core) error
 	DeleteEvent(id uint) error

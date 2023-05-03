@@ -79,8 +79,8 @@ func (er *EventRepository) GetEventsByCategory(category string) ([]events.Event,
 	return cores, nil
 }
 
-func (er *EventRepository) GetEventsByUserID(userid uint) ([]events.Core, error) {
-	var cores []events.Core
+func (er *EventRepository) GetEventsByUserID(userid uint) ([]events.Event, error) {
+	var cores []events.Event
 	if err := er.db.Table("events").Where("user_id = ? AND deleted_at IS NULL", userid).Find(&cores).Error; err != nil {
 		return nil, err
 	}
