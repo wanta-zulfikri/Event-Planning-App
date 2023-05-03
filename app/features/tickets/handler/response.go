@@ -2,6 +2,7 @@ package handler
 
 type ResponseGetTickets struct {
 	EventID        uint   `json:"event_id"`
+	TicketID       uint   `json:"ticket_id"`
 	TicketCategory string `json:"ticket_category"`
 	TicketPrice    uint   `json:"ticket_price"`
 	TicketQuantity uint   `json:"ticket_quantity"`

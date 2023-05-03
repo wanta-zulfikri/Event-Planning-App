@@ -17,7 +17,6 @@ type Core struct {
 	Hostedby     string //hostedby : username didapat dari JWT Token
 	UserID       uint
 	Transactions []Transaction
-	Attendances  []Attendances
 	Reviews      []Reviews
 	Tickets      []TicketCore
 }
@@ -30,24 +29,23 @@ type TicketCore struct {
 	TicketQuantity uint
 }
 
-type Attendances struct {
-	Username     string
-	User_picture string
-}
+// kalau mau lookup ke table users,
+//untuk mendapatkan user_picture,
+//nama object harus sesuai dengan nama table.
 
 type Reviews struct {
-	UserID       uint
-	Username     string
-	User_picture string
-	Review       string
+	UserID   uint
+	Username string
+	Image    string
+	Review   string
 }
 
 type Transaction struct {
-	ID           uint
-	UserID       uint
-	EventID      uint
-	Username     string
-	User_picture string
+	ID       uint
+	UserID   uint
+	EventID  uint
+	Username string
+	Image    string
 }
 
 type Repository interface {

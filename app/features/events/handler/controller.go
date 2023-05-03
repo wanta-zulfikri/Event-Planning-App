@@ -50,23 +50,26 @@ func (ec *EventController) GetEvent() echo.HandlerFunc {
 
 		for _, t := range event.Transactions {
 			transaction := ResponseTransactions{
-				UserID:   t.UserID,
-				Username: t.Username,
-				// UserPicture: t.User_picture,
+				Username:    t.Username,
+				UserPicture: t.Image,
 			}
 			response.Transactions = append(response.Transactions, transaction)
 		}
 
 		for _, r := range event.Reviews {
 			review := ResponseReviews{
-				UserID:   r.UserID,
-				Username: r.Username,
-				Review:   r.Review,
+				Username:    r.Username,
+				UserPicture: r.Image,
+				Review:      r.Review,
 			}
 			response.Reviews = append(response.Reviews, review)
 		}
 
-		return c.JSON(http.StatusOK, helper.ResponseFormat(http.StatusOK, "Successful Operation", response))
+		return c.JSON(http.StatusOK, GetEventResponse{
+			Code:    http.StatusOK,
+			Message: "Successful operation.",
+			Data:    response,
+		})
 	}
 }
 

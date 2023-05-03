@@ -49,6 +49,7 @@ func (tc *TicketController) GetTickets() echo.HandlerFunc {
 		for _, ticket := range tickets {
 			response = append(response, ResponseGetTickets{
 				EventID:        ticket.EventID,
+				TicketID:       ticket.ID,
 				TicketCategory: ticket.TicketCategory,
 				TicketPrice:    ticket.TicketPrice,
 				TicketQuantity: ticket.TicketQuantity,

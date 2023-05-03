@@ -1,7 +1,6 @@
 package repository
 
 import (
-	attendances "github.com/wanta-zulfikri/Event-Planning-App/app/features/attendances/repository"
 	reviews "github.com/wanta-zulfikri/Event-Planning-App/app/features/reviews/repository"
 	tickets "github.com/wanta-zulfikri/Event-Planning-App/app/features/tickets/repository"
 	transactions "github.com/wanta-zulfikri/Event-Planning-App/app/features/transactions/repository"
@@ -23,6 +22,5 @@ type Event struct {
 	UserID       uint
 	Tickets      []tickets.Ticket           `gorm:"foreignKey:EventID"`
 	Transactions []transactions.Transaction `gorm:"foreignKey:EventID"`
-	Attandances  []attendances.Attendance   `gorm:"foreignKey:EventID"`
 	Reviews      []reviews.Review           `gorm:"foreignKey:EventID"`
 }

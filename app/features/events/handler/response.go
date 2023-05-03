@@ -13,6 +13,12 @@ type ResponseGetEvents struct {
 	Event_picture string `json:"event_picture"`
 }
 
+type GetEventResponse struct {
+	Code    int              `json:"code"`
+	Message string           `json:"message"`
+	Data    ResponseGetEvent `json:"data"`
+}
+
 type ResponseGetEvent struct {
 	ID            uint                   `json:"event_id"`
 	Title         string                 `json:"title"`
@@ -29,15 +35,14 @@ type ResponseGetEvent struct {
 }
 
 type ResponseTransactions struct {
-	UserID   uint   `json:"user_id"`
-	Username string `json:"username"`
-	// UserPicture string `json:"user_picture"`
+	Username    string `json:"username"`
+	UserPicture string `json:"user_picture"`
 }
 
 type ResponseReviews struct {
-	UserID   uint   `json:"user_id"`
-	Username string `json:"username"`
-	Review   string `json:"review"`
+	Username    string `json:"username"`
+	UserPicture string `json:"user_picture"`
+	Review      string `json:"review"`
 }
 
 type EventResponse struct {
