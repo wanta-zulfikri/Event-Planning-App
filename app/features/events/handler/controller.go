@@ -151,7 +151,7 @@ func (ec *EventController) CreateEventWithTickets() echo.HandlerFunc {
 func (ec *EventController) GetEvents() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		category := c.QueryParam("category")
-		var events []events.Core
+		var events []events.Event
 		var err error
 
 		if category != "" {

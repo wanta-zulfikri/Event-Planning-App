@@ -24,7 +24,7 @@ func (s *EventService) CreateEventWithTickets(event events.Core, userID uint) er
 	return nil
 }
 
-func (es *EventService) GetEvents() ([]events.Core, error) {
+func (es *EventService) GetEvents() ([]events.Event, error) {
 	events, err := es.r.GetEvents()
 	if err != nil {
 		return nil, err
@@ -32,7 +32,7 @@ func (es *EventService) GetEvents() ([]events.Core, error) {
 	return events, nil
 }
 
-func (es *EventService) GetEventsByCategory(category string) ([]events.Core, error) {
+func (es *EventService) GetEventsByCategory(category string) ([]events.Event, error) {
 	events, err := es.r.GetEventsByCategory(category)
 	if err != nil {
 		return nil, err

@@ -63,16 +63,16 @@ func (er *EventRepository) CreateEventWithTickets(event events.Core, userID uint
 	return tx.Commit().Error
 }
 
-func (er *EventRepository) GetEvents() ([]events.Core, error) {
-	var cores []events.Core
+func (er *EventRepository) GetEvents() ([]events.Event, error) {
+	var cores []events.Event
 	if err := er.db.Table("events").Where("deleted_at IS NULL").Find(&cores).Error; err != nil {
 		return nil, err
 	}
 	return cores, nil
 }
 
-func (er *EventRepository) GetEventsByCategory(category string) ([]events.Core, error) {
-	var cores []events.Core
+func (er *EventRepository) GetEventsByCategory(category string) ([]events.Event, error) {
+	var cores []events.Event
 	if err := er.db.Table("events").Where("category = ? AND deleted_at IS NULL", category).Find(&cores).Error; err != nil {
 		return nil, err
 	}

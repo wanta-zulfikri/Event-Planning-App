@@ -21,6 +21,20 @@ type Core struct {
 	Tickets      []TicketCore
 }
 
+type Event struct {
+	ID          uint
+	Title       string
+	Description string
+	EventDate   string
+	EventTime   string
+	Status      string
+	Category    string
+	Location    string
+	Image       string
+	Hostedby    string // hostedby : username obtained from JWT Token
+	UserID      uint
+}
+
 type TicketCore struct {
 	ID             uint
 	EventID        uint
@@ -50,8 +64,8 @@ type Transaction struct {
 
 type Repository interface {
 	CreateEventWithTickets(event Core, userID uint) error
-	GetEvents() ([]Core, error)
-	GetEventsByCategory(category string) ([]Core, error)
+	GetEvents() ([]Event, error)
+	GetEventsByCategory(category string) ([]Event, error)
 	GetEventsByUserID(userid uint) ([]Core, error)
 	GetEvent(eventid uint) (Core, error)
 	UpdateEvent(id uint, updatedEvent Core) error
@@ -60,8 +74,8 @@ type Repository interface {
 
 type Service interface {
 	CreateEventWithTickets(event Core, userID uint) error
-	GetEvents() ([]Core, error)
-	GetEventsByCategory(category string) ([]Core, error)
+	GetEvents() ([]Event, error)
+	GetEventsByCategory(category string) ([]Event, error)
 	GetEventsByUserID(userid uint) ([]Core, error)
 	GetEvent(eventid uint) (Core, error)
 	UpdateEvent(id uint, updatedEvent Core) error
