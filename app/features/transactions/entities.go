@@ -38,15 +38,31 @@ type Transaction_Tickets struct {
 
 type Repository interface {
 	CreateTransaction(Transaction) error
-	GetTransaction(transactionid uint) (Transaction, error)
+	GetTransaction(transactionid uint) (Transaction, error) 
+	// UpdateTransaction(transactionid uint,) (Transaction, error)
 }
 
 type Service interface {
 	CreateTransaction(user_id, event_id, grandtotal uint, paymentmethod string, request Transaction) error
-	GetTransaction(transactionid uint) (Transaction, error)
+	GetTransaction(transactionid uint) (Transaction, error) 
+	// UpdateTransaction(transactionid uint)  (Transaction, error)
 }
 
 type Handler interface {
 	CreateTransaction() echo.HandlerFunc
-	GetTransaction() echo.HandlerFunc
+	GetTransaction() echo.HandlerFunc 
+	// UpdateTransaction() echo.HandlerFunc
 }
+
+
+type (
+	Data struct {
+		Invoice       string `json:"invoice"`
+		Total         int    `json:"total"`
+		Name          string `json:"name"`
+		Email         string `json:"email"`
+		PaymentCode   string `json:"payment_code"`
+		PaymentMethod string `json:"payment_method"`
+		Expire        string `json:"expire"`
+	}
+)

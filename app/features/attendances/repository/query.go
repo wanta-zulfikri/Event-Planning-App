@@ -17,12 +17,16 @@ func New(db *gorm.DB) *AttendancesRepository {
 
 func (ar *AttendancesRepository) CreateAttendance(newAttendance attendances.Core) (attendances.Core, error) {
 	input := Attendance{
-		ID:            newAttendance.ID,
-		UserID:        newAttendance.UserID,
-		EventID:       newAttendance.EventID,
-		EventCategory: newAttendance.EventCategory,
-		TicketType:    newAttendance.TicketType,
-		Quantity:      newAttendance.Quantity,
+		EventID:      newAttendance.EventID,
+		Title:        newAttendance.Title,
+		Description:  newAttendance.Description,
+		HostedBy:     newAttendance.HostedBy,
+		Date:         newAttendance.Date,
+		Time:         newAttendance.Time,
+		Status:       newAttendance.Status,
+		Category:     newAttendance.Category,
+		Location:     newAttendance.Location,
+		EventPicture: newAttendance.EventPicture,
 	}
 
 	err := ar.db.Table("attendances").Create(&input).Error
@@ -32,20 +36,22 @@ func (ar *AttendancesRepository) CreateAttendance(newAttendance attendances.Core
 	}
 
 	createdAttendances := attendances.Core{
-		ID:            input.ID,
-		UserID:        input.UserID,
-		EventID:       input.EventID,
-		EventCategory: input.EventCategory,
-		TicketType:    input.TicketType,
-		Quantity:      input.Quantity,
+		Description:  input.Description,
+		HostedBy:     input.HostedBy,
+		Date:         input.Date,
+		Time:         input.Time,
+		Status:       input.Status,
+		Category:     input.Category,
+		Location:     input.Location,
+		EventPicture: input.EventPicture,
 	}
 	return createdAttendances, nil
 }
 
-func (ar *AttendancesRepository) GetAttendance() ([]attendances.Core, error){
+func (ar *AttendancesRepository) GetAttendance(id uint) ([]attendances.Core, error) {
 	var cores []attendances.Core
 	if err := ar.db.Table("reviews").Where("deleted_at IS NULL").Find(&cores).Error; err != nil {
-	  return nil, err 
-	} 
-	return cores, nil 
+		return nil, err
+	}
+	return cores, nil
 }
