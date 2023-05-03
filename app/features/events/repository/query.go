@@ -6,7 +6,6 @@ import (
 
 	"github.com/wanta-zulfikri/Event-Planning-App/app/features/events"
 	"github.com/wanta-zulfikri/Event-Planning-App/app/features/tickets/repository"
-	tickets "github.com/wanta-zulfikri/Event-Planning-App/app/features/tickets/repository"
 	"gorm.io/gorm"
 )
 
@@ -162,11 +161,7 @@ func (er *EventRepository) DeleteEvent(id uint) error {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return err
 		}
-		return err
-	}
 
-	// hapus tiket yang terkait dengan event
-	if err := er.db.Where("event_id = ?", id).Delete(&tickets.Ticket{}).Error; err != nil {
 		return err
 	}
 
