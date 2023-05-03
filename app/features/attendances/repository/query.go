@@ -17,12 +17,16 @@ func New(db *gorm.DB) *AttendancesRepository {
 
 func (ar *AttendancesRepository) CreateAttendance(newAttendance attendances.Core) (attendances.Core, error) {
 	input := Attendance{
-		ID:            newAttendance.ID,
-		UserID:        newAttendance.UserID,
 		EventID:       newAttendance.EventID,
-		EventCategory: newAttendance.EventCategory,
-		TicketType:    newAttendance.TicketType,
-		Quantity:      newAttendance.Quantity,
+		Title:         newAttendance.Title,
+		Description:   newAttendance.Description,
+		HostedBy:      newAttendance.HostedBy,
+		Date:          newAttendance.Date,
+		Time:          newAttendance.Time,
+		Status:        newAttendance.Status,
+		Category:      newAttendance.Category,
+		Location:      newAttendance.Location,
+		EventPicture:  newAttendance.EventPicture,
 	}
 
 	err := ar.db.Table("attendances").Create(&input).Error
@@ -31,13 +35,16 @@ func (ar *AttendancesRepository) CreateAttendance(newAttendance attendances.Core
 		return attendances.Core{}, err
 	}
 
-	createdAttendances := attendances.Core{
-		ID:            input.ID,
-		UserID:        input.UserID,
-		EventID:       input.EventID,
-		EventCategory: input.EventCategory,
-		TicketType:    input.TicketType,
-		Quantity:      input.Quantity,
+	createdAttendances := attendances.Core{ 
+		Description:   input.Description,
+		HostedBy:      input.HostedBy,
+		Date:          input.Date,
+		Time:          input.Time,
+		Status:        input.Status,
+		Category:      input.Category, 
+		Location:      input.Location, 
+		EventPicture:  input.EventPicture,
+
 	}
 	return createdAttendances, nil
 }

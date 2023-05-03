@@ -1,18 +1,29 @@
 package handler 
 
-type RequestCreateAttendances struct {
-	UserID        uint 		`from:"user_id"`
-	EventID       uint 		`from:"event_id"`
-	EventCategory string 	`from:"event_category"`
-	TicketType    string	`from:"ticket_type"`
-	Quantity      string    `from:"quantity"`
+type RequestCreateAttendances struct { 
+	ID             uint         `json:"user_id"`
+	EventID        uint 		`json:"event_id"`
+	Title          string 	    `json:"title"`
+	Description    string	    `json:"description"`
+	HostedBy       string       `json:"hosted_by"`
+	Date           string       `json:"date"` 
+	Time           string       `json:"time"`
+	Status         string       `json:"status"`
+	Location       string       `json:"location"`
+	EventPicture   string       `json:"event_picture"` 
+	Category       string       `json:"category"`
 } 
 
 type RequestGetAttendances struct {
-	ID            uint 		`from:"id"`
-	UserID        uint 		`from:"user_id"`
-	EventID       uint 		`from:"event_id"`
-	EventCategory string 	`from:"event_category"`
-	TicketType    string	`from:"ticket_type"`
-	Quantity      string    `from:"quantity"`
+	ID             uint         `json:"user_id"`
+	EventID        uint 		`json:"event_id"`
+	Title          string 	    `json:"title"`
+	Description    string	    `json:"description"`
+	HostedBy       string       `json:"hosted_by"`
+	Date           string       `json:"date"` 
+	Time           string       `json:"time"`
+	Status         string       `json:"status"`
+	Location       string       `json:"location"`
+	EventPicture   string       `json:"event_picture"`
+	Category       string       `json:"category"`
 } 

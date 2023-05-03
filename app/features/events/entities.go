@@ -16,7 +16,32 @@ type Core struct {
 	Image       string
 	Hostedby    string //hostedby : username didapat dari JWT Token
 	UserID      uint
-	Tickets     []TicketCore `gorm:"foreignKey:EventID"`
+	Tickets     []TicketCore     `gorm:"foreignKey:EventID"` 
+	Review      []ReviewCore     `gorm:"foreignKey:EventID"` 
+	Attendance  []AttendanceCore `gorm:"foreignKey:EventID"`
+}
+
+type AttendanceCore struct {
+	EventID          uint
+	Title            string  
+	Descriotion      string 
+	HostedBy         string 
+	Date             string
+    Time             string 
+	Status           string 
+	Category         string 
+	Location         string 
+	EventPicture     string 
+	
+}
+
+type ReviewCore struct {
+	ID       uint
+	UserID   uint
+	Username string
+	Image    string
+	EventID  uint
+	Review   string
 }
 
 type TicketCore struct {

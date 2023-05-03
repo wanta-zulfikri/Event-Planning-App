@@ -4,13 +4,18 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type Core struct {
-	ID            uint
-	UserID        uint
-	EventID       uint
-	EventCategory string
-	TicketType    string
-	Quantity      string
+type Core struct { 
+    ID               uint
+	EventID          uint 
+	Title 			string  
+	Description 	string 
+	HostedBy  		string 
+	Date 			string 
+	Time 			string  
+	Status 			string  
+	Category 		string  
+	Location		string  
+	EventPicture 	string
 }
 
 type Repository interface {
