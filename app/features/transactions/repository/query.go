@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	pg "github.com/pandudpn/go-payment-gateway"
+	"github.com/pandudpn/go-payment-gateway/gateway/midtrans"
 	"github.com/wanta-zulfikri/Event-Planning-App/app/features/transactions"
 	"github.com/wanta-zulfikri/Event-Planning-App/helper"
 	"gorm.io/gorm"
@@ -17,38 +18,52 @@ func New(db *gorm.DB) *TransactionRepository {
 	return &TransactionRepository{db: db}
 }
 
-func (tr *TransactionRepository) PayTransaction(user_id uint, event_id uint, paymenttype string, request transactions.RequestPayTransaction) (string, error) {
+func (tr *TransactionRepository) PayTransaction(user_id uint, event_id uint, paymenttype string, request transactions.Transaction) (*midtrans.ChargeResponse, error) {
 	// Prepare transaction details
-	transactionDetails := []transactions.TransactionDetails{}
+	transactionDetails := []helper.TransactionDetail{}
 	for _, td := range request.Transaction_Details {
-		transactionDetails = append(transactionDetails, transactions.TransactionDetails{
+		transactionDetails = append(transactionDetails, helper.TransactionDetail{
 			OrderID:     helper.GenerateInvoice(),
-			GrossAmount: td.GrossAmount,
+			GrossAmount: int64(td.GrossAmount),
 		})
 	}
 
-	// Call BankTransferCharge method to get the virtual account details
+	// Call CreateBankTransferCharge method to get the virtual account details
+	bt := &midtrans.BankTransferCreateParams{
+		BankTransfer: &midtrans.BankTransfer{
+			Bank: "bca",
+		},
+	}
+	helper.SetTransactionDetails(bt, transactionDetails)
 	opts := &pg.Options{
 		ClientId:  helper.SandBoxClientKey,
 		ServerKey: helper.SandBoxServerKey,
 	}
-	virtualAccount, err := helper.BankTransferCharge(opts)
+	virtualAccount, err := helper.CreateBankTransferCharge(bt, opts)
 	if err != nil {
-		return "", fmt.Errorf("failed to get virtual account details: %w", err)
+		return nil, fmt.Errorf("failed to get virtual account details: %w", err)
+	}
+
+	var details []transactions.TransactionDetails
+	for _, td := range transactionDetails {
+		details = append(details, transactions.TransactionDetails{
+			OrderID:     td.OrderID,
+			GrossAmount: uint(td.GrossAmount),
+		})
 	}
 
 	transaction := transactions.Transaction{
 		UserID:              user_id,
 		EventID:             event_id,
 		PaymentType:         paymenttype,
-		Transaction_Details: transactionDetails,
-		VAAccount:           virtualAccount,
+		Transaction_Details: details,
+		VAAccount:           virtualAccount.VANumbers[0].VANumber,
 	}
 
 	// Save the transaction to the database
 	err = tr.db.Create(&transaction).Error
 	if err != nil {
-		return "", fmt.Errorf("failed to create transaction: %w", err)
+		return nil, fmt.Errorf("failed to create transaction: %w", err)
 	}
 
 	return virtualAccount, nil

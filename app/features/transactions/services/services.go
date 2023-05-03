@@ -1,6 +1,7 @@
 package services
 
 import (
+	"github.com/pandudpn/go-payment-gateway/gateway/midtrans"
 	"github.com/wanta-zulfikri/Event-Planning-App/app/features/transactions"
 )
 
@@ -12,10 +13,10 @@ func New(r transactions.Repository) transactions.Service {
 	return &TransactionService{r: r}
 }
 
-func (ts *TransactionService) PayTransaction(userID uint, eventID uint, paymentType string, request transactions.RequestPayTransaction) (string, error) {
+func (ts *TransactionService) PayTransaction(userID uint, eventID uint, paymentType string, request transactions.Transaction) (*midtrans.ChargeResponse, error) {
 	vaaccount, err := ts.r.PayTransaction(userID, eventID, paymentType, request)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	return vaaccount, nil

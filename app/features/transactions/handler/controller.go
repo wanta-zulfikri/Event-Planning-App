@@ -56,7 +56,7 @@ func (tc *TransactionController) PayTransaction() echo.HandlerFunc {
 
 		eventID := request.EventID
 		paymentType := request.PaymentType
-		var input transactions.RequestPayTransaction
+		var input transactions.Transaction
 		for _, item := range request.Transaction_Details {
 			input.Transaction_Details = append(input.Transaction_Details, transactions.TransactionDetails{
 				OrderID:     item.OrderID,
@@ -68,14 +68,12 @@ func (tc *TransactionController) PayTransaction() echo.HandlerFunc {
 		vaaccount, err := tc.s.PayTransaction(userID, eventID, paymentType, input)
 		if err != nil {
 			c.Logger().Error("Failed to create transaction: ", err)
-			return c.JSON(http.StatusInternalServerError, helper.ResponseFormat(http.StatusInternalServerError, "Internal Server Error", nil))
+			c.JSON(http.StatusInternalServerError, helper.ResponseFormat(http.StatusInternalServerError, "Internal Server Error", nil))
+			return err
 		}
 
-		return c.JSON(http.StatusCreated, helper.DataResponse{
-			Code:    http.StatusCreated,
-			Message: "Success Created a Transaction.",
-			Data:    map[string]interface{}{"va_account": vaaccount},
-		})
+		return c.JSON(http.StatusCreated, helper.ResponseFormat(http.StatusCreated, "Success Created a Transaction.", map[string]interface{}{"va_account": vaaccount}))
+
 	}
 }
 

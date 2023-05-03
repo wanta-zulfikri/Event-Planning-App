@@ -2,6 +2,7 @@ package transactions
 
 import (
 	"github.com/labstack/echo/v4"
+	"github.com/pandudpn/go-payment-gateway/gateway/midtrans"
 )
 
 // type Transaction struct {
@@ -26,15 +27,6 @@ import (
 // 	Transaction_Tickets []Transaction_Tickets
 // }
 
-type Transaction_Tickets struct {
-	TransactionID  uint
-	TicketID       string
-	TicketCategory string
-	TicketPrice    int64
-	TicketQuantity uint
-	Subtotal       uint
-}
-
 type Transaction struct {
 	UserID              uint
 	EventID             uint
@@ -42,6 +34,16 @@ type Transaction struct {
 	Transaction_Details []TransactionDetails
 	Transaction_Tickets []Transaction_Tickets
 	BankTransfer        *BankTransferDetails
+	VAAccount           string
+}
+
+type Transaction_Tickets struct {
+	TransactionID  uint
+	TicketID       string
+	TicketCategory string
+	TicketPrice    int64
+	TicketQuantity uint
+	Subtotal       uint
 }
 
 type TransactionDetails struct {
@@ -56,13 +58,13 @@ type BankTransferDetails struct {
 type Repository interface {
 	// CreateTransaction(Transaction) error
 	// GetTransaction(transactionid uint) (Transaction, error)
-	PayTransaction(user_id uint, event_id uint, paymenttype string, request Transaction) (string, error)
+	PayTransaction(user_id uint, event_id uint, paymenttype string, request Transaction) (*midtrans.ChargeResponse, error)
 }
 
 type Service interface {
 	// CreateTransaction(user_id, event_id, grandtotal uint, paymentmethod string, request Transaction) error
 	// GetTransaction(transactionid uint) (Transaction, error)
-	PayTransaction(user_id uint, event_id uint, paymenttype string, request Transaction) (string, error)
+	PayTransaction(user_id uint, event_id uint, paymenttype string, request Transaction) (*midtrans.ChargeResponse, error)
 }
 
 type Handler interface {

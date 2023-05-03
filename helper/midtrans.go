@@ -1,9 +1,9 @@
 package helper
 
 import (
+	"errors"
 	"log"
 
-	"github.com/google/uuid"
 	pg "github.com/pandudpn/go-payment-gateway"
 	"github.com/pandudpn/go-payment-gateway/gateway/midtrans"
 )
@@ -11,36 +11,28 @@ import (
 const SandBoxServerKey string = "SB-Mid-server-OvkShVQ_Lno2P2-jMFR9m1Hq"
 const SandBoxClientKey string = "SB-Mid-client-dWlmfZziZUWwJy87"
 
-func BankTransferCharge(opts *pg.Options) {
-	id := uuid.NewString()
-	bt := &midtrans.BankTransferCreateParams{
-		PaymentType: midtrans.PaymentTypeMandiri,
-		TransactionDetails: &midtrans.TransactionDetail{
-			OrderID:     id,
-			GrossAmount: 10000,
-		},
-		ItemDetails: []*midtrans.ItemDetail{
-			{
-				ID:       uuid.NewString(),
-				Price:    10000,
-				Name:     "abc",
-				Quantity: 1,
-			},
-		},
-		EChannel: &midtrans.EChannel{
-			BillKey:   "123456789",
-			BillInfo1: "Pembayaran:",
-			BillInfo2: id,
-		},
-		BankTransfer: &midtrans.BankTransfer{
-			Bank:     midtrans.BankPermata,
-			VANumber: "1234567890",
-		},
-	}
+type TransactionDetail struct {
+	OrderID     string `json:"order_id"`
+	GrossAmount int64  `json:"gross_amount"`
+}
 
+func SetTransactionDetails(bt *midtrans.BankTransferCreateParams, details []TransactionDetail) {
+	bt.TransactionDetails = &midtrans.TransactionDetail{}
+	for _, detail := range details {
+		bt.TransactionDetails.GrossAmount += detail.GrossAmount
+		bt.ItemDetails = append(bt.ItemDetails, &midtrans.ItemDetail{
+			ID:    detail.OrderID,
+			Price: detail.GrossAmount,
+		})
+	}
+}
+
+func CreateBankTransferCharge(bt *midtrans.BankTransferCreateParams, opts *pg.Options) (*midtrans.ChargeResponse, error) {
+	SetTransactionDetails(bt, []TransactionDetail{})
 	res, err := midtrans.CreateBankTransferCharge(bt, opts)
 	if err != nil {
-		log.Fatalln("failed to create bank_transfer charge with error:", err)
+		log.Println("failed to create bank_transfer charge with error:", err)
+		return nil, errors.New("failed to create bank_transfer charge")
 	}
 
 	log.Println("response bank_transfer charge", *res)
@@ -55,4 +47,6 @@ func BankTransferCharge(opts *pg.Options) {
 	if res.BillKey != "" {
 		log.Println("virtual account mandiri", res.BillerCode+"-"+res.BillKey)
 	}
+
+	return res, nil
 }
