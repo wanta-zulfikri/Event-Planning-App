@@ -17,6 +17,21 @@ type GetEventResponse struct {
 	Code    int              `json:"code"`
 	Message string           `json:"message"`
 	Data    ResponseGetEvent `json:"data"`
+} 
+
+type ResponseGetAttendances struct {
+	ID           uint   `json:"event_id"`
+	Title        string `json:"title"`
+    Description  string `json:"description"` 
+	HostedBy     string `json:"hosted_by"` 
+	Date         string `json:"date"` 
+	Time         string `json:"time"`
+	Status       string `json:"status"`
+	Category     string `json:"category"`
+    Location     string `json:"location"` 
+    Image        string `json:"event_picture"` 
+	Transactions []ResponseTransactions `json:"attendances"` 
+	Reviews      []ResponseReviews       `json:"reviews"`
 }
 
 type ResponseGetEvent struct {
@@ -31,8 +46,8 @@ type ResponseGetEvent struct {
 	Location      string                 `json:"location"`
 	Event_picture string                 `json:"event_picture"`
 	Transactions  []ResponseTransactions `json:"attendances"`
-	Reviews       []ResponseReviews      `json:"reviews"`
-}
+	Reviews       []ResponseReviews      `json:"reviews"`      
+} 
 
 type ResponseTransactions struct {
 	Username    string `json:"username"`
@@ -43,6 +58,19 @@ type ResponseReviews struct {
 	Username    string `json:"username"`
 	UserPicture string `json:"user_picture"`
 	Review      string `json:"review"`
+}
+
+type ResponseGetAttendance struct { 
+	ID           uint   `json:"event_id"`
+	Title        string `json:"title"`
+    Description  string `json:"description"` 
+	HostedBy     string `json:"hosted_by"` 
+	Date         string `json:"date"` 
+	Time         string `json:"time"`
+	Status       string `json:"status"`
+	Category     string `json:"category"`
+    Location     string `json:"location"` 
+    Image        string `json:"event_picture"`
 }
 
 type EventResponse struct {
@@ -77,6 +105,13 @@ type EventsResponse struct {
 	Pagination Pagination          `json:"pagination"`
 }
 
+type Getattendance struct {
+	Code       int                      `json:"code"` 
+	Message    string                   `json:"message"` 
+	Data       []ResponseGetAttendances `json:"data"`
+	Pagination Pagination               `json:"pagination"`
+}
+
 type Pagination struct {
 	Page       int `json:"page"`
 	PerPage    int `json:"per_page"`
@@ -84,7 +119,8 @@ type Pagination struct {
 	TotalItems int `json:"total_items"`
 }
 
-type ResponseUpdateEvent struct {
+type ResponseUpdateEvent struct { 
+	ID             uint  `json:"event_id"`
 	Title         string `json:"title"`
 	Description   string `json:"description"`
 	Hosted_by     string `json:"hosted_by"`

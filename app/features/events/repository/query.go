@@ -79,6 +79,14 @@ func (er *EventRepository) GetEventsByCategory(category string) ([]events.Event,
 	return cores, nil
 }
 
+func (er *EventRepository)GetEventsByAttendance(userID uint) ([]events.Event, error) {
+	var cores []events.Event 
+	if err := er.db.Table("attendances").Where("user_id = ? = ? AND deleted_at IS NULL", userID).Find(&cores).Error; err != nil {
+		return nil, err
+	} 
+	return cores, nil
+}
+
 func (er *EventRepository) GetEventsByUserID(userid uint) ([]events.Event, error) {
 	var cores []events.Event
 	if err := er.db.Table("events").Where("user_id = ? AND deleted_at IS NULL", userid).Find(&cores).Error; err != nil {
@@ -133,7 +141,7 @@ func (er *EventRepository) GetEvent(eventid uint) (events.Core, error) {
 	return response, nil
 }
 
-func (er *EventRepository) UpdateEvent(id uint, updatedEvent events.Event) error {
+func (er *EventRepository) UpdateEvent(id uint, updatedEvent events.Core) error {
 	if err := er.db.Model(&Event{}).Where("id = ?", id).Updates(map[string]interface{}{
 		"title":       updatedEvent.Title,
 		"description": updatedEvent.Description,

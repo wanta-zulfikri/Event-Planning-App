@@ -19,6 +19,22 @@ type Core struct {
 	Transactions []Transaction
 	Reviews      []Reviews
 	Tickets      []TicketCore
+	Attendances  []Attendance
+}
+
+
+type Attendance struct {
+	ID              uint
+	EventID         uint 
+	Title          string 
+	Description    string  
+	HostedBy       string 
+	Date           string 
+	Time           string  
+	Status         string  
+	Category       string   
+	Location       string      
+	EventPicture   string
 }
 
 type Event struct {
@@ -66,25 +82,28 @@ type Repository interface {
 	CreateEventWithTickets(event Core, userID uint) error
 	GetEvents() ([]Event, error)
 	GetEventsByCategory(category string) ([]Event, error)
-	GetEventsByUserID(userid uint) ([]Event, error)
+	GetEventsByUserID(userid uint) ([]Event, error) 
+	GetEventsByAttendance(userid uint) ([]Event, error)
 	GetEvent(eventid uint) (Core, error)
-	UpdateEvent(id uint, updatedEvent Event) error
+	UpdateEvent(id uint, updatedEvent Core) error
 	DeleteEvent(id uint) error
 }
 
 type Service interface {
 	CreateEventWithTickets(event Core, userID uint) error
 	GetEvents() ([]Event, error)
-	GetEventsByCategory(category string) ([]Event, error)
+	GetEventsByCategory(category string) ([]Event, error) 
+	GetEventsByAttendance(userid uint) ([]Event, error)
 	GetEventsByUserID(userid uint) ([]Event, error)
 	GetEvent(eventid uint) (Core, error)
-	UpdateEvent(id uint, updatedEvent Event) error
+	UpdateEvent(id uint, updatedEvent Core) error
 	DeleteEvent(id uint) error
 }
 
 type Handler interface {
 	CreateEventWithTickets() echo.HandlerFunc
-	GetEvents() echo.HandlerFunc
+	GetEvents() echo.HandlerFunc 
+	GetEventsByAttendance() echo.HandlerFunc
 	GetEventsByUserID() echo.HandlerFunc
 	GetEvent() echo.HandlerFunc
 	UpdateEvent() echo.HandlerFunc
