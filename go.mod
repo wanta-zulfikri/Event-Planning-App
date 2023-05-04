@@ -5,7 +5,6 @@ go 1.19
 require (
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/golang/mock v1.6.0
-	github.com/joho/godotenv v1.5.1
 	github.com/midtrans/midtrans-go v1.3.6
 	google.golang.org/api v0.114.0
 	gorm.io/gorm v1.25.0
@@ -42,12 +41,10 @@ require (
 	github.com/jinzhu/copier v0.3.5
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
-	github.com/joho/godotenv v1.5.1
 	github.com/labstack/echo/v4 v4.10.2
 	github.com/labstack/gommon v0.4.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.17 // indirect
-	github.com/midtrans/midtrans-go v1.3.6
 	github.com/stretchr/testify v1.8.2
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
