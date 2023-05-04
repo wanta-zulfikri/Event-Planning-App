@@ -36,33 +36,36 @@ type Transaction_Tickets struct {
 	Subtotal       uint
 }
 
+type TrasactionDetails struct {
+	Order_ID     string
+	Gross_Amount uint64
+}
+
+type Payment struct {
+	Transaction_ID     string
+	Order_ID           string
+	Gross_Amount       string
+	Payment_Type       string
+	Bank               string
+	Transaction_Time   string
+	Transaction_Status string
+	Va_Numbers         string
+}
+
 type Repository interface {
-	CreateTransaction(Transaction) error
-	GetTransaction(transactionid uint) (Transaction, error) 
-	// UpdateTransaction(transactionid uint,) (Transaction, error)
+	CreateTransaction(Transaction) (Transaction, error)
+	GetTransaction(invoice string) (Transaction, error)
+	Payment(invoice string, grossAmount uint) (Payment, error)
 }
 
 type Service interface {
-	CreateTransaction(user_id, event_id, grandtotal uint, paymentmethod string, request Transaction) error
-	GetTransaction(transactionid uint) (Transaction, error) 
-	// UpdateTransaction(transactionid uint)  (Transaction, error)
+	CreateTransaction(user_id, event_id, grandtotal uint, paymentmethod string, request Transaction) (Transaction, error)
+	GetTransaction(invoice string) (Transaction, error)
+	Payment(invoive string, grossAmount uint) (Payment, error)
 }
 
 type Handler interface {
 	CreateTransaction() echo.HandlerFunc
-	GetTransaction() echo.HandlerFunc 
-	// UpdateTransaction() echo.HandlerFunc
+	GetTransaction() echo.HandlerFunc
+	Payment() echo.HandlerFunc
 }
-
-
-type (
-	Data struct {
-		Invoice       string `json:"invoice"`
-		Total         int    `json:"total"`
-		Name          string `json:"name"`
-		Email         string `json:"email"`
-		PaymentCode   string `json:"payment_code"`
-		PaymentMethod string `json:"payment_method"`
-		Expire        string `json:"expire"`
-	}
-)

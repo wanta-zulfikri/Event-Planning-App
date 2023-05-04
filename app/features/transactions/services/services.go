@@ -1,6 +1,7 @@
 package services
 
 import (
+	"log"
 	"time"
 
 	"github.com/wanta-zulfikri/Event-Planning-App/app/features/transactions"
@@ -15,8 +16,17 @@ func New(r transactions.Repository) transactions.Service {
 	return &TransactionService{r: r}
 }
 
-func (ts *TransactionService) GetTransaction(transactionid uint) (transactions.Transaction, error) {
-	transaction, err := ts.r.GetTransaction(transactionid)
+func (ts *TransactionService) Payment(invoice string, grossAmount uint) (transactions.Payment, error) {
+	payment, err := ts.r.Payment(invoice, grossAmount)
+	if err != nil {
+		log.Println(err)
+		return transactions.Payment{}, err
+	}
+	return payment, nil
+}
+
+func (ts *TransactionService) GetTransaction(invoice string) (transactions.Transaction, error) {
+	transaction, err := ts.r.GetTransaction(invoice)
 	if err != nil {
 		return transactions.Transaction{}, err
 	}
@@ -24,8 +34,8 @@ func (ts *TransactionService) GetTransaction(transactionid uint) (transactions.T
 	return transaction, nil
 }
 
-func (ts *TransactionService) CreateTransaction(user_id, event_id, grandtotal uint, paymentmethod string, request transactions.Transaction) error {
-	Transaction := transactions.Transaction{
+func (ts *TransactionService) CreateTransaction(user_id, event_id, grandtotal uint, paymentmethod string, request transactions.Transaction) (transactions.Transaction, error) {
+	transaction := transactions.Transaction{
 		UserID:              user_id,
 		EventID:             event_id,
 		Invoice:             helper.GenerateInvoice(),
@@ -38,10 +48,10 @@ func (ts *TransactionService) CreateTransaction(user_id, event_id, grandtotal ui
 		PaymentMethod:       paymentmethod,
 	}
 
-	err := ts.r.CreateTransaction(Transaction)
+	createdTransaction, err := ts.r.CreateTransaction(transaction)
 	if err != nil {
-		return err
+		return transactions.Transaction{}, err
 	}
 
-	return nil
+	return createdTransaction, nil
 }

@@ -3,8 +3,12 @@ package repository
 import (
 	"errors"
 	"fmt"
+	"strings"
 
+	"github.com/midtrans/midtrans-go"
+	"github.com/midtrans/midtrans-go/coreapi"
 	"github.com/wanta-zulfikri/Event-Planning-App/app/features/transactions"
+	"github.com/wanta-zulfikri/Event-Planning-App/config/common"
 	"gorm.io/gorm"
 )
 
@@ -16,10 +20,66 @@ func New(db *gorm.DB) *TransactionRepository {
 	return &TransactionRepository{db: db}
 }
 
-func (tr *TransactionRepository) GetTransaction(transactionid uint) (transactions.Transaction, error) {
+func (tr *TransactionRepository) Payment(invoice string, grossAmount uint) (transactions.Payment, error) {
+	var c = coreapi.Client{}
+	c.New(common.MidstransServerKey, midtrans.Sandbox)
+
+	request := &coreapi.ChargeReq{
+		PaymentType: coreapi.PaymentTypeBankTransfer,
+		BankTransfer: &coreapi.BankTransferDetails{
+			Bank: midtrans.BankBca,
+		},
+		TransactionDetails: midtrans.TransactionDetails{
+			OrderID:  invoice,
+			GrossAmt: int64(grossAmount),
+		},
+	}
+
+	//chargeResponse
+	resp, err := c.ChargeTransaction(request)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	banks := make([]string, len(resp.VaNumbers))
+	for i, bank := range resp.VaNumbers {
+		banks[i] = bank.Bank
+	}
+	banksStr := strings.Join(banks, ",")
+
+	vaNumbers := make([]string, len(resp.VaNumbers))
+	for i, vaNumber := range resp.VaNumbers {
+		vaNumbers[i] = vaNumber.VANumber
+	}
+	vaNumbersStr := strings.Join(vaNumbers, ",")
+
+	// simpan chargeResponse dalam database
+	payment := transactions.Payment{
+		Transaction_ID:     resp.TransactionID,
+		Order_ID:           resp.OrderID,
+		Gross_Amount:       resp.GrossAmount,
+		Payment_Type:       resp.PaymentType,
+		Bank:               banksStr,
+		Transaction_Time:   resp.TransactionTime,
+		Transaction_Status: resp.TransactionStatus,
+		Va_Numbers:         vaNumbersStr,
+	}
+	result := tr.db.Create(&payment)
+	if result.Error != nil {
+		err := fmt.Errorf("failed to create payment: %v", result.Error)
+		return transactions.Payment{}, err
+	}
+
+	return payment, nil
+}
+
+func (tr *TransactionRepository) GetTransaction(invoice string) (transactions.Transaction, error) {
+	if invoice == "" {
+		return transactions.Transaction{}, errors.New("Missing invoice parameter")
+	}
 	var transaction transactions.Transaction
 	if err := tr.db.
-		Where("transactions.id = ?", transactionid).
+		Where("transactions.invoice = ?", invoice).
 		Preload("Transaction_Tickets").
 		Joins("JOIN users ON users.id = transactions.user_id").
 		Joins("JOIN events ON events.id = transactions.event_id").
@@ -33,11 +93,11 @@ func (tr *TransactionRepository) GetTransaction(transactionid uint) (transaction
 	return transaction, nil
 }
 
-func (tr *TransactionRepository) CreateTransaction(request transactions.Transaction) error {
+func (tr *TransactionRepository) CreateTransaction(request transactions.Transaction) (transactions.Transaction, error) {
 	var err error
 	tx := tr.db.Begin()
 
-	if err := tx.Model(&request).
+	if err = tx.Model(&request).
 		Create(map[string]interface{}{
 			"user_id":             request.UserID,
 			"event_id":            request.EventID,
@@ -50,24 +110,25 @@ func (tr *TransactionRepository) CreateTransaction(request transactions.Transact
 			"payment_method":      request.PaymentMethod,
 		}).Error; err != nil {
 		tx.Rollback()
-		return err
+		return transactions.Transaction{}, err
 	}
 
-	tx.Last(&request)
+	if err = tx.Last(&request).Error; err != nil {
+		tx.Rollback()
+		return transactions.Transaction{}, err
+	}
 
 	for i := range request.Transaction_Tickets {
 		request.Transaction_Tickets[i].TransactionID = request.ID
-		err = tx.Create(&request.Transaction_Tickets[i]).Error
-		if err != nil {
+		if err = tx.Create(&request.Transaction_Tickets[i]).Error; err != nil {
 			tx.Rollback()
-			return err
+			return transactions.Transaction{}, err
 		}
 	}
 
-	err = tx.Commit().Error
-	if err != nil {
-		return err
+	if err = tx.Commit().Error; err != nil {
+		return transactions.Transaction{}, err
 	}
 
-	return nil
+	return request, nil
 }

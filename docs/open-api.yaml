@@ -471,12 +471,12 @@ paths:
     get:
       tags:
         - Transactions
-      summary: Get transactions for an event
-      description: Endpoint to get all transactions for an event
+      summary: Get transactions for an event by invoice
+      description: Endpoint to get transaction detail for an event by invoice
       parameters:
         - name: id
           in: path
-          description: Transaction ID
+          description: Invoice
           required: true
           schema:
             type: integer
@@ -489,6 +489,26 @@ paths:
           $ref: '#/components/responses/Response401'
         '404':
           $ref: '#/components/responses/Response404'
+        '500':
+          $ref: '#/components/responses/Response500'
+      security:
+        - bearerAuth : []
+
+  /payments:
+    post:
+      tags:
+        - Transactions
+      summary: Create a payment for an event that user has already booked
+      description: Endpoint to create a payment for an event that user has already booked
+      requestBody:
+          $ref: '#/components/requestBodies/RequestPaymentCreate'
+      responses:
+        '201':
+          $ref: '#/components/responses/Response200PaymentCreate'
+        '400':
+          $ref: '#/components/responses/Response400'
+        '401':
+          $ref: '#/components/responses/Response401'
         '500':
           $ref: '#/components/responses/Response500'
       security:
@@ -614,6 +634,13 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/RequestTransactionCreate'
+
+    RequestPaymentCreate:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RequestPaymentCreate'
 
     RequestReviewCreate:
       required: true
@@ -884,7 +911,16 @@ components:
               value:
                 code: 201
                 message: Success Created a Transaction
-               
+                data:
+                  invoice: "MT00002570"   
+
+    Response200PaymentCreate:
+      description: Successful for creating a payment
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ResponseTransactionCreate'
+
     Response200TransactionGet:
       description: Successful response for retrieving transactions
       content:
@@ -1526,79 +1562,54 @@ components:
           enum: [credit_card, debit_card, bank_transfer, e-wallet]
           example: "credit_card"
 
+      
+    RequestPaymentCreate:
+      type: object
+      properties:
+        invoice:
+          type: string
+          example: "MT00002570"
+        gross_amount:
+          type: integer
+          example: 300000
 
     ResponseTransactionCreate:
           type: object
           properties:
             code:
               type: integer
-              example: 201
+              example: 200
             message:
               type: string
-              example: "Success created a transaction"
+              example: "Successful Operation"
             data:
               type: object
               properties:
-                invoice:
+                Transaction_ID:
+                  type: string
+                  example: "f839699e-7120-4f71-bf33-09796053fa07"
+                Order_ID:
                   type: string
                   example: "MT00002570"
-                user_id:
-                  type: number
-                  example: 1
-                event_id:
-                  type: number
-                  example: 1
-                event_date:
+                Gross_Amount:
+                  type: string
+                  example: "300000"
+                Payment_Type:
+                  type: string
+                  example: "bank_transfer"
+                Bank:
+                  type: string
+                  example: "bca"
+                Transaction_Time:
                   type: string
                   format: date-time
-                  example: "2023-04-25 10:15:00"
-                purchase_startdate:
-                  type: string
-                  format: date-time
-                  example: "2023-04-16 10:15:00"
-                purchase_enddate:
-                  type: string
-                  format: date-time
-                  example: "2023-04-17 10:15:00"
-                status:
+                  example: "2023-05-04 19:15:36"
+                Transaction_Status:
                   type: string
                   example: "pending"
-                status_date:
+                Va_Numbers:
                   type: string
-                  example: "2023-04-17 10:15:00"
-                items_description:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      ticket_category:
-                        type: string
-                      ticket_quantity:
-                        type: integer
-                      ticket_price:
-                        type: integer
-                      subtotal:
-                        type: integer
-                  example:
-                    - ticket_category: "VIP"
-                      ticket_quantity: 2
-                      ticket_price: 500000
-                      subtotal: 1000000
-                    - ticket_category: "Reguler"
-                      ticket_quantity: 4
-                      ticket_price: 250000
-                      subtotal: 1000000
-                grand_total:
-                  type: number
-                  example: 2000000
-                payment_type:
-                  type: string
-                  enum: [free, paid]
-                  example: "paid"
-                payment_method:
-                  type: string
-                  enum: [credit_card, debit_card, bank_transfer, e-wallet]
-                  example: "credit_card"
+                  example: "43863296105"
 
     ResponseTransactionGet:
       type: object

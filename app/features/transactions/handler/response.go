@@ -30,3 +30,14 @@ type ResponseTickets struct {
 	TicketQuantity uint   `json:"ticket_quantity"`
 	Subtotal       uint   `json:"subtotal"`
 }
+
+type ResponsePayment struct {
+	Transaction_ID     string `json:"transaction_id"`
+	Order_ID           string `json:"order_id"`
+	Gross_Amount       string `json:"gross_amount"`
+	Payment_Type       string `json:"payment_type"`
+	Bank               string `json:"bank"`
+	Transaction_Time   string `json:"transaction_time"`
+	Transaction_Status string `json:"transaction_status"`
+	VA_Numbers         string `json:"va_numbers"`
+}

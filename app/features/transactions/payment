@@ -1,0 +1,22 @@
+// buatkan objek
+// buatkan route
+// buatkan controller
+// letakkan midtrans client config di controller >> create CoreAPI Midtrans Instance
+// ambil serverkey dan client key dari dashboard midtrans
+// setup CoreAPI charge param. request body.
+// charge response , message.
+// jika request terkirim ke midtrans dan menerima respon,
+// declare order_id, ticket_id, nama, dan midtrans_repsonse. JsonStringify. konversi objek json menjadi string.
+// lalu simpan response ke tabel payment.
+
+
+// Element	Description	Type	Required
+// payment_type	The Bank Transfer payment method.	String	Required
+// transaction_details	The details of the transaction like the order_id and gross_amount.	-	Required
+// order_id	The order ID of the transaction.	String	Required
+// gross_amount	The total amount of transaction, defined from your side.	String	Required
+// bank_transfer	The bank transfer details such as name of the bank.	-	Required
+// bank	The name of the acquiring bank which process the transaction.	String	Required
+
+// resp itu tersiri dari banyak bagian, mau ambil dari va_number untuk FE
+// id transaction, va number.

@@ -15,6 +15,7 @@ func Migrate(db *gorm.DB) error {
 		&events.Event{},
 		&transactions.Transaction{},
 		&transactions.Transaction_Tickets{},
+		&transactions.Payment{},
 		&tickets.Ticket{},
 		&reviews.Review{},
 	)

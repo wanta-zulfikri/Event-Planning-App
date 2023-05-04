@@ -7,10 +7,9 @@ import (
 	"github.com/wanta-zulfikri/Event-Planning-App/app/features/transactions"
 	"github.com/wanta-zulfikri/Event-Planning-App/app/features/users"
 	"github.com/wanta-zulfikri/Event-Planning-App/config/common"
-	
+
 	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware" 
-	
+	"github.com/labstack/echo/v4/middleware"
 )
 
 func Route(e *echo.Echo, uc users.Handler, ec events.Handler, tc tickets.Handler, tr transactions.Handler, rc reviews.Handler) {
@@ -38,6 +37,7 @@ func Route(e *echo.Echo, uc users.Handler, ec events.Handler, tc tickets.Handler
 	//transactions
 	e.POST("/transactions", tr.CreateTransaction(), middleware.JWT([]byte(common.JWTSecret)))
 	e.GET("/transactions/:id", tr.GetTransaction(), middleware.JWT([]byte(common.JWTSecret)))
+	e.POST("/payments", tr.Payment(), middleware.JWT([]byte(common.JWTSecret)))
 	//reviews
 	e.POST("/reviews/:id", rc.WriteReview(), middleware.JWT([]byte(common.JWTSecret)))
 	e.PUT("/reviews/:id", rc.UpdateReview(), middleware.JWT([]byte(common.JWTSecret)))

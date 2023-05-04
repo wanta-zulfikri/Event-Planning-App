@@ -33,3 +33,14 @@ type Transaction_Tickets struct {
 	TicketQuantity uint
 	Subtotal       uint
 }
+
+type Payment struct {
+	Transaction_ID     string
+	Order_ID           string
+	Gross_Amount       string
+	Payment_Type       string
+	Bank               string
+	Transaction_Time   string
+	Transaction_Status string
+	Va_Numbers         string
+}

@@ -1,9 +1,11 @@
 package config
 
 import (
+	"log"
 	"os"
 	"sync"
 
+	"github.com/joho/godotenv"
 	"github.com/wanta-zulfikri/Event-Planning-App/config/common"
 )
 
@@ -36,20 +38,10 @@ func GetConfiguration() *Configuration {
 
 func InitConfiguration() *Configuration {
 
-	// err := godotenv.Load()
-	// if err != nil {
-	// 	log.Fatal("Error loading .env file")
-	// }
-
-	// env, err := strconv.Atoi(os.Getenv("Environment"))
-	// if err != nil {
-	// 	log.Fatal("Error parsing Unit: ", err)
-	// }
-
-	// expiryDuration, err := strconv.Atoi(os.Getenv("ExpiryDuration"))
-	// if err != nil {
-	// 	log.Fatal("Error parsing ExpiryDuration: ", err)
-	// }
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
 
 	var defaultConfig Configuration
 	defaultConfig.Port = os.Getenv("AppPort")
@@ -63,50 +55,20 @@ func InitConfiguration() *Configuration {
 	common.ProjectID = os.Getenv("ProjectID")
 	common.BucketName = os.Getenv("BucketName")
 	common.Path = os.Getenv("Path")
-	// common.MIDTRANS_CLIENT_KEY = os.Getenv("MIDTRANS_CLIENT_KEY")
-	// common.MIDTRANS_SERVER_KEY = os.Getenv("MIDTRANS_SERVER_KEY")
-	// common.Environment = env
-	// common.URLHandler = os.Getenv("URLHandler")
-	// common.ExpiryDuration = expiryDuration
-	// common.Unit = os.Getenv("Unit")
+	common.MidstransServerKey = os.Getenv("MidstransServerKey")
 
 	return &defaultConfig
 
 }
 
-type NSQConfig struct {
-	Host     string `mapstructure:"HOST"`
-	Port     string `mapstructure:"PORT"`
-	Topic    string `mapstructure:"TOPIC"`
-	Channel  string `mapstructure:"CHANNEL"`
-	Topic2   string `mapstructure:"TOPIC2"`
-	Channel2 string `mapstructure:"CHANNEL2"`
-	Topic3   string `mapstructure:"TOPIC3"`
-	Channel3 string `mapstructure:"CHANNEL3"`
-	Topic4   string `mapstructure:"TOPIC4"`
-	Channel4 string `mapstructure:"CHANNEL4"`
-}
-
 type SenderConfig struct {
-	Email     string `mapstructure:"EMAIL"`
-	Password  string `mapstructure:"PASSWORD"`
-	Phone     string `mapstructure:"PHONE"`
-	Name      string `mapstructure:"NAME"`
-	Address   string `mapstructure:"ADDRESS"`
-	Slogan    string `mapstructure:"SLOGAN"`
-	Twitter   string `mapstructure:"TWTR"`
-	Instagram string `mapstructure:"IG"`
-	Facebook  string `mapstructure:"FB"`
+	Email     string
+	Password  string
+	Phone     string
+	Name      string
+	Address   string
+	Slogan    string
+	Twitter   string
+	Instagram string
+	Facebook  string
 }
-
-type (
-	Data struct {
-		Invoice       string `json:"invoice"`
-		Total         int    `json:"total"`
-		Name          string `json:"name"`
-		Email         string `json:"email"`
-		PaymentCode   string `json:"payment_code"`
-		PaymentMethod string `json:"payment_method"`
-		Expire        string `json:"expire"`
-	}
-)
