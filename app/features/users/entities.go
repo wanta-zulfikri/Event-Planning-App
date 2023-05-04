@@ -14,7 +14,7 @@ type Core struct {
 	Password     string
 	Image        string
 	Events       []events.Core
-	Transactions []transactions.Transaction `gorm:"foreignKey:UserID"`
+	Transactions []transactions.Transaction `gorm:"foreignKey:UserID"` 
 }
 
 type Repository interface {
