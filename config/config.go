@@ -58,15 +58,3 @@ func InitConfiguration() *Configuration {
 	return &defaultConfig
 
 }
-
-type SenderConfig struct {
-	Email     string
-	Password  string
-	Phone     string
-	Name      string
-	Address   string
-	Slogan    string
-	Twitter   string
-	Instagram string
-	Facebook  string
-}
