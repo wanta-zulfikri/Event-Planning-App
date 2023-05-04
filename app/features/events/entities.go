@@ -68,7 +68,7 @@ type Repository interface {
 	GetEventsByCategory(category string) ([]Event, error)
 	GetEventsByUserID(userid uint) ([]Event, error)
 	GetEvent(eventid uint) (Core, error)
-	UpdateEvent(id uint, updatedEvent Event) error
+	UpdateEvent(id uint, updatedEvent Core) error
 	DeleteEvent(id uint) error
 }
 
@@ -78,7 +78,7 @@ type Service interface {
 	GetEventsByCategory(category string) ([]Event, error)
 	GetEventsByUserID(userid uint) ([]Event, error)
 	GetEvent(eventid uint) (Core, error)
-	UpdateEvent(id uint, updatedEvent Event) error
+	UpdateEvent(id uint, updatedEvent Core) error
 	DeleteEvent(id uint) error
 }
 
