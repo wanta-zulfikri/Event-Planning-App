@@ -56,7 +56,7 @@ func (es *EventService) GetEvent(eventid uint) (events.Core, error) {
 	return event, nil
 }
 
-func (es *EventService) UpdateEvent(id uint, updatedEvent events.Core) error {
+func (es *EventService) UpdateEvent(id uint, updatedEvent events.Event) error {
 	updatedEvent.ID = id
 	if err := es.r.UpdateEvent(id, updatedEvent); err != nil {
 		return err

@@ -41,16 +41,6 @@ func InitConfiguration() *Configuration {
 	// 	log.Fatal("Error loading .env file")
 	// }
 
-	// env, err := strconv.Atoi(os.Getenv("Environment"))
-	// if err != nil {
-	// 	log.Fatal("Error parsing Unit: ", err)
-	// }
-
-	// expiryDuration, err := strconv.Atoi(os.Getenv("ExpiryDuration"))
-	// if err != nil {
-	// 	log.Fatal("Error parsing ExpiryDuration: ", err)
-	// }
-
 	var defaultConfig Configuration
 	defaultConfig.Port = os.Getenv("AppPort")
 	defaultConfig.Database.Host = os.Getenv("Host")

@@ -133,7 +133,7 @@ func (er *EventRepository) GetEvent(eventid uint) (events.Core, error) {
 	return response, nil
 }
 
-func (er *EventRepository) UpdateEvent(id uint, updatedEvent events.Core) error {
+func (er *EventRepository) UpdateEvent(id uint, updatedEvent events.Event) error {
 	if err := er.db.Model(&Event{}).Where("id = ?", id).Updates(map[string]interface{}{
 		"title":       updatedEvent.Title,
 		"description": updatedEvent.Description,

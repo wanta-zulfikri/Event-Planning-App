@@ -336,7 +336,7 @@ func (ec *EventController) UpdateEvent() echo.HandlerFunc {
 			}
 		}
 
-		updatedEvent := events.Core{
+		updatedEvent := events.Event{
 			ID:          uint(id),
 			Title:       input.Title,
 			Description: input.Description,
