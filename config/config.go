@@ -1,11 +1,9 @@
 package config
 
 import (
-	"log"
 	"os"
 	"sync"
 
-	"github.com/joho/godotenv"
 	"github.com/wanta-zulfikri/Event-Planning-App/config/common"
 )
 
